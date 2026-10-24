@@ -38,6 +38,9 @@ else
     --admin_email="$WP_ADMIN_EMAIL" --skip-email
 fi
 
+# Pretty permalinks: archives such as /properties/ return 404 with the default plain structure.
+wp rewrite structure '/%postname%/' >/dev/null
+
 if [ -f ../frontend/luton-homes/style.css ]; then
   wp theme activate luton-homes
 else
