@@ -40,15 +40,24 @@ Docs/architecture.md                       text copy of the architecture page
 Docs/decisions/0001-classic-wordpress.md
 Docs/brand/brand-brief.md
 Docs/channels/{whatsapp-catalogue,facebook,instagram,google-business}.md
+Docs/design/home-page.md
 docker/docker-compose.yml
 docker/.env.example
 docker/setup.sh                            install WordPress, activate theme and plugin, seed
 frontend/luton-homes/{style.css,functions.php,index.php,header.php,footer.php}
+frontend/luton-homes/front-page.php
+frontend/luton-homes/template-parts/property-card.php
+frontend/luton-homes/assets/js/whatsapp-search.js
+frontend/luton-homes/assets/fonts/
 backend/luton-homes-core/luton-homes-core.php
 backend/luton-homes-core/seed/properties.json
 backend/luton-homes-core/seed/seed-properties.sh
+backend/luton-homes-core/seed/seed-properties.php
 tests/run.sh                               runs every tests/checks/*.sh, non-zero on any failure
 tests/checks/{t1-baseline,t2-stack,t3-theme,t4-plugin,t5-seed,t6-channels}.sh
+tests/checks/t7-home.sh
+tests/js/whatsapp-search.test.js
+tests/wp/test-property-type.php
 ```
 
 ---
@@ -165,6 +174,10 @@ tests/checks/{t1-baseline,t2-stack,t3-theme,t4-plugin,t5-seed,t6-channels}.sh
 ### Task 8: Clickable prototype on Vercel (deferred)
 
 Not detailed here on purpose: it depends on the client's model design, which has not been received. When it arrives I will append this task to the plan as an amendment, covering `frontend/prototype/` (static pages built from shared partials, one `properties.json`-shaped data source) and the Vercel preview deploy with its root directory set to `frontend/prototype`.
+
+### Amendment: Task 6b (home page design v1)
+
+Built before the client's model design arrived. The spec is `Docs/design/home-page.md`. Until a booking engine exists, guests ask about dates through a WhatsApp message built by the home page search card. The home page may be redone to match the model design when it arrives.
 
 ---
 

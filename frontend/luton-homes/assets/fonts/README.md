@@ -11,4 +11,4 @@ Self-hosted so the site makes no request to Google at page load (UK GDPR).
 Source: Google Fonts, downloaded from the `latin` subset of
 `https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,700&family=Atkinson+Hyperlegible:wght@400;700`.
 
-Both families are licensed under the SIL Open Font License 1.1.
+Both families are licensed under the SIL Open Font License 1.1. The licence texts shipped with the fonts are `OFL-Archivo.txt` and `OFL-AtkinsonHyperlegible.txt` in this folder, copied from the `ofl/` folder of the google/fonts repository.

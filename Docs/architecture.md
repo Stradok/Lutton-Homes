@@ -4,10 +4,11 @@
 
 Phase 1 delivers one brand, one website and one booking system for five short-stay properties near Luton Airport, so more guests book direct instead of through Booking.com.
 
-**Status of this page.** Design only. No code exists yet. This page covers Phase 1 only, as scoped in the requirements document (September 2026). Later phases are listed but not designed here. Badges used: **[Doc]** stated in the requirements document, **[Proposal]** my recommendation, **[Unverified]** a claim I have not checked.
+**Status of this page.** Stage 1 has a working local build (see [Stage 1 build status](#stage-1-build-status)). This page describes the Phase 1 design plus that status. It covers Phase 1 only, as scoped in the requirements document (September 2026). Later phases are listed but not designed here. Badges used: **[Doc]** stated in the requirements document, **[Proposal]** my recommendation, **[Unverified]** a claim I have not checked.
 
 Contents:
 
+- [Stage 1 build status](#stage-1-build-status)
 - [What the project is](#what-the-project-is)
 - [Phase 1 deliverables](#phase-1-deliverables)
 - [Requirements at a glance](#requirements-at-a-glance)
@@ -19,6 +20,29 @@ Contents:
 - [Boundaries and risks](#boundaries-and-risks)
 - [Phase 1 plan and gates](#phase-1-plan-and-gates)
 - [Open questions](#open-questions)
+
+---
+
+## Stage 1 build status
+
+**Built**
+
+- Local Docker stack (WordPress, MariaDB, WP-CLI) started by `docker/setup.sh`.
+- Theme `frontend/luton-homes/`: home page v1 with a hero and WhatsApp search card, five property tiles, a why-direct band, a contact band and a footer; fonts self-hosted.
+- Plugin `backend/luton-homes-core/` registering the `property` post type with six `lh_` meta fields.
+- Seed that creates five placeholder properties as drafts.
+- Seven automated checks, run by `bash tests/run.sh` (needs Docker, Node and curl).
+- Brand brief and four channel drafts in `Docs/brand/` and `Docs/channels/`.
+- Home page design v1 in `Docs/design/home-page.md`.
+
+**Not built yet**
+
+- Booking engine, payments and the channel manager link.
+- Individual property pages, and About, Contact, FAQ and legal pages.
+- Reviews, 301 redirects, analytics and production hosting.
+- The Vercel prototype and logo files.
+
+Until a booking engine exists, guests ask about dates through a WhatsApp message built by the home page search card.
 
 ---
 
@@ -142,7 +166,7 @@ Key to the diagram. Social channels (WhatsApp Business, Facebook Page, Instagram
 | Component | Responsibility | Status |
 |---|---|---|
 | Channel manager | Calendar, rates, Booking.com and Airbnb sync, booking engine. Must be a certified Booking.com connectivity partner. Candidates named: eviivo, Lodgify, Smoobu, Beds24, Hostaway. | Not chosen |
-| Website (WordPress) | Pages, content, SEO, embedded booking engine, WhatsApp click-to-chat button. Owners edit text, photos and prices without a developer. | WordPress proposed; theme custom or premade, to follow a model design the client will provide |
+| Website (WordPress) | Pages, content, SEO, embedded booking engine, WhatsApp click-to-chat button. Owners edit text, photos and prices without a developer. | Interim custom theme v1 (Docs/design/home-page.md); the client's model design may replace it |
 | Booking engine | Live availability, price breakdown, per-property rules. Preferred: the channel manager's own engine embedded in the site. A standalone WordPress plugin is acceptable only if it syncs two-way with the channel manager. | Open, see The sync decision |
 | Payment provider | Card, Apple Pay and Google Pay, refunds, 3D Secure. Card details stay with the provider (PCI DSS). Account in Luton Homes' name. | Stripe or Revolut, undecided |
 | Booking.com and Airbnb | Sales channels kept in step by the channel manager's certified connection, not iCal alone. | Booking.com exists; Airbnb optional |
@@ -322,10 +346,10 @@ The decision for the owners: which channel manager, and whether to follow the br
 ### Raised while reading **[Proposal]**
 
 - Which second channel manager is in use today, and is The Garden Nest already on Booking.com?
-- Which theme route: custom design or a premade theme, following the model design the client will provide?
+- An interim custom theme exists (v1, see Docs/design/home-page.md). The model design from the client is still awaited, and it may replace the theme.
 - Where do automatic guest messages run: the channel manager, WhatsApp or the website?
 - Which sync route, B or C?
 
 ---
 
-*Source: Luton Homes - Project Requirements (September 2026), Phase 1 scope. No code exists yet; this page describes a design, not a built system.*
+*Source: Luton Homes - Project Requirements (September 2026), Phase 1 scope. Stage 1 has a working local build; this page describes the design plus that build status.*
