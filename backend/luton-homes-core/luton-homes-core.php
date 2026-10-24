@@ -76,9 +76,13 @@ function lh_register_property_meta() {
 }
 add_action( 'init', 'lh_register_property_meta' );
 
-// Non-numeric input becomes an empty string rather than 0.
+// Non-numeric, negative, infinite and NaN input becomes an empty string rather than 0 or a float the site cannot show.
 function lh_sanitize_price( $value ) {
-	return is_numeric( $value ) ? (float) $value : '';
+	if ( ! is_numeric( $value ) ) {
+		return '';
+	}
+	$price = (float) $value;
+	return is_finite( $price ) && $price >= 0 ? $price : '';
 }
 
 function lh_activate() {

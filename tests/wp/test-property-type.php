@@ -27,6 +27,13 @@ function lh_test_registration() {
 	}
 }
 
+function lh_test_price_sanitiser() {
+	foreach ( array( -5, 'abc', INF, NAN ) as $bad ) {
+		lh_test_check( '' === lh_sanitize_price( $bad ), 'lh_sanitize_price returns empty for ' . var_export( $bad, true ) );
+	}
+	lh_test_check( 120.5 === lh_sanitize_price( '120.5' ), "lh_sanitize_price keeps '120.5' as the float 120.5" );
+}
+
 function lh_test_round_trip() {
 	$post_id = wp_insert_post(
 		array(
@@ -64,6 +71,7 @@ function lh_test_round_trip() {
 
 try {
 	lh_test_registration();
+	lh_test_price_sanitiser();
 	lh_test_round_trip();
 } catch ( RuntimeException $e ) {
 	fwrite( STDERR, 'FAIL: ' . $e->getMessage() . PHP_EOL );

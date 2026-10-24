@@ -24,6 +24,27 @@ function lh_whatsapp_url( string $text = '' ): string {
 	return '' === $text ? $url : $url . '?text=' . rawurlencode( $text );
 }
 
+// Raw title: no "Protected:" prefix or texturizing. Stored entities are decoded once; the result is plain text, escaped by the caller for HTML.
+function lh_post_title( int $post_id ): string {
+	return html_entity_decode( wp_strip_all_tags( get_post_field( 'post_title', $post_id ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+}
+
+// Trimmed meta text, or '' when unset or the seed placeholder. The placeholder is never shown on the site.
+function lh_property_text( int $post_id, string $key ): string {
+	$value = trim( (string) get_post_meta( $post_id, $key, true ) );
+	return 'PLACEHOLDER' === $value ? '' : $value;
+}
+
+// The display price only when it is a positive finite number. Null means "not set" (empty, zero or negative).
+function lh_property_price( int $post_id ): ?float {
+	$price = get_post_meta( $post_id, 'lh_price_from', true );
+	if ( ! is_numeric( $price ) ) {
+		return null;
+	}
+	$price = (float) $price;
+	return is_finite( $price ) && $price > 0 ? $price : null;
+}
+
 function lh_enqueue_scripts() {
 	if ( ! is_front_page() ) {
 		return;

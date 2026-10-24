@@ -81,7 +81,7 @@ footer_html=$(sed -n '/<footer/,/<\/footer>/p' <<<"$html")
 
 grep -qF 'href="https://wa.me/447934586612"' <<<"$header_html" \
   || { echo "  header lacks the WhatsApp link https://wa.me/447934586612"; fail=1; }
-grep -qF '>Message us on WhatsApp</a>' <<<"$header_html" \
+grep -qF '<span class="lh-cta-long">Message us on WhatsApp</span>' <<<"$header_html" \
   || { echo "  header lacks the button \"Message us on WhatsApp\""; fail=1; }
 grep -qF 'href="https://wa.me/447934586612"' <<<"$contact_html" \
   || { echo "  contact band lacks the WhatsApp link https://wa.me/447934586612"; fail=1; }
@@ -120,7 +120,7 @@ else
 fi
 
 if [ -n "$tmp_id" ]; then
-  need '<h3 class="lh-home-name">Tom &amp; Jerry&#039;s &quot;Place&quot; é</h3>' 'temporary tile name, decoded once and escaped for HTML'
+  need "<h3 class=\"lh-home-name\"><a href=\"http://localhost:$port/properties/lhtest-entity/\">Tom &amp; Jerry&#039;s &quot;Place&quot; é</a></h3>" 'temporary tile name link, decoded once and escaped for HTML'
   need 'href="https://wa.me/447934586612?text=Hello%20Luton%20Homes%2C%20I%20am%20interested%20in%20Tom%20%26%20Jerry%27s%20%22Place%22%20%C3%A9."' 'temporary tile link with the single-encoded message'
 fi
 grep -qE 'href="https://wa\.me/[^"]*(%26%23|%26amp%3B)' <<<"$html" \

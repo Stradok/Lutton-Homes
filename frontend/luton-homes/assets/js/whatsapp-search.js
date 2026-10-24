@@ -4,6 +4,7 @@
 const LH_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const LH_DATE_ERROR = 'Choose a check-out date after your check-in date.';
 const LH_GUESTS_ERROR = 'Enter a whole number of guests, 1 or more.';
+const LH_PAST_ERROR = 'Choose a check-in date from today onwards.';
 
 function lhIsDate(value) {
 	if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -32,6 +33,11 @@ function lhParseGuests(value) {
 	return Number.isSafeInteger(n) && n >= 1 ? n : null;
 }
 
+// True when checkin is an earlier valid YYYY-MM-DD date than todayIso. Invalid input is never "past".
+function lhIsPast(checkin, todayIso) {
+	return lhIsDate(checkin) && lhIsDate(todayIso) && checkin < todayIso;
+}
+
 function buildWhatsAppUrl(number, checkin, checkout, guests) {
 	const n = lhParseGuests(guests);
 	if (n === null || !lhIsDate(checkin) || !lhIsDate(checkout) || checkout <= checkin) {
@@ -50,6 +56,14 @@ if (typeof document !== 'undefined') {
 		const guests = document.getElementById('lh-guests');
 		const error = document.getElementById('lh-search-error');
 
+		// The local calendar date, not the UTC date.
+		const lhTodayIso = () => {
+			const now = new Date();
+			const pad = (n) => String(n).padStart(2, '0');
+			return now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+		};
+		checkin.min = lhTodayIso();
+
 		checkin.addEventListener('change', () => {
 			checkout.min = checkin.value;
 		});
@@ -59,6 +73,10 @@ if (typeof document !== 'undefined') {
 			error.textContent = '';
 			if (lhParseGuests(guests.value) === null) {
 				error.textContent = LH_GUESTS_ERROR;
+				return;
+			}
+			if (lhIsPast(checkin.value, lhTodayIso())) {
+				error.textContent = LH_PAST_ERROR;
 				return;
 			}
 			const url = buildWhatsAppUrl(form.dataset.whatsappNumber, checkin.value, checkout.value, guests.value);
@@ -78,5 +96,5 @@ if (typeof document !== 'undefined') {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-	module.exports = { buildWhatsAppUrl };
+	module.exports = { buildWhatsAppUrl, lhIsPast };
 }

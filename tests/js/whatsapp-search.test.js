@@ -4,7 +4,7 @@
 const assert = require('node:assert');
 const path = require('node:path');
 
-const { buildWhatsAppUrl } = require(path.join(
+const { buildWhatsAppUrl, lhIsPast } = require(path.join(
   __dirname, '..', '..', 'frontend', 'luton-homes', 'assets', 'js', 'whatsapp-search.js'
 ));
 
@@ -145,6 +145,34 @@ check('uses the singular "guest" for guests 1 given as a string', () => {
 		buildWhatsAppUrl(NUMBER, '2026-11-12', '2026-11-15', '1'),
 		message('Hello Luton Homes, I would like to check availability from 12 Nov 2026 to 15 Nov 2026 for 1 guest.')
 	);
+});
+
+check('lhIsPast is true for a check-in the day before today', () => {
+	assert.strictEqual(lhIsPast('2026-10-23', '2026-10-24'), true);
+});
+
+check('lhIsPast is false for a check-in today', () => {
+	assert.strictEqual(lhIsPast('2026-10-24', '2026-10-24'), false);
+});
+
+check('lhIsPast is false for a check-in tomorrow', () => {
+	assert.strictEqual(lhIsPast('2026-10-25', '2026-10-24'), false);
+});
+
+check('lhIsPast compares across a year boundary', () => {
+	assert.strictEqual(lhIsPast('2026-12-31', '2027-01-01'), true);
+	assert.strictEqual(lhIsPast('2027-01-01', '2026-12-31'), false);
+});
+
+check('lhIsPast is false when the check-in is not a valid date', () => {
+	assert.strictEqual(lhIsPast('', '2026-10-24'), false);
+	assert.strictEqual(lhIsPast('24/10/2026', '2026-10-24'), false);
+	assert.strictEqual(lhIsPast('2026-02-30', '2026-10-24'), false);
+	assert.strictEqual(lhIsPast(undefined, '2026-10-24'), false);
+});
+
+check('lhIsPast is false when today is not a valid date', () => {
+	assert.strictEqual(lhIsPast('2026-10-23', 'not a date'), false);
 });
 
 if (failed > 0) {
