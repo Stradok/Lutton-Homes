@@ -1,0 +1,7 @@
+.env
+docker/.env
+node_modules/
+.DS_Store
+*.log
+.vercel/
+.superpowers/
