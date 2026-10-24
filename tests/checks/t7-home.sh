@@ -28,7 +28,7 @@ done
 
 # The ampersand, apostrophe, double quotes and accent are the cases the entity fix must get right.
 entity_title='Tom &amp; Jerry'\''s "Place" é'
-tmp_id=$(wpcli post create --post_type=property --post_status=publish --post_title="$entity_title" --porcelain)
+tmp_id=$(wpcli post create --post_type=property --post_status=publish --post_title="$entity_title" --post_name=lhtest-entity --porcelain)
 if [[ "$tmp_id" =~ ^[0-9]+$ ]]; then
   tmp_ids+=("$tmp_id")
 else
@@ -88,6 +88,8 @@ grep -qF 'href="https://wa.me/447934586612"' <<<"$contact_html" \
 grep -qF '>Message us on WhatsApp</a>' <<<"$contact_html" \
   || { echo "  contact band lacks the button \"Message us on WhatsApp\""; fail=1; }
 
+grep -qF 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.' <<<"$footer_html" \
+  || { echo "  footer lacks the canonical description"; fail=1; }
 grep -qF '34 Beaconsfield, Luton LU2 0RW' <<<"$footer_html" \
   || { echo "  footer lacks the address 34 Beaconsfield, Luton LU2 0RW"; fail=1; }
 year=$(date +%Y)

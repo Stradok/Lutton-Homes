@@ -41,6 +41,15 @@ fi
 # Pretty permalinks: archives such as /properties/ return 404 with the default plain structure.
 wp rewrite structure '/%postname%/' >/dev/null
 
+# Blocks the admin theme and plugin editor, which would write into the bind-mounted repository files.
+wp config set DISALLOW_FILE_EDIT true --raw >/dev/null
+
+# Tagline: set only while empty or still WordPress's default, so a value an owner set is kept.
+tagline=$(wp option get blogdescription)
+if [ -z "$tagline" ] || [ "$tagline" = 'Just another WordPress site' ]; then
+  wp option update blogdescription 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.' >/dev/null
+fi
+
 if [ -f ../frontend/luton-homes/style.css ]; then
   wp theme activate luton-homes
 else

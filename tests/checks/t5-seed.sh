@@ -2,7 +2,8 @@
 # Task 5 seed: setup.sh leaves exactly the five canonical properties (any status: owners may publish
 # them), a second run changes nothing, re-running the seed keeps an owner edit, a seed run creates new
 # entries as drafts (checked on throwaway t5-draft-* posts), and bad seed input creates nothing. Deletes
-# no real property and leaves properties.json untouched (needs docker/.env and a running stack).
+# no real property (only t5-draft-* and lhtest-* posts) and leaves properties.json untouched (needs
+# docker/.env and a running stack).
 cd "$(dirname "$0")/../.." || exit 1
 fail=0
 compose=(docker compose -f docker/docker-compose.yml --env-file docker/.env --profile tools)
@@ -18,10 +19,10 @@ wpcli() { "${compose[@]}" run --rm -T wpcli wp "$@"; }
 titles() { wpcli post list --post_type=property --post_status=any --field=post_title 2>/dev/null | LC_ALL=C sort; }
 count() { titles | grep -c . ; }
 temp_ids() { wpcli post list --post_type=property --post_status=any --name=t5-temp --format=ids 2>/dev/null; }
-# Only test-owned posts: slugs t5-draft-*. The real properties never match this prefix.
-draft_ids() { wpcli post list --post_type=property --post_status=any --fields=ID,post_name --format=csv 2>/dev/null | awk -F, '$2 ~ /^t5-draft-/ {print $1}'; }
-delete_drafts() {
-  ids=$(draft_ids)
+# Only test-owned posts: slugs t5-draft-* or lhtest-*. The real properties never match these prefixes.
+test_ids() { wpcli post list --post_type=property --post_status=any --fields=ID,post_name --format=csv 2>/dev/null | awk -F, '$2 ~ /^(t5-draft-|lhtest-)/ {print $1}'; }
+delete_test_posts() {
+  ids=$(test_ids)
   # shellcheck disable=SC2086
   [ -z "$ids" ] || wpcli post delete $ids --force >/dev/null 2>&1
 }
@@ -33,12 +34,12 @@ cleanup() {
   ids=$(temp_ids)
   # shellcheck disable=SC2086
   [ -z "$ids" ] || wpcli post delete $ids --force >/dev/null 2>&1
-  delete_drafts
+  delete_test_posts
 }
 trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
-delete_drafts # leftovers from an interrupted run would break the canonical-title check
+delete_test_posts # leftovers from an interrupted run would break the canonical-title check
 
 # (a) setup.sh seeds exactly the five canonical titles (any status; owners may publish them)
 out=$(bash docker/setup.sh 2>&1) || { echo "  docker/setup.sh failed: $out"; exit 1; }

@@ -5,7 +5,7 @@
 # carries a parenthesised note. The catalogue names the five sub-brands in full (BR-03) and has at least 10
 # placeholders. The Instagram bio line is at most 150 characters. The brand brief carries the canonical
 # description, address and catalogue link.
-# Optional overrides (used by the mutation check only): CHANNELS_DIR (default Docs/channels) and
+# Optional overrides: CHANNELS_DIR (default Docs/channels) and
 # BRAND_BRIEF (default Docs/brand/brand-brief.md). Prints nothing on success, one line per failed
 # assertion otherwise, exits 1 on any failure. Needs no Docker.
 cd "$(dirname "$0")/../.." || exit 1

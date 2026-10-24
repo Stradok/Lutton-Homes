@@ -43,6 +43,10 @@ function lh_register_property_meta() {
 		'lh_map_url'          => 'esc_url_raw',
 		'lh_airport_distance' => 'sanitize_text_field',
 	);
+	$descriptions = array(
+		'lh_amenities'   => 'Display text only. Do not enter booking rules or availability here.',
+		'lh_house_rules' => 'Display text only. Do not enter booking rules here (minimum stay, maximum guests, check-in or check-out times): those live in the channel manager.',
+	);
 	foreach ( $string_meta as $key => $sanitize ) {
 		register_post_meta(
 			'property',
@@ -50,6 +54,7 @@ function lh_register_property_meta() {
 			array(
 				'single'            => true,
 				'type'              => 'string',
+				'description'       => $descriptions[ $key ] ?? '',
 				'show_in_rest'      => true,
 				'sanitize_callback' => $sanitize,
 				'auth_callback'     => $auth,

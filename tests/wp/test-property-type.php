@@ -33,6 +33,7 @@ function lh_test_round_trip() {
 			'post_type'   => 'property',
 			'post_status' => 'publish',
 			'post_title'  => 'Luton Homes test property',
+			'post_name'   => 'lhtest-property',
 		),
 		true
 	);
