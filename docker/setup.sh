@@ -53,4 +53,11 @@ else
   echo "skipped: luton-homes-core not present yet"
 fi
 
+# Seeds only when the plugin is active: the seed needs its post type. A failing seed fails setup.
+if wp plugin is-active luton-homes-core >/dev/null 2>&1; then
+  bash ../backend/luton-homes-core/seed/seed-properties.sh
+else
+  echo "skipped: seed (plugin not active)"
+fi
+
 echo "Site: http://localhost:$port  (admin login: WP_ADMIN_USER / WP_ADMIN_PASSWORD in docker/.env)"

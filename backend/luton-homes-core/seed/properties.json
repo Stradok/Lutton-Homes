@@ -1,0 +1,62 @@
+[
+  {
+    "title": "EasyStay",
+    "slug": "easystay",
+    "meta": {
+      "lh_price_from": null,
+      "lh_beds": "PLACEHOLDER",
+      "lh_amenities": "PLACEHOLDER",
+      "lh_house_rules": "PLACEHOLDER",
+      "lh_map_url": "",
+      "lh_airport_distance": "PLACEHOLDER"
+    }
+  },
+  {
+    "title": "Luton Lodge",
+    "slug": "luton-lodge",
+    "meta": {
+      "lh_price_from": null,
+      "lh_beds": "PLACEHOLDER",
+      "lh_amenities": "PLACEHOLDER",
+      "lh_house_rules": "PLACEHOLDER",
+      "lh_map_url": "",
+      "lh_airport_distance": "PLACEHOLDER"
+    }
+  },
+  {
+    "title": "EasyStay Studio",
+    "slug": "easystay-studio",
+    "meta": {
+      "lh_price_from": null,
+      "lh_beds": "PLACEHOLDER",
+      "lh_amenities": "PLACEHOLDER",
+      "lh_house_rules": "PLACEHOLDER",
+      "lh_map_url": "",
+      "lh_airport_distance": "PLACEHOLDER"
+    }
+  },
+  {
+    "title": "The Garden Studio",
+    "slug": "the-garden-studio",
+    "meta": {
+      "lh_price_from": null,
+      "lh_beds": "PLACEHOLDER",
+      "lh_amenities": "PLACEHOLDER",
+      "lh_house_rules": "PLACEHOLDER",
+      "lh_map_url": "",
+      "lh_airport_distance": "PLACEHOLDER"
+    }
+  },
+  {
+    "title": "The Garden Nest",
+    "slug": "the-garden-nest",
+    "meta": {
+      "lh_price_from": null,
+      "lh_beds": "PLACEHOLDER",
+      "lh_amenities": "PLACEHOLDER",
+      "lh_house_rules": "PLACEHOLDER",
+      "lh_map_url": "",
+      "lh_airport_distance": "PLACEHOLDER"
+    }
+  }
+]
