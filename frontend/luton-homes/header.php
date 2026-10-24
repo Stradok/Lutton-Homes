@@ -10,3 +10,13 @@ defined( 'ABSPATH' ) || exit;
 </head>
 <body <?php body_class( 'lh-theme' ); ?>>
 <?php wp_body_open(); ?>
+<a class="lh-skip-link" href="#content">Skip to content</a>
+<header class="lh-header">
+	<a class="lh-wordmark" href="<?php echo esc_url( home_url( '/' ) ); ?>">Luton Homes</a>
+	<nav class="lh-nav" aria-label="Main">
+		<a href="#homes">Homes</a>
+		<a href="#why-direct">Why book direct</a>
+		<a href="#contact">Contact</a>
+	</nav>
+	<a class="lh-button lh-button--primary lh-header-cta" href="<?php echo esc_url( lh_whatsapp_url() ); ?>">Message us on WhatsApp</a>
+</header>
