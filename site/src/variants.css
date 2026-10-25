@@ -1,0 +1,202 @@
+/* Home page design variants (index.html only). The default sky design has no rules here. */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Night to dawn. Night sits under the clouds, a veil dims them; the lights come on when the counter reaches 100. */
+[data-design="dawn"] .hero::before {
+	content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+	background: linear-gradient(180deg, var(--lh-ink) 0%, var(--lh-ink-2) 100%);
+	opacity: 0; transition: opacity 900ms var(--ease-in-out);
+}
+[data-design="dawn"] .hero-sky::after {
+	content: ""; position: absolute; inset: 0; pointer-events: none;
+	background: var(--lh-ink); opacity: 0; transition: opacity 900ms var(--ease-in-out);
+}
+/* Night while the intro runs. The fallback clears it after 2.5s if variants.js never runs. */
+[data-design="dawn"].dawn-pending .hero::before { opacity: 1; animation: dawn-out 0s 2.5s forwards; }
+[data-design="dawn"].dawn-pending .hero-sky::after { opacity: 0.75; animation: dawn-out 0s 2.5s forwards; }
+@keyframes dawn-out { to { opacity: 0; } }
+
+[data-design="dawn"] .dawn-count {
+	position: absolute; left: var(--lh-edge); bottom: 8vh; z-index: 2; margin: 0;
+	font-family: var(--lh-font-head); font-weight: 700; font-stretch: 112%; line-height: 1;
+	font-size: clamp(4rem, 16vw, 11rem); font-variant-numeric: tabular-nums;
+	color: var(--lh-paper); transition: opacity 400ms var(--ease-out);
+}
+[data-design="dawn"] .dawn-count.is-out { opacity: 0; }
+[data-design="dawn"] .dawn-frame {
+	position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none;
+	fill: none; stroke: var(--lh-paper); stroke-width: 1.5;
+	transition: opacity 600ms var(--ease-out), stroke 600ms var(--ease-out);
+}
+[data-design="dawn"] .dawn-frame rect { stroke-dasharray: 1; }
+[data-design="dawn"] .dawn-frame.is-done { opacity: 0.35; stroke: var(--lh-ink); }
+
+/* Hero content waits for the intro (dawn-go). Without JS the fallback reveals it at 2.5s. */
+[data-design="dawn"]:not(.dawn-go) :is(.hero-copy h1, .hero .lead, .search-card) { opacity: 0; animation: reveal-fallback 0s 2.5s forwards; }
+[data-design="dawn"].dawn-go .hero-copy h1 { animation: rise 700ms var(--ease-out) 0s both; }
+[data-design="dawn"].dawn-go .hero .lead { animation: rise 700ms var(--ease-out) 80ms both; }
+[data-design="dawn"].dawn-go .search-card { animation: rise 700ms var(--ease-out) 160ms both; }
+
+/* Orbit to your door. A night first screen with the Earth rising behind the copy, a descent, then the homes. */
+[data-design="orbit"] .hero { color: var(--lh-paper); background: linear-gradient(180deg, var(--lh-ink) 0%, var(--lh-ink-2) 100%); }
+[data-design="orbit"] .hero h1 { color: var(--lh-paper); }
+[data-design="orbit"] .hero .lead { color: var(--lh-sky); }
+[data-design="orbit"] .hero :focus-visible { outline-color: var(--lh-amber); box-shadow: none; }
+/* Stars: a fine still layer on the hero, and a larger layer that twinkles by opacity only. */
+[data-design="orbit"] .hero::before {
+	content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.85;
+	background-image:
+		radial-gradient(1px 1px at 18px 34px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 96px 12px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 150px 70px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 214px 46px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 54px 150px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 122px 128px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 190px 186px, var(--lh-paper) 50%, transparent 100%);
+	background-size: 240px 240px;
+}
+[data-design="orbit"] .hero-sky::before {
+	content: ""; position: absolute; inset: 0; pointer-events: none;
+	background-image:
+		radial-gradient(1.5px 1.5px at 40px 60px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 170px 22px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(2px 2px at 300px 96px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 88px 190px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 250px 260px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 330px 320px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 140px 300px, var(--lh-paper) 50%, transparent 100%);
+	background-size: 360px 360px;
+	animation: twinkle 7s ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.3; } to { opacity: 1; } }
+/* Ink behind the copy so the headline and card sit on a calm dark field, not on the lights of the Earth. */
+[data-design="orbit"] .hero::after {
+	content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+	background: linear-gradient(90deg, color-mix(in srgb, var(--lh-ink) 92%, transparent) 0%, color-mix(in srgb, var(--lh-ink) 60%, transparent) 38%, transparent 66%);
+}
+@media (max-width: 767px) {
+	[data-design="orbit"] .hero::after { background: linear-gradient(180deg, color-mix(in srgb, var(--lh-ink) 88%, transparent) 0%, color-mix(in srgb, var(--lh-ink) 50%, transparent) 30%, transparent 58%); }
+}
+[data-design="orbit"] .cloud, [data-design="orbit"] .contrail, [data-design="orbit"] .cloud-bank { display: none; }
+[data-design="orbit"] .orbit-skip {
+	display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--s3);
+	color: var(--lh-paper); font-weight: 700; text-underline-offset: 0.3em;
+}
+[data-design="orbit"] .orbit-credit { font-size: var(--lh-text-xs); color: var(--lh-slate); }
+
+/* The Earth: a large sphere whose centre sits near the bottom edge, so its upper half rises behind the copy. */
+[data-design="orbit"] .orbit-scene {
+	position: absolute; left: 50%; bottom: -30vw; width: 74vw; height: 74vw; margin-left: -37vw; pointer-events: none;
+}
+[data-design="orbit"] .orbit-globe {
+	position: absolute; inset: 0; border-radius: 50%;
+	background-image: url("/media/earth-night-2048.webp");
+	background-repeat: repeat-x; background-size: 200% 100%; background-position: 49.76% 50%;
+	box-shadow:
+		inset -4vw 0 6vw color-mix(in srgb, var(--lh-ink) 85%, transparent),
+		0 0 0 1px color-mix(in srgb, var(--lh-sky-top) 30%, transparent),
+		0 0 2.5vw 0.4vw color-mix(in srgb, var(--lh-sky-top) 50%, transparent),
+		0 0 8vw 1vw color-mix(in srgb, var(--lh-sky-top) 16%, transparent);
+}
+@media (max-width: 767px) {
+	/* On a phone the copy and card fill the screen, so the Earth rises from under the header and sits behind the headline. */
+	[data-design="orbit"] .orbit-scene { top: 5.5rem; bottom: auto; width: 125vw; height: 125vw; margin-left: -62.5vw; }
+	[data-design="orbit"] .orbit-globe { background-image: url("/media/earth-night-1024.webp"); }
+}
+@media (prefers-reduced-motion: no-preference) {
+	[data-design="orbit"] .orbit-globe { animation: orbit-turn 120s linear infinite; }
+}
+@keyframes orbit-turn { from { background-position: 49.76% 50%; } to { background-position: 249.76% 50%; } }
+/* The ring is a tilted ellipse in a 200 unit box; the five points are SMIL circles travelling along it (see variants.js). */
+[data-design="orbit"] .orbit-ring { position: absolute; left: -12%; top: -12%; width: 124%; height: 124%; overflow: visible; }
+[data-design="orbit"] .orbit-ring ellipse { fill: none; stroke: var(--lh-paper); stroke-opacity: 0.55; stroke-width: 1; vector-effect: non-scaling-stroke; }
+[data-design="orbit"] .orbit-dot { fill: var(--lh-paper); pointer-events: all; }
+
+/* Descent: a pinned stage. Scroll-driven where view timelines work. Elsewhere variants.js sets a stage class (is-europe, is-england, is-clouds) as markers pass the middle of the screen and the transitions run. Reduced motion has no descent. */
+[data-design="orbit"] .descent { display: none; position: relative; height: 200vh; }
+@media (prefers-reduced-motion: no-preference) {
+	[data-design="orbit"] .descent { display: block; }
+	[data-design="orbit"] .descent-stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; background: var(--lh-ink); }
+	[data-design="orbit"] .descent-stage > * { position: absolute; inset: 0; }
+	[data-design="orbit"] .d-mark { position: absolute; left: 0; width: 1px; height: 1px; }
+	[data-design="orbit"] .d-mark--europe { top: 38%; }
+	[data-design="orbit"] .d-mark--england { top: 47%; }
+	[data-design="orbit"] .d-mark--clouds { top: 60%; }
+	/* The Earth zooms about Luton (map y 21.18%): the transform origin sits on Luton and the translate brings it to the centre. */
+	[data-design="orbit"] .d-globe {
+		left: 50%; top: 50%; right: auto; bottom: auto; width: 80vmin; height: 80vmin; margin: -40vmin 0 0 -40vmin;
+		border-radius: 50%; background-image: url("/media/earth-night-2048.webp");
+		background-size: 200% 100%; background-position: 49.76% 50%; background-repeat: repeat-x;
+		transform-origin: 50% 21.18%; will-change: transform;
+		box-shadow: inset -6vmin 0 12vmin color-mix(in srgb, var(--lh-ink) 85%, transparent), 0 0 3vmin 0.6vmin color-mix(in srgb, var(--lh-sky-top) 50%, transparent);
+	}
+	/* Luton is the centre of the close-up, so the pin and a gentle zoom both hold it in place. */
+	[data-design="orbit"] .d-close {
+		opacity: 0; background-image: url("/media/earth-night-se-england.webp");
+		background-size: cover; background-position: 50% 50%; filter: brightness(1.2);
+	}
+	[data-design="orbit"] .d-dawn {
+		opacity: 0; background: linear-gradient(180deg, var(--lh-sky-top) 0%, var(--lh-sky) 52%, var(--lh-dawn) 86%, var(--lh-paper) 100%);
+	}
+	[data-design="orbit"] .d-cloud {
+		top: auto; height: 62%; transform: translate3d(0, 100%, 0);
+		background:
+			radial-gradient(ellipse 16% 70% at 12% 100%, var(--lh-cloud) 60%, transparent 100%),
+			radial-gradient(ellipse 20% 100% at 40% 100%, var(--lh-cloud) 60%, transparent 100%),
+			radial-gradient(ellipse 14% 75% at 66% 100%, var(--lh-cloud) 60%, transparent 100%),
+			radial-gradient(ellipse 22% 90% at 90% 100%, var(--lh-cloud) 60%, transparent 100%),
+			linear-gradient(var(--lh-paper), var(--lh-paper)) 0 100% / 100% 18% no-repeat;
+	}
+	[data-design="orbit"] .d-pin { inset: auto; left: 50%; top: 50%; width: 0; height: 0; opacity: 0; }
+	[data-design="orbit"] .d-pin::before {
+		content: ""; position: absolute; left: -0.9rem; top: -0.9rem; width: 1.8rem; height: 1.8rem; border-radius: 50%;
+		background: var(--lh-amber); box-shadow: 0 0 0 3px var(--lh-ink);
+	}
+	[data-design="orbit"] .d-pin::after {
+		content: ""; position: absolute; left: -0.9rem; top: -0.9rem; width: 1.8rem; height: 1.8rem; border-radius: 50%;
+		border: 2px solid var(--lh-amber); animation: orbit-pulse 2.4s ease-out infinite;
+	}
+	[data-design="orbit"] .d-pin-label {
+		position: absolute; left: 0; top: 1.5rem; transform: translateX(-50%); white-space: nowrap;
+		padding: 0.25rem 0.7rem; border-radius: 999px; background: var(--lh-ink); color: var(--lh-paper);
+		font-weight: 700; font-size: var(--lh-text-xs);
+	}
+}
+/* Scroll-driven: the stage is pinned for the middle half of the 200vh section (cover 33.33% to 66.67%). */
+@supports (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		[data-design="orbit"] .descent { view-timeline: --descent block; }
+		[data-design="orbit"] .descent-stage > * { animation-timeline: --descent; animation-range: cover 33.33% cover 66.67%; animation-fill-mode: both; }
+		[data-design="orbit"] .d-globe { animation-name: d-globe; animation-timing-function: linear; }
+		[data-design="orbit"] .d-close { animation-name: d-close; animation-timing-function: linear; }
+		[data-design="orbit"] .d-dawn { animation-name: d-dawn; animation-timing-function: linear; }
+		[data-design="orbit"] .d-cloud { animation-name: d-cloud; animation-timing-function: linear; }
+		[data-design="orbit"] .d-pin { animation-name: d-pin; animation-timing-function: linear; }
+	}
+}
+/* Stepped: the same three states as classes on the stage, with transitions. */
+@supports not (animation-timeline: view()) {
+	@media (prefers-reduced-motion: no-preference) {
+		[data-design="orbit"] .descent-stage > * { transition: transform 1100ms var(--ease-in-out), opacity 1100ms var(--ease-in-out); }
+		[data-design="orbit"] .is-europe .d-globe, [data-design="orbit"] .is-england .d-globe, [data-design="orbit"] .is-clouds .d-globe { transform: translate3d(0, 23vmin, 0) scale(2.6); opacity: 0; }
+		[data-design="orbit"] .is-england .d-close { opacity: 1; transform: scale(1.12); }
+		[data-design="orbit"] .is-england .d-pin { opacity: 1; }
+		[data-design="orbit"] .is-clouds .d-dawn { opacity: 1; }
+		[data-design="orbit"] .is-clouds .d-cloud { transform: translate3d(0, 0, 0); }
+	}
+}
+@keyframes orbit-pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.6); opacity: 0; } }
+/* Stops are fractions of the pinned stage. The sky is complete at 90%, so little static sky shows before the homes arrive. */
+@keyframes d-globe {
+	0%, 22% { transform: none; opacity: 1; }
+	48%, 100% { transform: translate3d(0, 23vmin, 0) scale(2.6); opacity: 0; }
+}
+@keyframes d-close {
+	0%, 34% { opacity: 0; transform: scale(1.04); }
+	44% { opacity: 1; transform: scale(1.08); }
+	76% { opacity: 1; transform: scale(1.16); }
+	84%, 100% { opacity: 0; transform: scale(1.2); }
+}
+@keyframes d-dawn { 0%, 62% { opacity: 0; } 80%, 100% { opacity: 1; } }
+@keyframes d-cloud { 0%, 62% { transform: translate3d(0, 100%, 0); } 90%, 100% { transform: translate3d(0, 0, 0); } }
+@keyframes d-pin { 0%, 38% { opacity: 0; } 46%, 70% { opacity: 1; } 78%, 100% { opacity: 0; } }
