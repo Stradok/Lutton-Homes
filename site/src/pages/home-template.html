@@ -1,0 +1,95 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content" class="home-page">
+<section class="page-band">
+<div class="wrap">
+<h1>{{name}}</h1>
+<p class="by-line">by Luton Homes</p>
+<p class="lead">{{summary}}</p>
+</div>
+</section>
+
+<div class="wrap">
+<div class="gallery">{{{gallery}}}</div>
+{{{galleryCaption}}}
+
+<dl class="facts">
+<div><dt>Sleeps</dt><dd>{{sleeps}}</dd></div>
+<div><dt>Bedrooms</dt><dd>{{beds}}</dd></div>
+<div><dt>To the airport</dt><dd>{{distance}}</dd></div>
+</dl>
+
+<div class="home-layout">
+<aside id="book" class="booking-panel" aria-labelledby="book-title">
+<form id="booking-form" action="/book/" method="get" novalidate data-rate="{{rate}}">
+<input type="hidden" name="home" value="{{slug}}">
+<h2 id="book-title">Check dates</h2>
+<p class="rate">From £{{rate}} a night <span class="sample">(sample)</span></p>
+<div class="field">
+<label for="book-in">Check in</label>
+<input id="book-in" name="in" type="date" aria-describedby="book-in-error">
+<p id="book-in-error" class="error" data-err="in" role="alert"></p>
+</div>
+<div class="field">
+<label for="book-out">Check out</label>
+<input id="book-out" name="out" type="date" aria-describedby="book-out-error">
+<p id="book-out-error" class="error" data-err="out" role="alert"></p>
+</div>
+<div class="field">
+<label for="book-guests">Guests</label>
+<input id="book-guests" name="guests" type="number" min="1" value="2" aria-describedby="book-guests-error">
+<p id="book-guests-error" class="error" data-err="guests" role="alert"></p>
+</div>
+<div id="booking-estimate" class="estimate-box">
+<p id="booking-sum" class="estimate-sum" aria-hidden="true"></p>
+<p id="booking-nights" class="estimate-nights" aria-live="polite">Choose dates to see a sample total.</p>
+</div>
+<button type="submit" class="button button--primary button--block">Reserve<span class="arrow" aria-hidden="true"></span></button>
+<p class="note">Preview only. No booking is made.</p>
+</form>
+<a class="link" href="{{wa}}?text={{ask}}">Ask about {{name}} on WhatsApp</a>
+</aside>
+
+<div class="home-main">
+<section>
+<h2>About this home</h2>
+<p>{{name}} is one of five short-stay homes run by one team near Luton Airport.</p>
+<p>Sample text for the design preview. The full description comes from the owners before launch.</p>
+</section>
+<section>
+<h2>Amenities</h2>
+<p class="note">Sample details.</p>
+<ul class="list list--two">{{{amenities}}}</ul>
+</section>
+<section>
+<h2>House rules</h2>
+<p class="note">Sample details.</p>
+<ul class="list">{{{rules}}}</ul>
+</section>
+<section>
+<h2>Location</h2>
+<p>Our address is 34 Beaconsfield, Luton LU2 0RW.</p>
+<a class="link" href="{{maps}}">Get directions</a>
+</section>
+</div>
+</div>
+</div>
+
+<section class="page-section other-homes">
+<div class="wrap">
+<h2>Other homes</h2>
+<ul class="other-home-list">{{{otherHomes}}}</ul>
+</div>
+</section>
+</main>
+
+<div class="bottom-bar">
+<p id="bar-text">From £{{rate}} a night <span class="sample">(sample)</span></p>
+<a class="button button--primary" href="#book">Check dates<span class="arrow" aria-hidden="true"></span></a>
+</div>
+{{{lightbox}}}
+{{> footer}}
+<script src="/assets/homes.js" defer></script>
+</body>
+</html>

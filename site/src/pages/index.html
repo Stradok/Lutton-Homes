@@ -1,0 +1,99 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="hero">
+<div class="hero-sky" aria-hidden="true">
+<span class="cloud cloud--a"></span>
+<span class="cloud cloud--b"></span>
+<span class="cloud cloud--c"></span>
+<svg class="contrail" viewBox="0 0 1440 400" preserveAspectRatio="none" focusable="false"><path pathLength="1" d="M-40 340 C 360 300 820 190 1480 36"/></svg>
+<span class="cloud-bank"></span>
+</div>
+<div class="wrap hero-inner">
+<div class="hero-copy">
+<h1>Somewhere calm to land</h1>
+<p class="lead">Five short-stay homes near Luton Airport, booked direct.</p>
+</div>
+<form id="search-form" class="search-card" action="/homes/" method="get" novalidate>
+<div class="search-card-head">
+<h2 class="search-card-title">Plan your stay</h2>
+<span class="search-card-code" aria-hidden="true">LTN</span>
+</div>
+<div class="search-card-body">
+<div class="field">
+<label for="search-in">Check in</label>
+<input id="search-in" name="in" type="date" aria-describedby="search-in-error">
+<p id="search-in-error" class="error" data-err="in" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-out">Check out</label>
+<input id="search-out" name="out" type="date" aria-describedby="search-out-error">
+<p id="search-out-error" class="error" data-err="out" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-guests">Guests</label>
+<input id="search-guests" name="guests" type="number" min="1" value="2" aria-describedby="search-guests-error">
+<p id="search-guests-error" class="error" data-err="guests" role="alert"></p>
+</div>
+<button type="submit" class="button button--primary button--block">Check availability<span class="arrow" aria-hidden="true"></span></button>
+<p class="note">Availability and prices are samples in this preview.</p>
+</div>
+</form>
+</div>
+</section>
+
+<section id="homes" class="page-section">
+<div class="wrap">
+<h2>Five homes, one team</h2>
+<p class="intro">Each home keeps its own name. Photos and details are on the way.</p>
+<ul class="home-cards">{{{homeCards}}}</ul>
+</div>
+</section>
+
+<section id="why-direct" class="page-section">
+<div class="wrap">
+<h2>Why book with us directly</h2>
+<ul class="why-rows">
+<li class="why-row reveal"><h3>Talk to a person.</h3><p>Message us on WhatsApp and the team that looks after the homes answers.</p></li>
+<li class="why-row reveal"><h3>Clear check-in details.</h3><p>We send check-in instructions before you arrive.</p></li>
+<li class="why-row reveal"><h3>Pay securely online.</h3><p>Secure online payment once booking opens.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="how-booking" class="page-section">
+<div class="wrap">
+<h2>How booking works</h2>
+<ul class="steps">
+<li><h3>Pick your dates</h3><p>Tell us when you arrive and when you leave.</p></li>
+<li><h3>Choose a home</h3><p>Each home has its own page with its rules and sample rate.</p></li>
+<li><h3>Pay securely</h3><p>Online payment is not connected in this preview.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="find-us" class="page-section find-us">
+<span class="find-us-ltn" aria-hidden="true">LTN</span>
+<div class="wrap">
+<h2>Find us</h2>
+<address>34 Beaconsfield, Luton LU2 0RW</address>
+<p>Luton Airport is nearby.</p>
+<div class="actions">
+<a class="link" href="{{maps}}">Get directions</a>
+<a class="link" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+</div>
+</section>
+
+<section class="band band--ink contact-band">
+<div class="wrap">
+<h2>Questions before you book?</h2>
+<p>Message us on WhatsApp or find us at 34 Beaconsfield, Luton LU2 0RW.</p>
+<a class="button button--primary" href="{{wa}}">Message us on WhatsApp<span class="arrow" aria-hidden="true"></span></a>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>

@@ -1,0 +1,80 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="page-band">
+<div class="wrap">
+<h1>Book your stay</h1>
+<p class="lead">Three steps: your details, a review, then payment.</p>
+</div>
+</section>
+<section class="page-section">
+<div class="wrap book-wrap">
+<p class="notice" role="note">This is a design preview. No booking is made and nothing you type is saved or sent.</p>
+<ol class="progress" aria-label="Booking steps">
+<li aria-current="step">Your details</li>
+<li>Review</li>
+<li>Pay</li>
+</ol>
+<form id="book-form" class="book-form" action="/book/confirmed/" method="get" novalidate>
+<section class="step" aria-labelledby="step-1-title">
+<h2 id="step-1-title" tabindex="-1">Your details</h2>
+<div class="field">
+<label for="guest-name">Full name</label>
+<input id="guest-name" type="text" autocomplete="name" data-check="name" aria-describedby="guest-name-error">
+<p id="guest-name-error" class="error" role="alert"></p>
+</div>
+<div class="field">
+<label for="guest-email">Email address</label>
+<input id="guest-email" type="email" autocomplete="email" data-check="email" aria-describedby="guest-email-error">
+<p id="guest-email-error" class="error" role="alert"></p>
+</div>
+<div class="field">
+<label for="guest-phone">Phone number</label>
+<input id="guest-phone" type="tel" autocomplete="tel" inputmode="tel" data-check="phone" aria-describedby="guest-phone-error">
+<p id="guest-phone-error" class="error" role="alert"></p>
+</div>
+<div class="field">
+<label for="guest-arrival">Arrival note (optional)</label>
+<textarea id="guest-arrival" rows="3"></textarea>
+</div>
+<div class="actions">
+<div class="step-nav"><button type="button" class="button button--primary" data-go="1">Review your booking<span class="arrow" aria-hidden="true"></span></button></div>
+</div>
+</section>
+
+<section class="step" aria-labelledby="step-2-title">
+<h2 id="step-2-title" tabindex="-1">Review</h2>
+<div id="book-review" class="summary-box">
+<p>Choose a home and dates first. <a class="link" href="/homes/">See the homes</a></p>
+</div>
+<p class="note">Cancellation terms to be confirmed.</p>
+<div class="actions">
+<div class="step-nav"><button type="button" class="button button--quiet" data-go="-1">Back</button></div>
+<div class="step-nav"><button type="button" class="button button--primary" data-go="1">Continue to pay<span class="arrow" aria-hidden="true"></span></button></div>
+</div>
+</section>
+
+<section class="step" aria-labelledby="step-3-title">
+<h2 id="step-3-title" tabindex="-1">Pay</h2>
+<div class="pay-box">
+<p>Secure card payment will appear here once a payment provider is connected.</p>
+</div>
+<input type="hidden" id="f-home" name="home">
+<input type="hidden" id="f-in" name="in">
+<input type="hidden" id="f-out" name="out">
+<input type="hidden" id="f-guests" name="guests">
+<div class="actions">
+<div class="step-nav"><button type="button" class="button button--quiet" data-go="-1">Back</button></div>
+<button type="submit" class="button button--primary">Complete preview booking<span class="arrow" aria-hidden="true"></span></button>
+</div>
+</section>
+</form>
+</div>
+</section>
+</main>
+{{> footer}}
+{{{homesJson}}}
+<script src="/assets/book.js" defer></script>
+</body>
+</html>

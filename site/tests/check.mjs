@@ -1,0 +1,173 @@
+// Static checks for dist/ and unit checks for the helpers in src/app.js. Run after build: node tests/check.mjs
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = fileURLToPath(new URL('..', import.meta.url));
+const dist = join(root, 'dist');
+const failures = [];
+const fail = (msg) => failures.push(msg);
+
+// Routes whose files are not built yet. Empty: every internal link is checked.
+const PENDING_ROUTES = [];
+const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
+const KB = 1024;
+const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 60 * KB };
+const HOMES = ['easystay', 'easystay-studio', 'luton-lodge', 'the-garden-nest', 'the-garden-studio'];
+const CANONICAL = 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.';
+const PREVIEW = 'Design preview: sample photos, prices and details.';
+const PAGES = ['index.html', 'homes/index.html', 'book/index.html', 'book/confirmed/index.html', 'about/index.html', 'contact/index.html', 'faq/index.html', '404.html'];
+
+if (!existsSync(dist)) {
+	console.error('dist/ is missing. Run node build.mjs first.');
+	process.exit(1);
+}
+
+const files = readdirSync(dist, { recursive: true }).map(String).filter((f) => statSync(join(dist, f)).isFile());
+const read = (f) => readFileSync(join(dist, f), 'utf8');
+const pages = files.filter((f) => f.endsWith('.html'));
+const idsIn = (f) => new Set([...read(f).matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+
+for (const page of pages) {
+	const html = read(page);
+	const name = relative(dist, join(dist, page));
+	if (!/<title>[^<]+<\/title>/.test(html)) fail(`${name}: missing <title>`);
+	if (!/<meta name="description" content="[^"]+">/.test(html)) fail(`${name}: missing meta description`);
+	if (!html.includes('<meta name="robots" content="noindex">')) fail(`${name}: missing noindex`);
+	if ((html.match(/<h1[\s>]/g) || []).length !== 1) fail(`${name}: must have exactly one <h1>`);
+	if (!html.includes('<main id="content"')) fail(`${name}: missing main#content`);
+	if (!html.includes(PREVIEW)) fail(`${name}: missing preview strip`);
+	if (!html.includes('<link rel="icon" href="/favicon.svg"')) fail(`${name}: favicon not linked`);
+	for (const [img] of html.matchAll(/<img\b[^>]*>/g)) {
+		if (!/\swidth=/.test(img) || !/\sheight=/.test(img)) fail(`${name}: <img> without width and height`);
+		if (!/\salt="[^"]+"/.test(img)) fail(`${name}: <img> without alt text`);
+		for (const [, url] of (img.match(/\ssrcset="([^"]*)"/) || [, ''])[1].matchAll(/(\S+)\s+\d+w/g)) {
+			if (!existsSync(join(dist, url))) fail(`${name}: srcset "${url}" does not exist`);
+		}
+	}
+	for (const [, attr, value] of html.matchAll(/\s(href|src|action)="([^"]*)"/g)) {
+		if (/^https?:\/\//.test(value)) {
+			if (attr !== 'href' || !ALLOWED_EXTERNAL.test(value)) fail(`${name}: external ${attr} ${value}`);
+			continue;
+		}
+		if (/^(mailto:|tel:|data:)/.test(value)) continue;
+		const [path, hash] = value.split('#');
+		const route = path.split('?')[0] || '/' + page.replace(/index\.html$/, '');
+		if (PENDING_ROUTES.includes(route)) continue;
+		let target = route === '/' || route.endsWith('/') ? join(route, 'index.html') : route;
+		if (!path && !value.startsWith('?')) target = page;
+		if (!existsSync(join(dist, target))) {
+			fail(`${name}: ${attr} "${value}" does not resolve`);
+			continue;
+		}
+		if (hash && !idsIn(relative(dist, join(dist, target))).has(hash)) fail(`${name}: no id "${hash}" in ${target}`);
+	}
+	const size = Buffer.byteLength(html);
+	if (size > BUDGET.html) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
+}
+
+const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes };
+for (const [file, budget] of Object.entries(assets)) {
+	const text = read(file);
+	if (Buffer.byteLength(text) > budget) fail(`${file}: ${Buffer.byteLength(text)} bytes, budget ${budget}`);
+}
+
+for (const file of files.filter((f) => f.startsWith('media/'))) {
+	const size = statSync(join(dist, file)).size;
+	if (size > BUDGET.media) fail(`${file}: ${size} bytes, budget ${BUDGET.media}`);
+}
+
+for (const file of files.filter((f) => /\.(html|css|js)$/.test(f))) {
+	const text = read(file);
+	if (/[\u2013\u2014]|&ndash;|&mdash;/.test(text)) fail(`${file}: contains an en or em dash`);
+}
+
+for (const page of PAGES) if (!existsSync(join(dist, page))) fail(`${page}: not built`);
+if (!existsSync(join(dist, 'favicon.svg'))) fail('favicon.svg: missing from dist');
+// 500 page: Vercel does not serve a static custom 500 page on its own, so it is checked here directly.
+if (!existsSync(join(dist, '500.html'))) {
+	fail('500.html: not built');
+} else {
+	const page500 = read('500.html');
+	if (!/<h1[^>]*>[^<]*\b500\b[^<]*<\/h1>/.test(page500)) fail('500.html: the h1 must contain 500');
+	if (!page500.includes('<meta name="robots" content="noindex">')) fail('500.html: missing noindex');
+	if (/[\u2013\u2014]/.test(page500)) fail('500.html: contains an en or em dash');
+}
+const homesHtml = read('homes/index.html');
+const chips = [...homesHtml.matchAll(/<button type="button" class="chip"[^>]*data-tag="[^"]+"[^>]*aria-pressed="(?:true|false)"/g)];
+if (chips.length !== 5) fail(`homes/index.html: expected 5 aria-pressed filter chips, found ${chips.length}`);
+if ((homesHtml.match(/<li class="reveal" data-tags="\|[^"]+\|"/g) || []).length !== HOMES.length) fail('homes/index.html: cards need data-tags');
+if (!read('homes/easystay/index.html').includes('<dialog id="lightbox"')) fail('homes/easystay/index.html: missing lightbox dialog');
+if (!read('index.html').includes(CANONICAL)) fail('index.html: canonical description missing or changed');
+const robots = read('robots.txt');
+if (!/^Disallow: \/$/m.test(robots)) fail('robots.txt: missing Disallow: /');
+const vercel = JSON.parse(readFileSync(join(root, 'vercel.json'), 'utf8'));
+const hasNoindex = JSON.stringify(vercel.headers).includes('"X-Robots-Tag"') && JSON.stringify(vercel.headers).includes('"noindex"');
+if (!hasNoindex) fail('vercel.json: X-Robots-Tag noindex header missing');
+
+const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+if (pkg.type !== 'module') fail('package.json: type must be module');
+if (!pkg.scripts?.test) fail('package.json: missing test script');
+if (pkg.dependencies || pkg.devDependencies) fail('package.json: dependencies are not allowed');
+
+// Motion and view-transition rules.
+const css = readFileSync(join(root, 'src/styles.css'), 'utf8');
+if (!css.includes('prefers-reduced-motion')) fail('styles.css: no prefers-reduced-motion block');
+if (!css.includes('@view-transition')) fail('styles.css: no @view-transition rule');
+if (!css.includes('reveal-fallback')) fail('styles.css: no reveal-fallback safety net for .reveal content');
+// Every animation name used in styles.css must have a @keyframes rule. Keywords, times, timing functions, counts and var() are skipped.
+const cssBare = css.replace(/\/\*[\s\S]*?\*\//g, '');
+const keyframeNames = new Set([...cssBare.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]));
+const CSS_KEYWORD = /^(none|normal|reverse|alternate|alternate-reverse|forwards|backwards|both|infinite|running|paused|linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end|auto|!important)$/;
+const CSS_NOT_A_NAME = /^-?[\d.]+(m?s)?$/;
+for (const [, value] of cssBare.matchAll(/(?<![\w-])animation(?:-name)?\s*:\s*([^;{}]+)/g)) {
+	for (const part of value.replace(/[\w-]+\([^()]*\)/g, '').split(',')) {
+		for (const token of part.trim().split(/\s+/)) {
+			if (!token || CSS_KEYWORD.test(token) || CSS_NOT_A_NAME.test(token)) continue;
+			if (!keyframeNames.has(token)) fail(`styles.css: animation "${token}" is used but has no @keyframes`);
+		}
+	}
+}
+for (const slug of HOMES) {
+	for (const file of ['homes/index.html', `homes/${slug}/index.html`]) {
+		if (!read(file).includes(`view-transition-name: home-${slug}"`)) fail(`${file}: missing view-transition-name home-${slug}`);
+	}
+}
+
+// Unit checks: evaluate app.js with no document; the module.exports guard supplies the helpers.
+const src = readFileSync(join(root, 'src/app.js'), 'utf8');
+for (const file of files.filter((f) => /\.(js|html)$/.test(f))) {
+	if (/addEventListener\(\s*['"]scroll['"]/.test(read(file))) fail(`${file}: scroll event listener is not allowed`);
+}
+const mod = { exports: {} };
+new Function('document', 'module', src)(undefined, mod);
+const h = mod.exports;
+const eq = (actual, expected, label) => {
+	if (JSON.stringify(actual) !== JSON.stringify(expected)) fail(`app.js ${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+};
+const TODAY = '2026-10-25';
+eq(h.lhIsDate('2026-11-12'), true, 'valid date');
+eq(h.lhIsDate('2026-02-30'), false, 'impossible date');
+eq(h.lhIsDate('12/11/2026'), false, 'wrong format');
+eq(h.lhIsDate(undefined), false, 'undefined');
+eq(h.lhFormatDate('2026-11-12'), '12 Nov 2026', 'format date');
+eq(h.lhParseGuests('2'), 2, 'guests digits');
+eq(h.lhParseGuests(' 3 '), 3, 'guests with spaces');
+eq(h.lhParseGuests(4), 4, 'guests number');
+for (const bad of ['0', '1.5', '1e2', '', '-1', 'two']) eq(h.lhParseGuests(bad), null, `guests ${JSON.stringify(bad)}`);
+eq(h.lhStayErrors('2026-11-12', '2026-11-15', '2', TODAY), {}, 'valid stay');
+eq(Object.keys(h.lhStayErrors('2026-10-24', '2026-10-26', '2', TODAY)), ['in'], 'past check in');
+eq(Object.keys(h.lhStayErrors('2026-11-12', '2026-11-12', '2', TODAY)), ['out'], 'same day check out');
+eq(Object.keys(h.lhStayErrors('2026-11-12', '2026-11-10', '2', TODAY)), ['out'], 'check out before check in');
+eq(Object.keys(h.lhStayErrors('2026-11-12', '2026-11-15', '0', TODAY)), ['guests'], 'zero guests');
+eq(Object.keys(h.lhStayErrors('', '', '', TODAY)).sort(), ['guests', 'in', 'out'], 'blank fields');
+eq(h.lhEstimate(95, '2026-11-12', '2026-11-15'), { nights: 3, total: 285 }, 'estimate');
+eq(h.lhEstimate(95, '2026-11-15', '2026-11-12'), null, 'estimate reversed');
+eq(h.lhEstimate(95, 'x', '2026-11-12'), null, 'estimate invalid');
+
+if (failures.length) {
+	console.error(failures.map((f) => '- ' + f).join('\n'));
+	console.error(`\n${failures.length} problem(s).`);
+	process.exit(1);
+}
+console.log(`ok: ${pages.length} pages, ${files.length} files, unit checks passed`);
