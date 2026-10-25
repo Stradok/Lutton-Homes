@@ -12,7 +12,7 @@ const fail = (msg) => failures.push(msg);
 const PENDING_ROUTES = [];
 const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
 const KB = 1024;
-const BUDGET = { html: 18 * KB, css: 34 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 60 * KB };
+const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 60 * KB };
 const HOMES = ['easystay', 'easystay-studio', 'luton-lodge', 'the-garden-nest', 'the-garden-studio'];
 const CANONICAL = 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.';
 const PREVIEW = 'Design preview: sample photos, prices and details.';
@@ -79,11 +79,20 @@ for (const file of files.filter((f) => f.startsWith('media/'))) {
 
 for (const file of files.filter((f) => /\.(html|css|js)$/.test(f))) {
 	const text = read(file);
-	if (/[–—]|&ndash;|&mdash;/.test(text)) fail(`${file}: contains an en or em dash`);
+	if (/[\u2013\u2014]|&ndash;|&mdash;/.test(text)) fail(`${file}: contains an en or em dash`);
 }
 
 for (const page of PAGES) if (!existsSync(join(dist, page))) fail(`${page}: not built`);
 if (!existsSync(join(dist, 'favicon.svg'))) fail('favicon.svg: missing from dist');
+// 500 page: Vercel does not serve a static custom 500 page on its own, so it is checked here directly.
+if (!existsSync(join(dist, '500.html'))) {
+	fail('500.html: not built');
+} else {
+	const page500 = read('500.html');
+	if (!/<h1[^>]*>[^<]*\b500\b[^<]*<\/h1>/.test(page500)) fail('500.html: the h1 must contain 500');
+	if (!page500.includes('<meta name="robots" content="noindex">')) fail('500.html: missing noindex');
+	if (/[\u2013\u2014]/.test(page500)) fail('500.html: contains an en or em dash');
+}
 const homesHtml = read('homes/index.html');
 const chips = [...homesHtml.matchAll(/<button type="button" class="chip"[^>]*data-tag="[^"]+"[^>]*aria-pressed="(?:true|false)"/g)];
 if (chips.length !== 5) fail(`homes/index.html: expected 5 aria-pressed filter chips, found ${chips.length}`);
@@ -106,6 +115,19 @@ const css = readFileSync(join(root, 'src/styles.css'), 'utf8');
 if (!css.includes('prefers-reduced-motion')) fail('styles.css: no prefers-reduced-motion block');
 if (!css.includes('@view-transition')) fail('styles.css: no @view-transition rule');
 if (!css.includes('reveal-fallback')) fail('styles.css: no reveal-fallback safety net for .reveal content');
+// Every animation name used in styles.css must have a @keyframes rule. Keywords, times, timing functions, counts and var() are skipped.
+const cssBare = css.replace(/\/\*[\s\S]*?\*\//g, '');
+const keyframeNames = new Set([...cssBare.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]));
+const CSS_KEYWORD = /^(none|normal|reverse|alternate|alternate-reverse|forwards|backwards|both|infinite|running|paused|linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end|auto|!important)$/;
+const CSS_NOT_A_NAME = /^-?[\d.]+(m?s)?$/;
+for (const [, value] of cssBare.matchAll(/(?<![\w-])animation(?:-name)?\s*:\s*([^;{}]+)/g)) {
+	for (const part of value.replace(/[\w-]+\([^()]*\)/g, '').split(',')) {
+		for (const token of part.trim().split(/\s+/)) {
+			if (!token || CSS_KEYWORD.test(token) || CSS_NOT_A_NAME.test(token)) continue;
+			if (!keyframeNames.has(token)) fail(`styles.css: animation "${token}" is used but has no @keyframes`);
+		}
+	}
+}
 for (const slug of HOMES) {
 	for (const file of ['homes/index.html', `homes/${slug}/index.html`]) {
 		if (!read(file).includes(`view-transition-name: home-${slug}"`)) fail(`${file}: missing view-transition-name home-${slug}`);

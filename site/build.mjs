@@ -93,6 +93,7 @@ const pages = [
 	{ file: 'contact.html', out: 'contact/index.html', title: 'Contact | Luton Homes', description: 'Message Luton Homes on WhatsApp or visit us at 34 Beaconsfield, Luton LU2 0RW.', vars: {} },
 	{ file: 'faq.html', out: 'faq/index.html', title: 'FAQ | Luton Homes', description: 'Short answers about booking a Luton Homes stay direct.', vars: {} },
 	{ file: '404.html', out: '404.html', title: 'Page not found | Luton Homes', description: 'This page is not here. Find a home or message us on WhatsApp.', vars: {} },
+	{ file: '500.html', out: '500.html', title: 'Something went wrong | Luton Homes', description: 'Our site is having a problem right now. We are working on it. Go back to the home page.', vars: {} },
 ];
 
 rmSync(dist, { recursive: true, force: true });

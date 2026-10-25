@@ -312,9 +312,9 @@ main { margin-top: -5rem; }
 	background-repeat: repeat-x;
 	opacity: 0.8;
 }
-.cloud--a { top: 8%; opacity: 0.9; --travel: -60px; --drift: 120s; --depth: 24px; }
-.cloud--b { top: 34%; height: 26%; opacity: 0.6; --travel: -36px; --drift: 95s; --depth: 18px; }
-.cloud--c { top: 56%; height: 24%; opacity: 0.45; --travel: -18px; --drift: 75s; }
+.cloud--a { top: 8%; opacity: 0.9; --para: 60px; --drift: 120s; --depth: 24px; }
+.cloud--b { top: 34%; height: 26%; opacity: 0.6; --para: 36px; --drift: 95s; --depth: 18px; }
+.cloud--c { top: 56%; height: 24%; opacity: 0.45; --para: 18px; --drift: 75s; }
 /* Pointer depth (fine pointers, set on .hero by app.js): transform only, on the pseudo layers. */
 .cloud::before, .cloud::after { transform: translate3d(calc(var(--mx, 0) * var(--depth) * -1), calc(var(--my, 0) * var(--depth) * -1), 0); transition: transform 600ms var(--ease-out); }
 
@@ -664,11 +664,11 @@ main { margin-top: -5rem; }
 	.cloud { animation: drift var(--drift, 120s) linear infinite, para var(--drift, 120s) linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 100vh; }
 	.site-header::after { animation: solid linear both; animation-timeline: scroll(root); animation-range: 60vh 100vh; }
 	.steps { view-timeline: --steps block; }
-	.steps::after { animation: fill linear both; animation-timeline: --steps; animation-range: entry 10% entry 80%; }
-	.steps li::after { animation: marker linear both; animation-timeline: --steps; }
-	.steps li:nth-child(1)::after { animation-range: entry 15% entry 30%; }
-	.steps li:nth-child(2)::after { animation-range: entry 40% entry 55%; }
-	.steps li:nth-child(3)::after { animation-range: entry 65% entry 80%; }
+	/* Ranges use cover (the whole pass through the view), not entry: the block is short, so entry alone ends in ~150px of scroll. */
+	.steps::after { animation: fill linear both; animation-timeline: --steps; animation-range: cover 0% cover 60%; }
+	.steps li::after { animation: marker linear both; animation-timeline: --steps; animation-range: cover 0% cover 8%; }
+	.steps li:nth-child(2)::after { animation-range: cover 20% cover 28%; }
+	.steps li:nth-child(3)::after { animation-range: cover 40% cover 48%; }
 }
 
 /* Without scroll timelines, app.js adds .is-in on entry and these states animate once. */
@@ -686,10 +686,43 @@ main { margin-top: -5rem; }
 .js .reveal:not(.is-in) { opacity: 0; transform: translate3d(0, 24px, 0); }
 .js:not(.js-ready) .reveal:not(.is-in) { animation: reveal-fallback 0s 2.5s forwards; }
 @keyframes reveal-fallback { to { opacity: 1; transform: none; } }
+
+/* Keyframes for the animations above. Drift and parallax use separate properties (transform and translate) so they compose. */
+@keyframes drift {
+	0%, 100% { transform: translate3d(0, 0, 0); animation-timing-function: ease-in-out; }
+	50% { transform: translate3d(-6%, 0, 0); animation-timing-function: ease-in-out; }
+}
+@keyframes para { from { translate: 0 0; } to { translate: 0 var(--para, 0px); } }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes rise { from { opacity: 0; transform: translate3d(0, 12px, 0); } to { opacity: 1; transform: none; } }
+@keyframes solid { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fill { from { transform: var(--fill-from); } to { transform: none; } }
+@keyframes marker { from { background-color: transparent; } to { background-color: var(--lh-amber); } }
+@keyframes slide { from { opacity: 0; transform: translate3d(0, 16px, 0); } to { opacity: 1; transform: none; } }
 .js .home-cards > li:nth-child(2) { transition-delay: 60ms; }
 .js .home-cards > li:nth-child(3) { transition-delay: 120ms; }
 .js .home-cards > li:nth-child(4) { transition-delay: 180ms; }
 .js .home-cards > li:nth-child(5) { transition-delay: 240ms; }
+
+/* 500 page: one centred column on the sky. Reuses the hero gradient, tokens and cloud layers. */
+.error-page {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	min-height: 100dvh;
+	margin-top: 0;
+	padding: 4.5rem 1rem;
+	overflow: hidden;
+	background: linear-gradient(180deg, var(--lh-sky-top) 0%, var(--lh-sky) 52%, var(--lh-dawn) 86%, var(--lh-paper) 100%);
+	text-align: center;
+}
+.error-page > .preview-strip { position: absolute; top: 0; left: 0; right: 0; }
+.error-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: var(--s3); width: 100%; margin: auto; }
+.error-mark { width: 56px; height: 56px; filter: drop-shadow(0 12px 24px rgba(15, 47, 58, 0.28)); }
+.error-brand { margin: 0; font-family: var(--lh-font-head); font-weight: 700; font-stretch: 112%; color: var(--lh-ink-2); }
+.error-page h1 { margin: 0; font-size: clamp(2.25rem, 8vw, 5.5rem); }
+.error-lead { max-width: 46ch; margin: 0; line-height: 1.6; }
 
 @media (min-width: 480px) {
 	.search-card-body { grid-template-columns: repeat(2, minmax(0, 1fr)); }
