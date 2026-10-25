@@ -12,7 +12,9 @@ const fail = (msg) => failures.push(msg);
 const PENDING_ROUTES = [];
 const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
 const KB = 1024;
-const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB };
+const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB, switcherCss: 4 * KB, themeOriginalCss: 12 * KB };
+const DESIGNS = ['original', 'sky', 'dawn', 'orbit'];
+const DESIGN_NAMES = ['Original', 'Sky', 'Night to dawn', 'Orbit'];
 const HOMES = ['easystay', 'easystay-studio', 'luton-lodge', 'the-garden-nest', 'the-garden-studio'];
 const CANONICAL = 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.';
 const PREVIEW = 'Design preview: sample photos, prices and details.';
@@ -28,6 +30,8 @@ if (!existsSync(dist)) {
 const files = readdirSync(dist, { recursive: true }).map(String).filter((f) => statSync(join(dist, f)).isFile());
 const read = (f) => readFileSync(join(dist, f), 'utf8');
 const variantsCss = read('assets/variants.css');
+const themeCss = read('assets/theme-original.css');
+const switcherCss = read('assets/switcher.css');
 const pages = files.filter((f) => f.endsWith('.html'));
 const idsIn = (f) => new Set([...read(f).matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 
@@ -41,9 +45,15 @@ for (const page of pages) {
 	if (!html.includes('<main id="content"')) fail(`${name}: missing main#content`);
 	if (PREVIEW_ON !== html.includes(PREVIEW)) fail(`${name}: preview strip ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
 	if (PREVIEW_ON !== html.includes('data-switcher')) fail(`${name}: design switcher ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
+	if (!/<html[^>]*\sdata-design="original"/.test(html)) fail(`${name}: the default design must be original on <html>`);
+	if (!html.includes('/assets/theme-original.css')) fail(`${name}: theme-original.css not linked`);
 	if (PREVIEW_ON) {
-		if ((html.match(/role="menuitemradio"/g) || []).length !== 3) fail(`${name}: the switcher needs three menuitemradio options`);
+		const options = [...html.matchAll(/role="menuitemradio"[^>]*data-design-value="([^"]+)">([^<]+)</g)];
+		if (options.map((m) => m[1]).join() !== DESIGNS.join()) fail(`${name}: switcher options must be ${DESIGNS.join(', ')} in that order`);
+		if (options.map((m) => m[2]).join() !== DESIGN_NAMES.join()) fail(`${name}: switcher labels must be ${DESIGN_NAMES.join(', ')}`);
+		if (!html.includes('<span class="design-switcher-text">Design: Original</span>')) fail(`${name}: switcher label must start as Design: Original`);
 		if (!html.includes('aria-label="Design preview switcher"')) fail(`${name}: switcher not announced as Design preview switcher`);
+		if (!html.includes('/assets/switcher.css')) fail(`${name}: switcher.css not linked`);
 	}
 	if (/\/assets\/variants\.(css|js)/.test(html) && page !== 'index.html') fail(`${name}: variant files are for the home page only`);
 	if (!html.includes('<link rel="icon" href="/favicon.svg"')) fail(`${name}: favicon not linked`);
@@ -75,7 +85,7 @@ for (const page of pages) {
 	if (size > BUDGET.html) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
 }
 
-const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs };
+const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss };
 for (const [file, budget] of Object.entries(assets)) {
 	const text = read(file);
 	if (Buffer.byteLength(text) > budget) fail(`${file}: ${Buffer.byteLength(text)} bytes, budget ${budget}`);
@@ -118,6 +128,27 @@ for (const [, selector, body] of variantsCss.replace(/\/\*[\s\S]*?\*\//g, '').ma
 for (const file of files.filter((f) => /\.(html|js|css)$/.test(f) && f !== 'assets/variants.css')) {
 	if (/earth-night/.test(read(file))) fail(`${file}: earth image referenced outside the orbit rules`);
 }
+// Original layer: every rule is scoped to html[data-design="original"] (keyframes excepted, there are none).
+// Split a selector list on the commas that sit outside parentheses, so :is(a, b) stays whole.
+const topLevelParts = (list) => {
+	const parts = [];
+	let depth = 0;
+	let cur = '';
+	for (const ch of list) {
+		if (ch === '(') depth++;
+		if (ch === ')') depth--;
+		if (ch === ',' && depth === 0) { parts.push(cur.trim()); cur = ''; } else cur += ch;
+	}
+	parts.push(cur.trim());
+	return parts.filter(Boolean);
+};
+for (const [, selector] of themeCss.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*\}/g)) {
+	for (const part of topLevelParts(selector)) {
+		if (!part.startsWith('[data-design="original"]')) fail(`assets/theme-original.css: selector not scoped to original: ${part}`);
+	}
+}
+if (!/\.design-switcher-button\s*\{[^}]*min-height:\s*48px/.test(switcherCss)) fail('assets/switcher.css: switcher button must be at least 48px high');
+if (!/\.design-switcher-glyph\s*\{/.test(switcherCss) || !/\.design-switcher-chev\s*\{/.test(switcherCss)) fail('assets/switcher.css: switcher needs a glyph and a chevron');
 if (!/\[data-design="dawn"\]:not\(\.dawn-go\)[^{]*\{[^}]*reveal-fallback/.test(variantsCss)) fail('assets/variants.css: dawn hero has no reveal-fallback');
 if (!read('index.html').includes('<meta name="robots" content="noindex">')) fail('index.html: missing noindex');
 if (!read('index.html').includes(CANONICAL)) fail('index.html: canonical description missing or changed');
@@ -138,7 +169,7 @@ if (!css.includes('prefers-reduced-motion')) fail('styles.css: no prefers-reduce
 if (!css.includes('@view-transition')) fail('styles.css: no @view-transition rule');
 if (!css.includes('reveal-fallback')) fail('styles.css: no reveal-fallback safety net for .reveal content');
 // Every animation name used in styles.css must have a @keyframes rule. Keywords, times, timing functions, counts and var() are skipped.
-const cssBare = (css + '\n' + variantsCss).replace(/\/\*[\s\S]*?\*\//g, '');
+const cssBare = (css + '\n' + variantsCss + '\n' + switcherCss + '\n' + themeCss).replace(/\/\*[\s\S]*?\*\//g, '');
 const keyframeNames = new Set([...cssBare.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]));
 const CSS_KEYWORD = /^(none|normal|reverse|alternate|alternate-reverse|forwards|backwards|both|infinite|running|paused|linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end|auto|!important)$/;
 const CSS_NOT_A_NAME = /^-?[\d.]+(m?s)?$/;

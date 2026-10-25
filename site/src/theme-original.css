@@ -1,0 +1,82 @@
+/* Original design (the default): the minimalistic direction in Docs/design/home-page.md, as a layer over styles.css.
+   Every rule is scoped to html[data-design="original"], so the other designs are untouched.
+   Solid bar header, ink hero, paper sections, 4px radius, one 1px border, no shadows, no clouds, no intro, simple reveal only.
+   Amber stays on primary buttons. */
+
+/* Header: a solid bar in the flow, not a floating pill. The mobile sheet (.is-open) keeps its own rules. */
+[data-design="original"] .site-header:not(.is-open) {
+	width: 100%;
+	margin: 0;
+	padding: 0.75rem var(--lh-edge);
+	border-radius: 0;
+	border-bottom: 1px solid var(--lh-line);
+	background: var(--lh-white);
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	box-shadow: none;
+}
+[data-design="original"] .site-header::after { display: none; }
+[data-design="original"] main { margin-top: 0; }
+
+/* Hero: flat ink with the boarding-pass card. No sky, clouds, contrail or intro. */
+[data-design="original"] .hero { min-height: 0; padding: 3rem 0 3.5rem; background: var(--lh-ink); color: var(--lh-white); }
+[data-design="original"] .hero-sky { display: none; }
+[data-design="original"] .hero h1 { color: var(--lh-white); }
+[data-design="original"] .hero .lead { color: var(--lh-sky); }
+[data-design="original"] .hero-copy h1,
+[data-design="original"] .hero .lead,
+[data-design="original"] .search-card { animation: none; }
+[data-design="original"] .search-card { border: 1px solid var(--lh-line); border-radius: var(--lh-radius); box-shadow: none; }
+[data-design="original"] .search-card-head { border-bottom: 1px solid var(--lh-line); }
+[data-design="original"] .search-card-head::before,
+[data-design="original"] .search-card-head::after { background: var(--lh-ink); }
+
+/* Sections: paper, with the why-book-direct band in sky. */
+[data-design="original"] .page-section,
+[data-design="original"] .band { padding-block: 3rem; }
+[data-design="original"] #why-direct { background: var(--lh-sky); }
+[data-design="original"] .band--ink.contact-band { background: var(--lh-ink); }
+@media (min-width: 768px) {
+	[data-design="original"] .page-section,
+	[data-design="original"] .band { padding-block: 4.5rem; }
+	/* Three plain columns separated by thin vertical rules. */
+	[data-design="original"] .why-rows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	[data-design="original"] .why-row { grid-template-columns: minmax(0, 1fr); gap: var(--s2); padding: 0 var(--s4); border-top: 0; }
+	[data-design="original"] .why-row:first-child { padding-inline-start: 0; }
+	[data-design="original"] .why-row + .why-row { border-inline-start: 1px solid var(--lh-line); }
+	[data-design="original"] .why-row:last-child { border-bottom: 0; }
+}
+
+/* Inner pages: a plain paper title band with ink type. */
+/* The band has no bottom padding: the section below supplies the normal section gap. */
+[data-design="original"] .page-band { padding: 3rem 0 0; background: var(--lh-paper); }
+[data-design="original"] .page-band :is(.intro, .by-line, .lead) { color: var(--lh-slate); }
+@media (min-width: 768px) {
+	[data-design="original"] .page-band { padding-block: 4.5rem 0; }
+}
+
+/* Radius and borders: 4px on every surface and field, one 1px line, no shadows. */
+[data-design="original"] :is(.home-card, .other-home, .stay-summary, .booking-panel, .search-card, .summary-box, .pay-box, .estimate, .estimate-box, .notice, .gallery .gate-sign, .chip, .field input, .field textarea, .button) {
+	border-radius: var(--lh-radius);
+}
+[data-design="original"] :is(.other-home, .stay-summary, .booking-panel, .summary-box) { border: 1px solid var(--lh-line); }
+[data-design="original"] :is(.home-card, .booking-panel, .search-card, .site-header, .bottom-bar) { box-shadow: none; }
+[data-design="original"] .bottom-bar { border-top: 1px solid var(--lh-line); }
+[data-design="original"] :is(.home-card, .other-home):is(:hover, :focus-visible) { transform: none; box-shadow: none; border-color: var(--lh-ink); }
+[data-design="original"] .gate-sign::before { display: none; }
+
+/* Buttons: flat, no arrow disc. Amber is kept for primary buttons only. */
+[data-design="original"] .button { gap: 0; padding: 0.7rem 1.25rem; }
+[data-design="original"] .button--block { justify-content: center; }
+[data-design="original"] .arrow { display: none; }
+
+/* How booking works: ink markers, no scroll or entrance animation. */
+[data-design="original"] .steps::after,
+[data-design="original"] .steps li::after,
+[data-design="original"] .js .steps::after,
+[data-design="original"] .js .steps li::after { animation: none; transform: none; transition: none; }
+[data-design="original"] .js .steps li::after,
+[data-design="original"] .steps li::after { opacity: 1; background: var(--lh-ink); }
+
+/* 500 page: the same paper and ink, no sky. */
+[data-design="original"] .error-page { background: var(--lh-paper); color: var(--lh-ink); }

@@ -29,7 +29,13 @@
 	transition: opacity 600ms var(--ease-out), stroke 600ms var(--ease-out);
 }
 [data-design="dawn"] .dawn-frame rect { stroke-dasharray: 1; }
-[data-design="dawn"] .dawn-frame.is-done { opacity: 0.35; stroke: var(--lh-ink); }
+[data-design="dawn"] .dawn-frame.is-done { stroke: var(--lh-ink); stroke-opacity: 0.3; stroke-width: 1; }
+/* At rest: the sky with a warmer, deeper horizon (amber at low opacity over the dawn band). */
+[data-design="dawn"] .hero {
+	background:
+		linear-gradient(180deg, transparent 50%, color-mix(in srgb, var(--lh-amber) 30%, transparent) 100%),
+		linear-gradient(180deg, var(--lh-sky-top) 0%, var(--lh-sky) 40%, var(--lh-dawn) 80%, var(--lh-paper) 100%);
+}
 
 /* Hero content waits for the intro (dawn-go). Without JS the fallback reveals it at 2.5s. */
 [data-design="dawn"]:not(.dawn-go) :is(.hero-copy h1, .hero .lead, .search-card) { opacity: 0; animation: reveal-fallback 0s 2.5s forwards; }

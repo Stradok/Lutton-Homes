@@ -3,18 +3,20 @@
 	var root = document.documentElement;
 	var hero = document.querySelector('.hero');
 	if (!hero) return;
-	if (root.dataset.design === 'dawn' && root.classList.contains('dawn-pending')) dawn();
+	if (root.dataset.design === 'dawn') dawn();
 	if (root.dataset.design === 'orbit') orbit();
 
 	// Counter follows real progress (fonts half, load half), never faster than 900ms and never slower than 1600ms.
+	// The frame is drawn at rest too: without the intro (reduced motion, or seen this session) it appears complete.
 	function dawn() {
+		var pending = root.classList.contains('dawn-pending');
 		var t0 = performance.now();
 		var real = 0;
 		(document.fonts ? document.fonts.ready : Promise.resolve()).then(function () { real += 0.5; });
 		(document.readyState === 'complete' ? Promise.resolve() : new Promise(function (ok) { addEventListener('load', ok, { once: true }); })).then(function () { real += 0.5; });
-		hero.insertAdjacentHTML('beforeend', '<p class="dawn-count" aria-hidden="true">0%</p>'
+		hero.insertAdjacentHTML('beforeend', (pending ? '<p class="dawn-count" aria-hidden="true">0%</p>' : '')
 			+ '<svg class="dawn-frame" aria-hidden="true"><rect pathLength="1" rx="20"/></svg>'
-			+ '<p class="sr-only" role="status">Loading</p>');
+			+ (pending ? '<p class="sr-only" role="status">Loading</p>' : ''));
 		var count = hero.querySelector('.dawn-count');
 		var frame = hero.querySelector('.dawn-frame');
 		var rect = frame.firstChild;
@@ -28,6 +30,7 @@
 		rect.setAttribute('y', 16);
 		rect.setAttribute('width', w - 32);
 		rect.setAttribute('height', h - 32);
+		if (!pending) { frame.classList.add('is-done'); return; }
 		try { sessionStorage.setItem('lh-dawn-seen', '1'); } catch (e) { /* the intro may replay in a new tab */ }
 
 		var shown = 0;

@@ -810,40 +810,24 @@ main { margin-top: -5rem; }
 	::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
 
-/* Design preview switcher (every page; removed with PREVIEW in build.mjs). */
-.design-switcher { position: fixed; right: 1rem; bottom: 1rem; z-index: 40; }
-.design-switcher-button {
-	min-height: 44px;
-	padding: 0 1.25rem;
-	border: 0;
-	border-radius: 999px;
-	background: var(--lh-ink);
-	color: var(--lh-white);
-	font: 700 var(--lh-text-xs) var(--lh-font-body);
-	box-shadow: var(--shadow-float);
-	cursor: pointer;
+/* Inner title bands for the variant designs (the sky band above is unchanged). The 500 page uses the same band. */
+[data-design="dawn"] :is(.page-band, .error-page) { background: linear-gradient(180deg, var(--lh-ink) 0%, var(--lh-ink-2) 62%, var(--lh-sky-top) 90%, var(--lh-paper) 100%); color: var(--lh-white); }
+[data-design="dawn"] .page-band :is(.intro, .by-line, .lead) { color: var(--lh-white); }
+[data-design="orbit"] :is(.page-band, .error-page) { position: relative; overflow: hidden; background: var(--lh-ink); color: var(--lh-paper); }
+[data-design="orbit"] :is(.page-band, .error-page) > .wrap { position: relative; }
+[data-design="orbit"] .page-band :is(.intro, .by-line, .lead) { color: var(--lh-sky); }
+[data-design="orbit"] :is(.page-band, .error-page)::before {
+	content: ""; position: absolute; inset: 0; pointer-events: none;
+	background-image:
+		radial-gradient(1px 1px at 18px 34px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 96px 12px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 150px 70px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 214px 46px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 54px 150px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1.5px 1.5px at 122px 128px, var(--lh-paper) 50%, transparent 100%),
+		radial-gradient(1px 1px at 190px 186px, var(--lh-paper) 50%, transparent 100%);
+	background-size: 240px 240px;
+	opacity: 0.8;
 }
-.design-switcher-menu {
-	position: absolute;
-	right: 0;
-	bottom: calc(100% + 0.5rem);
-	display: grid;
-	min-width: 15rem;
-	padding: 0.25rem;
-	background: var(--lh-white);
-	border-radius: 16px;
-	box-shadow: var(--shadow-float);
-}
-.design-switcher-menu button {
-	min-height: 44px;
-	padding: 0 0.9rem;
-	border: 0;
-	border-radius: 12px;
-	background: none;
-	color: var(--lh-ink);
-	font: inherit;
-	text-align: left;
-	cursor: pointer;
-}
-.design-switcher-menu button:hover, .design-switcher-menu button:focus-visible { background: var(--lh-sky); }
-.design-switcher-menu button[aria-checked="true"] { font-weight: 700; background: var(--lh-paper); }
+[data-design="dawn"] .error-brand, [data-design="orbit"] .error-brand { color: var(--lh-sky); }
+

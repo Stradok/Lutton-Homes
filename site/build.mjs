@@ -64,23 +64,27 @@ const lightbox = (h) => (h.images?.length ? `<dialog id="lightbox" class="lightb
 // The booking pages read name and rate by slug from this inline JSON (no request).
 const homesJson = `<script id="lh-homes" type="application/json">${JSON.stringify(Object.fromEntries(homes.map((h) => [h.slug, { name: h.name, rate: h.rate }]))).replace(/</g, '\\u003c')}</script>`;
 
-// Preview only: the switcher markup, and the design attribute script that reads ?design= then localStorage, before first paint.
+// Preview only: the switcher markup (four designs, in menu order) and the design script that reads ?design= then localStorage before first paint.
+// Default is original; unknown values fall back to original. The html tag also carries data-design="original" for no-JS pages.
 const SWITCHER = '<div class="design-switcher" role="group" aria-label="Design preview switcher" data-switcher>'
-	+ '<button type="button" class="design-switcher-button" aria-haspopup="menu" aria-expanded="false" aria-controls="design-menu">Design: Sky</button>'
+	+ '<button type="button" class="design-switcher-button" aria-haspopup="menu" aria-expanded="false" aria-controls="design-menu">'
+	+ '<span class="design-switcher-glyph" aria-hidden="true"></span><span class="design-switcher-text">Design: Original</span><span class="design-switcher-chev" aria-hidden="true"></span></button>'
 	+ '<div class="design-switcher-menu" id="design-menu" role="menu" hidden>'
-	+ '<button type="button" role="menuitemradio" aria-checked="true" data-design-value="sky">Design: Sky</button>'
-	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="dawn">Design: Night to dawn</button>'
-	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="orbit">Design: Orbit</button>'
+	+ '<button type="button" role="menuitemradio" aria-checked="true" data-design-value="original">Original</button>'
+	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="sky">Sky</button>'
+	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="dawn">Night to dawn</button>'
+	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="orbit">Orbit</button>'
 	+ '</div></div><script src="/assets/switcher.js" defer></script>';
-const DESIGN_SCRIPT = '<script>(function(){var d=document.documentElement,v="sky",u=null,s=null;try{u=new URLSearchParams(location.search).get("design");s=localStorage.getItem("lh-design")}catch(e){}if(/^(sky|dawn|orbit)$/.test(u))v=u;else if(/^(sky|dawn|orbit)$/.test(s))v=s;d.dataset.design=v;if(v!=="dawn")return;var seen=null;try{seen=sessionStorage.getItem("lh-dawn-seen")}catch(e){}if(seen||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("dawn-go");else d.classList.add("dawn-pending")})();</script>';
+const PREVIEW_HEAD = PREVIEW ? '<link rel="stylesheet" href="/assets/switcher.css">' : '';
+const DESIGN_SCRIPT = '<script>(function(){var d=document.documentElement,v="original",u=null,s=null;try{u=new URLSearchParams(location.search).get("design");s=localStorage.getItem("lh-design")}catch(e){}if(/^(original|sky|dawn|orbit)$/.test(u))v=u;else if(/^(original|sky|dawn|orbit)$/.test(s))v=s;d.dataset.design=v;if(v!=="dawn")return;var seen=null;try{seen=sessionStorage.getItem("lh-dawn-seen")}catch(e){}if(seen||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("dawn-go");else d.classList.add("dawn-pending")})();</script>';
 const VARIANT_HEAD = '<link rel="stylesheet" href="/assets/variants.css">\n<script src="/assets/variants.js" defer></script>';
-const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, designScript: PREVIEW ? DESIGN_SCRIPT : '', extraHead: '' };
+const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, designScript: PREVIEW ? DESIGN_SCRIPT : '', extraHead: PREVIEW_HEAD };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
 		title: 'Luton Homes: homes near Luton Airport, booked direct',
 		description: CANONICAL,
-		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), extraHead: PREVIEW ? VARIANT_HEAD : '' },
+		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), extraHead: PREVIEW ? PREVIEW_HEAD + '\n' + VARIANT_HEAD : '' },
 	},
 	{
 		file: 'homes.html', out: 'homes/index.html',
@@ -116,7 +120,7 @@ cpSync(at('src/styles.css'), join(dist, 'assets/styles.css'));
 cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
-for (const f of ['switcher.js', 'variants.js', 'variants.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
+for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
 for (const p of pages) {
 	const vars = { ...shared, title: p.title, description: p.description, ...p.vars };
 	const out = join(dist, p.out);
