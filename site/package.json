@@ -1,0 +1,9 @@
+{
+  "name": "luton-homes-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs && node tests/check.mjs"
+  }
+}

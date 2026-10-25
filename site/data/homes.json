@@ -1,0 +1,153 @@
+{
+  "homes": [
+    {
+      "slug": "easystay",
+      "name": "EasyStay",
+      "monogram": "ES",
+      "tone": "sky",
+      "tags": [
+        "one bedroom"
+      ],
+      "sample": true,
+      "sleeps": 2,
+      "beds": "1 bedroom",
+      "distance": "10 minutes to the airport",
+      "rate": 95,
+      "summary": "A calm one-bedroom home a short drive from the airport.",
+      "amenities": [
+        "Wi-Fi",
+        "Fully equipped kitchen",
+        "Washing machine",
+        "Smart TV",
+        "Parking on the street"
+      ],
+      "rules": [
+        "Check in from 3pm",
+        "Check out by 10am",
+        "No smoking inside",
+        "No parties or events"
+      ],
+      "images": [
+        "/media/easystay-1-1600.webp",
+        "/media/easystay-2-1600.webp",
+        "/media/easystay-3-1600.webp"
+      ],
+      "alts": [
+        "Living room with a grey sofa, a table for two and sheer curtains by a window",
+        "Bedroom with two single beds, white bedding and bedside lamps",
+        "Kitchen with white cabinets, a wooden worktop and a kettle"
+      ]
+    },
+    {
+      "slug": "easystay-studio",
+      "name": "EasyStay Studio",
+      "monogram": "ESS",
+      "tone": "ink",
+      "tags": [
+        "studio"
+      ],
+      "sample": true,
+      "sleeps": 2,
+      "beds": "Studio",
+      "distance": "10 minutes to the airport",
+      "rate": 80,
+      "summary": "A compact studio with its own kitchen corner.",
+      "amenities": [
+        "Wi-Fi",
+        "Kitchenette",
+        "Desk",
+        "Smart TV"
+      ],
+      "rules": [
+        "Check in from 3pm",
+        "Check out by 10am",
+        "No smoking inside",
+        "No parties or events"
+      ]
+    },
+    {
+      "slug": "luton-lodge",
+      "name": "Luton Lodge",
+      "monogram": "LL",
+      "tone": "paper",
+      "tags": [
+        "two bedrooms"
+      ],
+      "sample": true,
+      "sleeps": 4,
+      "beds": "2 bedrooms",
+      "distance": "15 minutes to the airport",
+      "rate": 120,
+      "summary": "A two-bedroom lodge for families or friends sharing.",
+      "amenities": [
+        "Wi-Fi",
+        "Fully equipped kitchen",
+        "Washing machine",
+        "Two bathrooms",
+        "Parking on the street"
+      ],
+      "rules": [
+        "Check in from 3pm",
+        "Check out by 10am",
+        "No smoking inside",
+        "Maximum four guests"
+      ]
+    },
+    {
+      "slug": "the-garden-nest",
+      "name": "The Garden Nest",
+      "monogram": "GN",
+      "tone": "paper",
+      "tags": [
+        "one bedroom",
+        "garden"
+      ],
+      "sample": true,
+      "sleeps": 3,
+      "beds": "1 bedroom",
+      "distance": "20 minutes to the airport",
+      "rate": 110,
+      "summary": "A one-bedroom home with a garden for slower evenings.",
+      "amenities": [
+        "Wi-Fi",
+        "Garden",
+        "Fully equipped kitchen",
+        "Washing machine"
+      ],
+      "rules": [
+        "Check in from 3pm",
+        "Check out by 10am",
+        "No smoking inside",
+        "Pets by arrangement"
+      ]
+    },
+    {
+      "slug": "the-garden-studio",
+      "name": "The Garden Studio",
+      "monogram": "GS",
+      "tone": "sky",
+      "tags": [
+        "studio",
+        "garden"
+      ],
+      "sample": true,
+      "sleeps": 2,
+      "beds": "Studio",
+      "distance": "20 minutes to the airport",
+      "rate": 85,
+      "summary": "A quiet studio with a view over the garden.",
+      "amenities": [
+        "Wi-Fi",
+        "Garden view",
+        "Kitchenette",
+        "Desk"
+      ],
+      "rules": [
+        "Check in from 3pm",
+        "Check out by 10am",
+        "No smoking inside",
+        "No parties or events"
+      ]
+    }
+  ]
+}
