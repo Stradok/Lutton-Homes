@@ -12,10 +12,12 @@ const fail = (msg) => failures.push(msg);
 const PENDING_ROUTES = [];
 const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
 const KB = 1024;
-const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 60 * KB };
+const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB };
 const HOMES = ['easystay', 'easystay-studio', 'luton-lodge', 'the-garden-nest', 'the-garden-studio'];
 const CANONICAL = 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.';
 const PREVIEW = 'Design preview: sample photos, prices and details.';
+// The preview flag lives in build.mjs: when it is on, every page has the strip and the switcher.
+const PREVIEW_ON = /^const PREVIEW = true;$/m.test(readFileSync(join(root, 'build.mjs'), 'utf8'));
 const PAGES = ['index.html', 'homes/index.html', 'book/index.html', 'book/confirmed/index.html', 'about/index.html', 'contact/index.html', 'faq/index.html', '404.html'];
 
 if (!existsSync(dist)) {
@@ -25,6 +27,7 @@ if (!existsSync(dist)) {
 
 const files = readdirSync(dist, { recursive: true }).map(String).filter((f) => statSync(join(dist, f)).isFile());
 const read = (f) => readFileSync(join(dist, f), 'utf8');
+const variantsCss = read('assets/variants.css');
 const pages = files.filter((f) => f.endsWith('.html'));
 const idsIn = (f) => new Set([...read(f).matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 
@@ -36,7 +39,13 @@ for (const page of pages) {
 	if (!html.includes('<meta name="robots" content="noindex">')) fail(`${name}: missing noindex`);
 	if ((html.match(/<h1[\s>]/g) || []).length !== 1) fail(`${name}: must have exactly one <h1>`);
 	if (!html.includes('<main id="content"')) fail(`${name}: missing main#content`);
-	if (!html.includes(PREVIEW)) fail(`${name}: missing preview strip`);
+	if (PREVIEW_ON !== html.includes(PREVIEW)) fail(`${name}: preview strip ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
+	if (PREVIEW_ON !== html.includes('data-switcher')) fail(`${name}: design switcher ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
+	if (PREVIEW_ON) {
+		if ((html.match(/role="menuitemradio"/g) || []).length !== 3) fail(`${name}: the switcher needs three menuitemradio options`);
+		if (!html.includes('aria-label="Design preview switcher"')) fail(`${name}: switcher not announced as Design preview switcher`);
+	}
+	if (/\/assets\/variants\.(css|js)/.test(html) && page !== 'index.html') fail(`${name}: variant files are for the home page only`);
 	if (!html.includes('<link rel="icon" href="/favicon.svg"')) fail(`${name}: favicon not linked`);
 	for (const [img] of html.matchAll(/<img\b[^>]*>/g)) {
 		if (!/\swidth=/.test(img) || !/\sheight=/.test(img)) fail(`${name}: <img> without width and height`);
@@ -66,7 +75,7 @@ for (const page of pages) {
 	if (size > BUDGET.html) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
 }
 
-const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes };
+const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs };
 for (const [file, budget] of Object.entries(assets)) {
 	const text = read(file);
 	if (Buffer.byteLength(text) > budget) fail(`${file}: ${Buffer.byteLength(text)} bytes, budget ${budget}`);
@@ -74,7 +83,8 @@ for (const [file, budget] of Object.entries(assets)) {
 
 for (const file of files.filter((f) => f.startsWith('media/'))) {
 	const size = statSync(join(dist, file)).size;
-	if (size > BUDGET.media) fail(`${file}: ${size} bytes, budget ${BUDGET.media}`);
+	const budget = file === 'media/earth-night-se-england.webp' ? 100 * KB : BUDGET.media;
+	if (size > budget) fail(`${file}: ${size} bytes, budget ${budget}`);
 }
 
 for (const file of files.filter((f) => /\.(html|css|js)$/.test(f))) {
@@ -98,6 +108,18 @@ const chips = [...homesHtml.matchAll(/<button type="button" class="chip"[^>]*dat
 if (chips.length !== 5) fail(`homes/index.html: expected 5 aria-pressed filter chips, found ${chips.length}`);
 if ((homesHtml.match(/<li class="reveal" data-tags="\|[^"]+\|"/g) || []).length !== HOMES.length) fail('homes/index.html: cards need data-tags');
 if (!read('homes/easystay/index.html').includes('<dialog id="lightbox"')) fail('homes/easystay/index.html: missing lightbox dialog');
+if (PREVIEW_ON) {
+	if (!read('index.html').includes('/assets/variants.css') || !read('index.html').includes('/assets/variants.js')) fail('index.html: variant files not referenced');
+}
+// Earth images: only from rules scoped to [data-design="orbit"], and nowhere else in the built site.
+for (const [, selector, body] of variantsCss.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+	if (/earth-night/.test(body) && !/\[data-design="orbit"\]/.test(selector)) fail(`assets/variants.css: earth image outside [data-design="orbit"]: ${selector.trim()}`);
+}
+for (const file of files.filter((f) => /\.(html|js|css)$/.test(f) && f !== 'assets/variants.css')) {
+	if (/earth-night/.test(read(file))) fail(`${file}: earth image referenced outside the orbit rules`);
+}
+if (!/\[data-design="dawn"\]:not\(\.dawn-go\)[^{]*\{[^}]*reveal-fallback/.test(variantsCss)) fail('assets/variants.css: dawn hero has no reveal-fallback');
+if (!read('index.html').includes('<meta name="robots" content="noindex">')) fail('index.html: missing noindex');
 if (!read('index.html').includes(CANONICAL)) fail('index.html: canonical description missing or changed');
 const robots = read('robots.txt');
 if (!/^Disallow: \/$/m.test(robots)) fail('robots.txt: missing Disallow: /');
@@ -116,7 +138,7 @@ if (!css.includes('prefers-reduced-motion')) fail('styles.css: no prefers-reduce
 if (!css.includes('@view-transition')) fail('styles.css: no @view-transition rule');
 if (!css.includes('reveal-fallback')) fail('styles.css: no reveal-fallback safety net for .reveal content');
 // Every animation name used in styles.css must have a @keyframes rule. Keywords, times, timing functions, counts and var() are skipped.
-const cssBare = css.replace(/\/\*[\s\S]*?\*\//g, '');
+const cssBare = (css + '\n' + variantsCss).replace(/\/\*[\s\S]*?\*\//g, '');
 const keyframeNames = new Set([...cssBare.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]));
 const CSS_KEYWORD = /^(none|normal|reverse|alternate|alternate-reverse|forwards|backwards|both|infinite|running|paused|linear|ease|ease-in|ease-out|ease-in-out|step-start|step-end|auto|!important)$/;
 const CSS_NOT_A_NAME = /^-?[\d.]+(m?s)?$/;

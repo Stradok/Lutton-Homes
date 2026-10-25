@@ -8,6 +8,8 @@ const at = (...p) => join(root, ...p);
 const dist = at('dist');
 const { homes } = JSON.parse(readFileSync(at('data/homes.json'), 'utf8'));
 const TONES = ['sky', 'paper', 'ink'];
+// Design preview: the preview strip, the design switcher and the variant files. Set to false for launch.
+const PREVIEW = true;
 const CANONICAL = 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -16,6 +18,7 @@ const need = (map, key) => {
 	return map[key];
 };
 const partials = Object.fromEntries(readdirSync(at('src/partials')).map((f) => [f.replace(/\.html$/, ''), readFileSync(at('src/partials', f), 'utf8')]));
+if (!PREVIEW) partials['preview-strip'] = '';
 // One pass: {{key}} is escaped, {{{key}}} is inserted as HTML, {{> name}} inserts a partial rendered the same way.
 // replace() never rescans its output, so a substituted value that contains {{...}} stays literal.
 const render = (tpl, vars) => tpl.replace(/\{\{\{(\w+)\}\}\}|\{\{(\w+)\}\}|\{\{> ([\w-]+)\}\}/g,
@@ -61,13 +64,23 @@ const lightbox = (h) => (h.images?.length ? `<dialog id="lightbox" class="lightb
 // The booking pages read name and rate by slug from this inline JSON (no request).
 const homesJson = `<script id="lh-homes" type="application/json">${JSON.stringify(Object.fromEntries(homes.map((h) => [h.slug, { name: h.name, rate: h.rate }]))).replace(/</g, '\\u003c')}</script>`;
 
-const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson };
+// Preview only: the switcher markup, and the design attribute script that reads ?design= then localStorage, before first paint.
+const SWITCHER = '<div class="design-switcher" role="group" aria-label="Design preview switcher" data-switcher>'
+	+ '<button type="button" class="design-switcher-button" aria-haspopup="menu" aria-expanded="false" aria-controls="design-menu">Design: Sky</button>'
+	+ '<div class="design-switcher-menu" id="design-menu" role="menu" hidden>'
+	+ '<button type="button" role="menuitemradio" aria-checked="true" data-design-value="sky">Design: Sky</button>'
+	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="dawn">Design: Night to dawn</button>'
+	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="orbit">Design: Orbit</button>'
+	+ '</div></div><script src="/assets/switcher.js" defer></script>';
+const DESIGN_SCRIPT = '<script>(function(){var d=document.documentElement,v="sky",u=null,s=null;try{u=new URLSearchParams(location.search).get("design");s=localStorage.getItem("lh-design")}catch(e){}if(/^(sky|dawn|orbit)$/.test(u))v=u;else if(/^(sky|dawn|orbit)$/.test(s))v=s;d.dataset.design=v;if(v!=="dawn")return;var seen=null;try{seen=sessionStorage.getItem("lh-dawn-seen")}catch(e){}if(seen||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("dawn-go");else d.classList.add("dawn-pending")})();</script>';
+const VARIANT_HEAD = '<link rel="stylesheet" href="/assets/variants.css">\n<script src="/assets/variants.js" defer></script>';
+const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, designScript: PREVIEW ? DESIGN_SCRIPT : '', extraHead: '' };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
 		title: 'Luton Homes: homes near Luton Airport, booked direct',
 		description: CANONICAL,
-		vars: { homeCards: homes.map((h) => homeCard(h, false)).join('') },
+		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), extraHead: PREVIEW ? VARIANT_HEAD : '' },
 	},
 	{
 		file: 'homes.html', out: 'homes/index.html',
@@ -103,10 +116,13 @@ cpSync(at('src/styles.css'), join(dist, 'assets/styles.css'));
 cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
+for (const f of ['switcher.js', 'variants.js', 'variants.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
 for (const p of pages) {
 	const vars = { ...shared, title: p.title, description: p.description, ...p.vars };
 	const out = join(dist, p.out);
 	mkdirSync(dirname(out), { recursive: true });
-	writeFileSync(out, render(readFileSync(at('src/pages', p.file), 'utf8'), vars));
+	let html = render(readFileSync(at('src/pages', p.file), 'utf8'), vars);
+	if (PREVIEW) html = html.replace('</body>', SWITCHER + '</body>');
+	writeFileSync(out, html);
 }
 console.log(`built ${pages.length} pages into dist/`);
