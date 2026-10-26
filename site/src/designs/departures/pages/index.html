@@ -1,0 +1,108 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content" class="dep-home">
+<section class="dep-hero">
+<div class="wrap">
+<h1 class="flap-title" data-flap>Somewhere calm to land</h1>
+<p class="dep-lead">Five short-stay homes near Luton Airport, booked direct.</p>
+
+<div class="board" role="region" aria-labelledby="board-title">
+<div class="board-head">
+<h2 id="board-title" class="board-title" data-flap>Arrivals</h2>
+<p class="board-sub">Luton Homes</p>
+</div>
+<div class="board-cols" aria-hidden="true"><span>Home</span><span>Gate</span><span>Details</span><span>Rate</span></div>
+<ul class="board-rows">{{{boardRows}}}</ul>
+</div>
+
+<form id="search-form" class="pass" action="/homes/" method="get" novalidate>
+<div class="pass-main">
+<div class="pass-head">
+<h2 class="pass-title">Plan your stay</h2>
+<span class="pass-code" aria-hidden="true">LTN</span>
+</div>
+<div class="pass-fields">
+<div class="field">
+<label for="search-in">Check in</label>
+<input id="search-in" name="in" type="date" aria-describedby="search-in-error">
+<p id="search-in-error" class="error" data-err="in" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-out">Check out</label>
+<input id="search-out" name="out" type="date" aria-describedby="search-out-error">
+<p id="search-out-error" class="error" data-err="out" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-guests">Guests</label>
+<input id="search-guests" name="guests" type="number" min="1" value="2" aria-describedby="search-guests-error">
+<p id="search-guests-error" class="error" data-err="guests" role="alert"></p>
+</div>
+</div>
+</div>
+<div class="pass-stub">
+<button type="submit" class="button button--primary button--block">Check availability<span class="arrow" aria-hidden="true"></span></button>
+<p class="note">Availability and prices are samples in this preview.</p>
+</div>
+</form>
+</div>
+</section>
+
+<section id="homes" class="dep-section">
+<div class="wrap">
+<h2>Five homes, one team</h2>
+<p class="intro">Each home keeps its own name. Photos and details are on the way.</p>
+<ul class="home-cards">{{{homeCards}}}</ul>
+</div>
+</section>
+
+<section id="why-direct" class="dep-section dep-signs">
+<div class="wrap">
+<h2>Why book with us directly</h2>
+<ul class="sign-row">
+<li class="sign reveal"><span class="sign-glyph" aria-hidden="true">A</span><h3>Talk to a person.</h3><p>Message us on WhatsApp and the team that looks after the homes answers.</p></li>
+<li class="sign reveal"><span class="sign-glyph" aria-hidden="true">B</span><h3>Clear check-in details.</h3><p>We send check-in instructions before you arrive.</p></li>
+<li class="sign reveal"><span class="sign-glyph" aria-hidden="true">C</span><h3>Pay securely online.</h3><p>Secure online payment once booking opens.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="how-booking" class="dep-section dep-route">
+<div class="wrap">
+<h2>How booking works</h2>
+<ol class="route">
+<li class="route-stop reveal"><h3>Pick your dates</h3><p>Tell us when you arrive and when you leave.</p></li>
+<li class="route-stop reveal"><h3>Choose a home</h3><p>Each home has its own page with its rules and sample rate.</p></li>
+<li class="route-stop reveal"><h3>Pay securely</h3><p>Online payment is not connected in this preview.</p></li>
+</ol>
+</div>
+</section>
+
+<section id="find-us" class="dep-section dep-wayfind">
+<div class="wrap">
+<h2>Find us</h2>
+<div class="wayfind-sign">
+<span class="wayfind-arrow" aria-hidden="true"></span>
+<div>
+<address>34 Beaconsfield, Luton LU2 0RW</address>
+<p>Luton Airport is nearby.</p>
+</div>
+</div>
+<div class="actions">
+<a class="link" href="{{maps}}">Get directions</a>
+<a class="link" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+</div>
+</section>
+
+<section class="dep-section dep-contact">
+<div class="wrap">
+<h2 data-flap>Questions before you book?</h2>
+<p>Message us on WhatsApp or find us at 34 Beaconsfield, Luton LU2 0RW.</p>
+<a class="button button--primary" href="{{wa}}">Message us on WhatsApp<span class="arrow" aria-hidden="true"></span></a>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>

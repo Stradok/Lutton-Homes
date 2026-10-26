@@ -13,8 +13,9 @@ const PENDING_ROUTES = [];
 const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
 const KB = 1024;
 const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB, switcherCss: 4 * KB, themeOriginalCss: 12 * KB };
-const DESIGNS = ['original', 'sky', 'dawn', 'orbit'];
-const DESIGN_NAMES = ['Original', 'Sky', 'Night to dawn', 'Orbit'];
+// Designs come from build.mjs (id, menu name, base path, html data-design value), in menu order.
+const DESIGN_LIST = [...readFileSync(join(root, 'build.mjs'), 'utf8').matchAll(/\{ id: '([\w-]+)', name: '([^']+)', base: '([^']*)', attr: '([\w-]+)' \}/g)].map(([, id, name, base, attr]) => ({ id, name, base, attr }));
+const designOf = (page) => DESIGN_LIST.find((d) => d.base && page.startsWith(d.base.slice(1) + '/')) || DESIGN_LIST[0];
 const HOMES = ['easystay', 'easystay-studio', 'luton-lodge', 'the-garden-nest', 'the-garden-studio'];
 const CANONICAL = 'Short-stay homes near Luton Airport. Five properties, one team. Book direct with Luton Homes.';
 const PREVIEW = 'Design preview: sample photos, prices and details.';
@@ -44,18 +45,32 @@ for (const page of pages) {
 	if ((html.match(/<h1[\s>]/g) || []).length !== 1) fail(`${name}: must have exactly one <h1>`);
 	if (!html.includes('<main id="content"')) fail(`${name}: missing main#content`);
 	if (PREVIEW_ON !== html.includes(PREVIEW)) fail(`${name}: preview strip ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
-	if (PREVIEW_ON !== html.includes('data-switcher')) fail(`${name}: design switcher ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
-	if (!/<html[^>]*\sdata-design="original"/.test(html)) fail(`${name}: the default design must be original on <html>`);
-	if (!html.includes('/assets/theme-original.css')) fail(`${name}: theme-original.css not linked`);
-	if (PREVIEW_ON) {
-		const options = [...html.matchAll(/role="menuitemradio"[^>]*data-design-value="([^"]+)">([^<]+)</g)];
-		if (options.map((m) => m[1]).join() !== DESIGNS.join()) fail(`${name}: switcher options must be ${DESIGNS.join(', ')} in that order`);
-		if (options.map((m) => m[2]).join() !== DESIGN_NAMES.join()) fail(`${name}: switcher labels must be ${DESIGN_NAMES.join(', ')}`);
-		if (!html.includes('<span class="design-switcher-text">Design: Original</span>')) fail(`${name}: switcher label must start as Design: Original`);
+	// Error pages are the same for every design, so they carry no switcher.
+	if ((PREVIEW_ON && !/^(404|500)\.html$/.test(page)) !== html.includes('data-switcher')) fail(`${name}: design switcher ${PREVIEW_ON ? 'missing' : 'must not be built'}`);
+	const design = designOf(page);
+	const local = design.base ? page.slice(design.base.length) : page;
+	if (!html.includes(`<html lang="en-GB" data-design="${design.attr}">`)) fail(`${name}: <html> must carry data-design="${design.attr}"`);
+	if ((design.id === 'original') !== html.includes('/assets/theme-original.css')) fail(`${name}: theme-original.css belongs to the Original design only`);
+	if (PREVIEW_ON && !/^(404|500)\.html$/.test(page)) {
+		const options = [...html.matchAll(/<a role="menuitemradio" aria-checked="(true|false)" data-design-value="([^"]+)" href="([^"]+)">([^<]+)</g)];
+		if (options.map((m) => m[2]).join() !== DESIGN_LIST.map((d) => d.id).join()) fail(`${name}: switcher options must be ${DESIGN_LIST.map((d) => d.id).join(', ')} in that order`);
+		if (options.map((m) => m[4]).join() !== DESIGN_LIST.map((d) => d.name).join()) fail(`${name}: switcher labels must be ${DESIGN_LIST.map((d) => d.name).join(', ')}`);
+		const path = '/' + local.replace(/index\.html$/, '');
+		for (const [, checked, id, href] of options) {
+			const d = DESIGN_LIST.find((x) => x.id === id);
+			if (d && href !== d.base + path) fail(`${name}: switcher link for ${id} must be ${d.base + path}, got ${href}`);
+			if ((checked === 'true') !== (id === design.id)) fail(`${name}: switcher must mark ${design.id} as current`);
+		}
+		if (!html.includes(`<span class="design-switcher-text">Design: ${design.name}</span>`)) fail(`${name}: switcher label must be Design: ${design.name}`);
 		if (!html.includes('aria-label="Design preview switcher"')) fail(`${name}: switcher not announced as Design preview switcher`);
 		if (!html.includes('/assets/switcher.css')) fail(`${name}: switcher.css not linked`);
 	}
-	if (/\/assets\/variants\.(css|js)/.test(html) && page !== 'index.html') fail(`${name}: variant files are for the home page only`);
+	if (/\/assets\/variants\.(css|js)/.test(html) && local !== 'index.html') fail(`${name}: variant files are for the home page only`);
+	// Site links stay inside the page's own design (shared files and the switcher excepted).
+	for (const [, value] of html.replace(/<div class="design-switcher"[\s\S]*?<\/div><\/div>/, '').matchAll(/\s(?:href|action)="(\/[^"]*)"/g)) {
+		if (/^\/(assets|fonts|media|favicon)/.test(value)) continue;
+		if (design.base ? !value.startsWith(design.base + '/') : value.startsWith('/d/')) fail(`${name}: link ${value} leaves the ${design.name} design`);
+	}
 	if (!html.includes('<link rel="icon" href="/favicon.svg"')) fail(`${name}: favicon not linked`);
 	for (const [img] of html.matchAll(/<img\b[^>]*>/g)) {
 		if (!/\swidth=/.test(img) || !/\sheight=/.test(img)) fail(`${name}: <img> without width and height`);
@@ -102,7 +117,11 @@ for (const file of files.filter((f) => /\.(html|css|js)$/.test(f))) {
 	if (/[\u2013\u2014]|&ndash;|&mdash;/.test(text)) fail(`${file}: contains an en or em dash`);
 }
 
-for (const page of PAGES) if (!existsSync(join(dist, page))) fail(`${page}: not built`);
+if (DESIGN_LIST.length < 2 || DESIGN_LIST[0].id !== 'original' || DESIGN_LIST[0].base !== '') fail('build.mjs: Original must be the first design, at the site root');
+for (const d of DESIGN_LIST) for (const page of PAGES) {
+	if (d.base && /^404\.html$/.test(page)) continue;
+	if (!existsSync(join(dist, d.base, page))) fail(`${d.base}/${page}: not built`);
+}
 if (!existsSync(join(dist, 'favicon.svg'))) fail('favicon.svg: missing from dist');
 // 500 page: Vercel does not serve a static custom 500 page on its own, so it is checked here directly.
 if (!existsSync(join(dist, '500.html'))) {
@@ -113,13 +132,20 @@ if (!existsSync(join(dist, '500.html'))) {
 	if (!page500.includes('<meta name="robots" content="noindex">')) fail('500.html: missing noindex');
 	if (/[\u2013\u2014]/.test(page500)) fail('500.html: contains an en or em dash');
 }
-const homesHtml = read('homes/index.html');
-const chips = [...homesHtml.matchAll(/<button type="button" class="chip"[^>]*data-tag="[^"]+"[^>]*aria-pressed="(?:true|false)"/g)];
-if (chips.length !== 5) fail(`homes/index.html: expected 5 aria-pressed filter chips, found ${chips.length}`);
-if ((homesHtml.match(/<li class="reveal" data-tags="\|[^"]+\|"/g) || []).length !== HOMES.length) fail('homes/index.html: cards need data-tags');
-if (!read('homes/easystay/index.html').includes('<dialog id="lightbox"')) fail('homes/easystay/index.html: missing lightbox dialog');
-if (PREVIEW_ON) {
-	if (!read('index.html').includes('/assets/variants.css') || !read('index.html').includes('/assets/variants.js')) fail('index.html: variant files not referenced');
+for (const d of DESIGN_LIST) {
+	const at = (f) => (d.base ? d.base.slice(1) + '/' : '') + f;
+	const homesHtml = read(at('homes/index.html'));
+	const chips = [...homesHtml.matchAll(/<button type="button" class="chip"[^>]*data-tag="[^"]+"[^>]*aria-pressed="(?:true|false)"/g)];
+	if (chips.length !== 5) fail(`${at('homes/index.html')}: expected 5 aria-pressed filter chips, found ${chips.length}`);
+	if ((homesHtml.match(/<li class="reveal" data-tags="\|[^"]+\|"/g) || []).length !== HOMES.length) fail(`${at('homes/index.html')}: cards need data-tags`);
+	if (!read(at('homes/easystay/index.html')).includes('<dialog id="lightbox"')) fail(`${at('homes/easystay/index.html')}: missing lightbox dialog`);
+	if (PREVIEW_ON && (!read(at('index.html')).includes('/assets/variants.css') || !read(at('index.html')).includes('/assets/variants.js'))) fail(`${at('index.html')}: variant files not referenced`);
+	if (!read(at('index.html')).includes(CANONICAL)) fail(`${at('index.html')}: canonical description missing or changed`);
+	for (const slug of HOMES) {
+		for (const file of [at('homes/index.html'), at(`homes/${slug}/index.html`)]) {
+			if (!read(file).includes(`view-transition-name: home-${slug}"`)) fail(`${file}: missing view-transition-name home-${slug}`);
+		}
+	}
 }
 // Earth images: only from rules scoped to [data-design="orbit"], and nowhere else in the built site.
 for (const [, selector, body] of variantsCss.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -151,7 +177,6 @@ if (!/\.design-switcher-button\s*\{[^}]*min-height:\s*48px/.test(switcherCss)) f
 if (!/\.design-switcher-glyph\s*\{/.test(switcherCss) || !/\.design-switcher-chev\s*\{/.test(switcherCss)) fail('assets/switcher.css: switcher needs a glyph and a chevron');
 if (!/\[data-design="dawn"\]:not\(\.dawn-go\)[^{]*\{[^}]*reveal-fallback/.test(variantsCss)) fail('assets/variants.css: dawn hero has no reveal-fallback');
 if (!read('index.html').includes('<meta name="robots" content="noindex">')) fail('index.html: missing noindex');
-if (!read('index.html').includes(CANONICAL)) fail('index.html: canonical description missing or changed');
 const robots = read('robots.txt');
 if (!/^Disallow: \/$/m.test(robots)) fail('robots.txt: missing Disallow: /');
 const vercel = JSON.parse(readFileSync(join(root, 'vercel.json'), 'utf8'));
@@ -179,11 +204,6 @@ for (const [, value] of cssBare.matchAll(/(?<![\w-])animation(?:-name)?\s*:\s*([
 			if (!token || CSS_KEYWORD.test(token) || CSS_NOT_A_NAME.test(token)) continue;
 			if (!keyframeNames.has(token)) fail(`styles.css: animation "${token}" is used but has no @keyframes`);
 		}
-	}
-}
-for (const slug of HOMES) {
-	for (const file of ['homes/index.html', `homes/${slug}/index.html`]) {
-		if (!read(file).includes(`view-transition-name: home-${slug}"`)) fail(`${file}: missing view-transition-name home-${slug}`);
 	}
 }
 

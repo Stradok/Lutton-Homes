@@ -1,0 +1,214 @@
+/* Departures design: an airport terminal. Black arrivals boards with amber split-flap type, yellow wayfinding
+   signs, square ticket shapes and white terminal walls. Scoped to [data-design="departures"].
+   Brand tokens only; the board black is the brand ink taken darker. */
+[data-design="departures"] {
+	--dep-board: #0A1C23;
+	--dep-board-2: #11303A;
+	--dep-tile: #163843;
+	--dep-sign: var(--lh-amber);
+	--dep-line: rgba(243, 246, 245, 0.14);
+	--lh-radius: 2px;
+}
+[data-design="departures"] body { background: var(--lh-paper); }
+[data-design="departures"] main { margin-top: 0; }
+[data-design="departures"] h1,
+[data-design="departures"] h2,
+[data-design="departures"] h3 { text-transform: uppercase; letter-spacing: 0.02em; }
+[data-design="departures"] .flap-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Header: the board bar. Solid black, amber wordmark, clock on the right. */
+[data-design="departures"] .site-header:not(.is-open) {
+	width: 100%;
+	margin: 0;
+	padding: 0.6rem var(--lh-edge);
+	border-radius: 0;
+	background: var(--dep-board);
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	box-shadow: none;
+	border-bottom: 3px solid var(--dep-sign);
+}
+[data-design="departures"] .site-header::after { display: none; }
+[data-design="departures"] .wordmark { color: var(--dep-sign); gap: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; }
+[data-design="departures"] .wordmark-mark { display: inline-grid; place-items: center; width: 2rem; height: 2rem; background: var(--dep-sign); color: var(--dep-board); font-size: 0.85rem; letter-spacing: 0; }
+[data-design="departures"] .site-header:not(.is-open) .site-nav a { color: var(--lh-white); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.9rem; }
+[data-design="departures"] .board-clock { display: none; margin: 0; align-items: center; gap: 0.5rem; color: var(--dep-sign); font: 700 1rem var(--lh-font-head); font-stretch: 112%; font-variant-numeric: tabular-nums; }
+[data-design="departures"] .board-clock-code { padding: 0.1rem 0.4rem; border: 1px solid var(--dep-sign); font-size: 0.75rem; }
+[data-design="departures"] .menu-lines,
+[data-design="departures"] .menu-lines::before,
+[data-design="departures"] .menu-lines::after { background: var(--lh-white); }
+[data-design="departures"] .site-header.is-open .menu-lines { background: transparent; }
+[data-design="departures"] .site-header.is-open .menu-lines::before,
+[data-design="departures"] .site-header.is-open .menu-lines::after { background: var(--lh-ink); }
+@media (min-width: 900px) { [data-design="departures"] .board-clock { display: inline-flex; } }
+/* Phones: wordmark, WhatsApp and the menu button stay on one row. */
+@media (max-width: 767px) {
+	[data-design="departures"] .site-header:not(.is-open) { flex-wrap: nowrap; gap: 0.5rem; }
+	[data-design="departures"] .wordmark { font-size: 0.95rem; gap: 0.45rem; min-width: 0; }
+	[data-design="departures"] .wordmark-mark { width: 1.7rem; height: 1.7rem; font-size: 0.75rem; }
+	[data-design="departures"] .header-cta { padding-inline: 0.75rem; }
+}
+
+/* Buttons and links: square, flat, sign yellow on black type. */
+[data-design="departures"] .button { border-radius: var(--lh-radius); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.95rem; white-space: nowrap; }
+[data-design="departures"] .button--primary { background: var(--dep-sign); color: var(--dep-board); box-shadow: inset 0 -3px 0 rgba(10, 28, 35, 0.25); }
+[data-design="departures"] .button--primary:hover { background: var(--lh-amber-hover); }
+[data-design="departures"] .arrow { border-radius: 0; background: var(--dep-board); }
+
+/* Split-flap tiles. Each letter sits on a dark tile with a hinge line through the middle. */
+[data-design="departures"] .flap-tiles { display: inline; }
+[data-design="departures"] .flap-word { display: inline-flex; gap: 0.06em; margin-inline-end: 0.12em; white-space: nowrap; }
+[data-design="departures"] .flap {
+	position: relative;
+	display: inline-grid;
+	place-items: center;
+	min-width: 0.78em;
+	height: 1.12em;
+	padding: 0 0.04em;
+	background: linear-gradient(180deg, #1B414D 0 49%, #0B2129 49% 51%, var(--dep-tile) 51% 100%);
+	color: var(--dep-sign);
+	border-radius: 0.06em;
+	line-height: 1;
+}
+[data-design="departures"] .flap.is-tick { animation: dep-flip 55ms linear; }
+@keyframes dep-flip { from { transform: scaleY(0.2); } to { transform: none; } }
+
+/* Hero: the black board area. Headline in flaps, then the arrivals board, then the pass. */
+[data-design="departures"] .dep-hero { padding: 2.5rem 0 3.5rem; background: var(--dep-board); color: var(--lh-white); }
+[data-design="departures"] .dep-hero .flap-title { margin: 0; font-size: clamp(1.9rem, 5.2vw, 3.6rem); line-height: 1.25; color: var(--dep-sign); }
+[data-design="departures"] .dep-lead { margin: 1rem 0 2rem; color: var(--lh-sky); font-size: var(--lh-text-md); }
+
+[data-design="departures"] .board { margin-bottom: 2rem; border: 1px solid var(--dep-line); background: var(--dep-board-2); }
+[data-design="departures"] .board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 2px solid var(--dep-sign); }
+[data-design="departures"] .board-title { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); color: var(--dep-sign); }
+[data-design="departures"] .board-sub { margin: 0; color: var(--lh-sky); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; }
+[data-design="departures"] .board-cols,
+[data-design="departures"] .board-row { display: grid; grid-template-columns: minmax(0, 2.2fr) 4.5rem minmax(0, 1.4fr) minmax(0, 1.4fr); gap: 1rem; align-items: center; padding: 0.75rem 1.25rem; }
+[data-design="departures"] .board-cols { color: var(--lh-sky); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid var(--dep-line); }
+[data-design="departures"] .board-rows { margin: 0; padding: 0; list-style: none; }
+[data-design="departures"] .board-rows li + li .board-row { border-top: 1px solid var(--dep-line); }
+[data-design="departures"] .board-row { min-height: 64px; color: var(--lh-white); text-decoration: none; transition: background-color 180ms var(--ease-out); }
+[data-design="departures"] .board-row:hover,
+[data-design="departures"] .board-row:focus-visible { background: rgba(242, 176, 30, 0.1); }
+[data-design="departures"] .board-home { font: 700 1.15rem var(--lh-font-head); font-stretch: 112%; text-transform: uppercase; color: var(--dep-sign); }
+[data-design="departures"] .board-gate { justify-self: start; padding: 0.15rem 0.5rem; background: var(--dep-sign); color: var(--dep-board); font: 700 0.95rem var(--lh-font-head); font-stretch: 112%; }
+[data-design="departures"] .board-info { color: var(--lh-sky); }
+[data-design="departures"] .board-rate { font-weight: 700; }
+[data-design="departures"] .board .sample { color: var(--lh-sky); font-weight: 400; }
+@media (max-width: 639px) {
+	[data-design="departures"] .board-cols { display: none; }
+	[data-design="departures"] .board-row { grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 1rem; padding: 0.9rem 1rem; }
+	[data-design="departures"] .board-gate { grid-row: 1; grid-column: 2; justify-self: end; }
+	[data-design="departures"] .board-info,
+	[data-design="departures"] .board-rate { grid-column: 1 / -1; font-size: 0.95rem; }
+}
+
+/* The boarding pass search: one wide ticket with a perforated stub. */
+[data-design="departures"] .pass { display: grid; background: var(--lh-white); color: var(--lh-ink); border-radius: 4px; overflow: hidden; }
+[data-design="departures"] .pass-main { padding: 1.25rem 1.25rem 0.5rem; }
+[data-design="departures"] .pass-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
+[data-design="departures"] .pass-title { margin: 0; font-size: var(--lh-text-md); }
+[data-design="departures"] .pass-code { font: 700 1.6rem var(--lh-font-head); font-stretch: 112%; color: var(--lh-ink); }
+[data-design="departures"] .pass-fields { display: grid; gap: 0 1rem; }
+[data-design="departures"] .pass-stub { display: grid; align-content: center; gap: 0.5rem; padding: 1.25rem; background: var(--lh-paper); border-top: 2px dashed var(--lh-line); }
+[data-design="departures"] .pass .note { margin: 0; font-size: 0.85rem; color: var(--lh-slate); }
+[data-design="departures"] .field input { border-radius: var(--lh-radius); }
+@media (min-width: 768px) {
+	[data-design="departures"] .pass { grid-template-columns: minmax(0, 1fr) 21rem; }
+	[data-design="departures"] .pass-fields { grid-template-columns: 1fr 1fr 8rem; }
+	[data-design="departures"] .pass-stub { border-top: 0; border-left: 2px dashed var(--lh-line); }
+}
+
+/* Sections: white terminal walls with a yellow sign bar on every heading. */
+[data-design="departures"] .dep-section,
+[data-design="departures"] .page-section { padding-block: 3.5rem; }
+[data-design="departures"] .dep-section h2,
+[data-design="departures"] .page-section h2,
+[data-design="departures"] .page-band h1 { display: inline-block; padding: 0.35rem 0.75rem; background: var(--dep-sign); color: var(--dep-board); font-size: clamp(1.3rem, 3vw, 1.9rem); line-height: 1.2; }
+[data-design="departures"] .intro { margin-top: 1rem; }
+
+/* Home cards on the home page and the homes list: square tiles with a black gate band. */
+[data-design="departures"] .home-card { border-radius: var(--lh-radius); box-shadow: none; border: 1px solid var(--lh-line); }
+[data-design="departures"] .home-card:hover,
+[data-design="departures"] .home-card:focus-visible { transform: none; border-color: var(--dep-board); box-shadow: 6px 6px 0 var(--dep-sign); }
+[data-design="departures"] .gate-sign { border-radius: 0; }
+[data-design="departures"] .gate-sign--ink,
+[data-design="departures"] .gate-sign--sky,
+[data-design="departures"] .gate-sign--paper { background: var(--dep-board); }
+[data-design="departures"] .gate-sign-mark { color: var(--dep-sign); }
+[data-design="departures"] .gate-sign-note { color: var(--lh-sky); }
+[data-design="departures"] .home-card-body h2,
+[data-design="departures"] .home-card-body h3 { font-size: var(--lh-text-base); }
+
+/* Why direct: three yellow wayfinding signs with a letter glyph. */
+[data-design="departures"] .sign-row { display: grid; gap: 1rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+[data-design="departures"] .sign { display: grid; grid-template-columns: 3.5rem 1fr; gap: 0.25rem 1rem; padding: 1.25rem; background: var(--dep-board); color: var(--lh-white); }
+[data-design="departures"] .sign-glyph { grid-row: span 2; display: grid; place-items: center; width: 3.5rem; height: 3.5rem; background: var(--dep-sign); color: var(--dep-board); font: 700 1.6rem var(--lh-font-head); font-stretch: 112%; }
+[data-design="departures"] .sign h3 { margin: 0; color: var(--dep-sign); font-size: var(--lh-text-base); }
+[data-design="departures"] .sign p { margin: 0; color: var(--lh-sky); }
+@media (min-width: 900px) { [data-design="departures"] .sign-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* How booking works: a route line with three stops, like a terminal map. */
+[data-design="departures"] .route { position: relative; display: grid; gap: 1.5rem; margin: 2rem 0 0; padding: 0 0 0 2rem; list-style: none; counter-reset: stop; }
+[data-design="departures"] .route::before { content: ""; position: absolute; left: 0.55rem; top: 0.5rem; bottom: 0.5rem; width: 4px; background: var(--dep-board); }
+[data-design="departures"] .route-stop { position: relative; counter-increment: stop; }
+[data-design="departures"] .route-stop::before { content: counter(stop); position: absolute; left: -2rem; top: 0; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; background: var(--dep-sign); color: var(--dep-board); border: 3px solid var(--dep-board); font: 700 0.8rem var(--lh-font-head); }
+[data-design="departures"] .route-stop h3 { margin: 0 0 0.25rem; font-size: var(--lh-text-base); }
+[data-design="departures"] .route-stop p { margin: 0; }
+@media (min-width: 900px) {
+	[data-design="departures"] .route { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2rem; padding: 2.5rem 0 0; }
+	[data-design="departures"] .route::before { left: 0.5rem; right: 0.5rem; top: 0.65rem; bottom: auto; width: auto; height: 4px; }
+	[data-design="departures"] .route-stop::before { left: 0; top: -2.5rem; }
+}
+
+/* Find us: a big wayfinding sign with an arrow. */
+[data-design="departures"] .wayfind-sign { display: flex; align-items: center; gap: 1.25rem; margin: 1.5rem 0 1rem; padding: 1.5rem; background: var(--dep-sign); color: var(--dep-board); }
+[data-design="departures"] .wayfind-sign address { font: 700 clamp(1.2rem, 3vw, 1.8rem) var(--lh-font-head); font-stretch: 112%; font-style: normal; text-transform: uppercase; }
+[data-design="departures"] .wayfind-sign p { margin: 0.25rem 0 0; font-weight: 700; }
+[data-design="departures"] .wayfind-arrow { flex: 0 0 auto; width: 3.5rem; height: 3.5rem; background: var(--dep-board); clip-path: polygon(0 35%, 55% 35%, 55% 10%, 100% 50%, 55% 90%, 55% 65%, 0 65%); }
+
+/* Contact: back on the board. */
+[data-design="departures"] .dep-contact { background: var(--dep-board); color: var(--lh-white); }
+[data-design="departures"] .dep-contact h2 { display: block; padding: 0; background: none; color: var(--dep-sign); font-size: clamp(1.4rem, 4vw, 2.4rem); }
+[data-design="departures"] .dep-contact p { color: var(--lh-sky); }
+
+/* Inner pages: a board band for the title. */
+[data-design="departures"] .page-band { padding: 2.5rem 0; background: var(--dep-board); color: var(--lh-white); }
+[data-design="departures"] .page-band :is(.intro, .lead, .by-line) { color: var(--lh-sky); }
+[data-design="departures"] .chip { border-radius: var(--lh-radius); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; }
+[data-design="departures"] .chip[aria-pressed="true"] { background: var(--dep-board); color: var(--dep-sign); border-color: var(--dep-board); }
+[data-design="departures"] :is(.stay-summary, .notice, .summary-box, .pay-box, .estimate, .estimate-box, .other-home) { border-radius: var(--lh-radius); }
+
+/* A home: the ticket. Main part on the left, the booking form as the tear-off stub on the right. */
+[data-design="departures"] .dep-ticket-page { padding-top: 2rem; }
+[data-design="departures"] .ticket { display: grid; margin-bottom: 1.5rem; background: var(--lh-white); border: 1px solid var(--lh-line); }
+[data-design="departures"] .ticket-main { display: flex; flex-direction: column; padding: 1.5rem; background: var(--dep-board); color: var(--lh-white); }
+/* A printed barcode closes the ticket; decorative, drawn with stripes. */
+[data-design="departures"] .ticket-main::after { content: ""; display: block; height: 3.5rem; margin-top: auto; padding-top: 1.5rem; background: repeating-linear-gradient(90deg, var(--lh-sky) 0 2px, transparent 2px 5px, var(--lh-sky) 5px 6px, transparent 6px 9px, var(--lh-sky) 9px 12px, transparent 12px 14px) content-box; opacity: 0.35; }
+[data-design="departures"] .ticket-kicker { margin: 0 0 0.75rem; color: var(--lh-sky); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.8rem; }
+[data-design="departures"] .ticket .flap-title { margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.25; color: var(--dep-sign); }
+[data-design="departures"] .ticket .by-line,
+[data-design="departures"] .ticket .lead { color: var(--lh-sky); }
+[data-design="departures"] .ticket-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.5rem 0; padding-top: 1.25rem; border-top: 1px dashed var(--dep-line); }
+[data-design="departures"] .ticket-fields dt { color: var(--lh-sky); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+[data-design="departures"] .ticket-fields dd { margin: 0.2rem 0 0; color: var(--lh-white); font: 700 1.05rem var(--lh-font-head); font-stretch: 112%; }
+[data-design="departures"] .ticket-stub.booking-panel { order: 0; margin: 0; padding: 1.5rem; border-radius: 0; box-shadow: none; background: var(--lh-white); border-top: 2px dashed var(--lh-line); }
+@media (min-width: 900px) {
+	[data-design="departures"] .ticket { grid-template-columns: minmax(0, 1fr) 22rem; }
+	[data-design="departures"] .ticket-fields { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	[data-design="departures"] .ticket-stub.booking-panel { border-top: 0; border-left: 2px dashed var(--lh-line); }
+}
+[data-design="departures"] .dep-ticket-page .gallery .gate-sign { border-radius: 0; }
+[data-design="departures"] .dep-detail-grid { display: grid; gap: 2rem; padding: 2.5rem 0; }
+[data-design="departures"] .dep-detail-grid h2 { font-size: var(--lh-text-md); }
+@media (min-width: 900px) { [data-design="departures"] .dep-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Footer: the board again. */
+[data-design="departures"] .site-footer { background: var(--dep-board); border-top: 3px solid var(--dep-sign); }
+[data-design="departures"] .footer-name { color: var(--dep-sign); text-transform: uppercase; letter-spacing: 0.04em; }
+
+@media (prefers-reduced-motion: reduce) {
+	[data-design="departures"] .flap.is-tick { animation: none; }
+	[data-design="departures"] .board-row,
+	[data-design="departures"] .home-card { transition: none; }
+}

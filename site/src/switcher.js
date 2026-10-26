@@ -1,38 +1,17 @@
-// Design switcher, every page. A choice applies at once on inner pages; the home page reloads so its intro plays.
+// Design switcher, every page. Each option is a link to the same page in another design (works without JavaScript).
+// This script adds the menu behaviour and carries the current query (dates, guests) across designs.
 (function () {
-	var root = document.documentElement;
 	var wrap = document.querySelector('[data-switcher]');
 	if (!wrap) return;
 	var button = wrap.querySelector('.design-switcher-button');
-	var text = wrap.querySelector('.design-switcher-text');
 	var menu = wrap.querySelector('.design-switcher-menu');
 	var items = [].slice.call(menu.querySelectorAll('[role="menuitemradio"]'));
-	var names = { original: 'Original', sky: 'Sky', dawn: 'Night to dawn', orbit: 'Orbit' };
-	var current = function () { return root.dataset.design || 'original'; };
 
-	function sync() {
-		text.textContent = 'Design: ' + names[current()];
-		items.forEach(function (item) { item.setAttribute('aria-checked', String(item.dataset.designValue === current())); });
-	}
 	function setOpen(open) {
 		menu.hidden = !open;
 		button.setAttribute('aria-expanded', String(open));
 	}
 	function focusItem(i) { items[(i + items.length) % items.length].focus(); }
-	function choose(value) {
-		try {
-			localStorage.setItem('lh-design', value);
-			if (value === 'dawn') sessionStorage.removeItem('lh-dawn-seen');
-		} catch (e) { /* private mode: the URL still carries the choice */ }
-		var url = new URL(location.href);
-		url.searchParams.set('design', value);
-		if (location.pathname === '/') return location.replace(url.href);
-		history.replaceState(null, '', url.href);
-		root.dataset.design = value;
-		sync();
-		setOpen(false);
-		button.focus();
-	}
 
 	button.addEventListener('click', function () {
 		var open = menu.hidden;
@@ -41,7 +20,10 @@
 	});
 	menu.addEventListener('click', function (e) {
 		var item = e.target.closest('[role="menuitemradio"]');
-		if (item) choose(item.dataset.designValue);
+		if (!item) return;
+		// Choosing Sky always replays its intro.
+		if (item.dataset.designValue === 'sky') try { sessionStorage.removeItem('lh-dawn-seen'); } catch (err) { /* intro may be skipped */ }
+		if (location.search) { e.preventDefault(); location.href = item.getAttribute('href') + location.search; }
 	});
 	wrap.addEventListener('keydown', function (e) {
 		var i = items.indexOf(document.activeElement);
@@ -65,5 +47,4 @@
 			localStorage.setItem('lh-design-seen', '1');
 		}
 	} catch (e) { /* no storage: no pulse */ }
-	sync();
 })();

@@ -1,5 +1,5 @@
 // Builds the static design site into dist/. No dependencies. Run with Node 22: node build.mjs
-import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,12 +17,16 @@ const need = (map, key) => {
 	if (!(key in map)) throw new Error('missing template value: ' + key);
 	return map[key];
 };
-const partials = Object.fromEntries(readdirSync(at('src/partials')).map((f) => [f.replace(/\.html$/, ''), readFileSync(at('src/partials', f), 'utf8')]));
-if (!PREVIEW) partials['preview-strip'] = '';
+const readHtmlDir = (dir) => (existsSync(dir) ? Object.fromEntries(readdirSync(dir).filter((f) => f.endsWith('.html')).map((f) => [f.replace(/\.html$/, ''), readFileSync(join(dir, f), 'utf8')])) : {});
+const basePartials = readHtmlDir(at('src/partials'));
+if (!PREVIEW) basePartials['preview-strip'] = '';
 // One pass: {{key}} is escaped, {{{key}}} is inserted as HTML, {{> name}} inserts a partial rendered the same way.
 // replace() never rescans its output, so a substituted value that contains {{...}} stays literal.
-const render = (tpl, vars) => tpl.replace(/\{\{\{(\w+)\}\}\}|\{\{(\w+)\}\}|\{\{> ([\w-]+)\}\}/g,
-	(_, raw, key, part) => (part ? render(need(partials, part), vars) : raw ? need(vars, raw) : esc(need(vars, key))));
+const renderWith = (partials) => {
+	const render = (tpl, vars) => tpl.replace(/\{\{\{(\w+)\}\}\}|\{\{(\w+)\}\}|\{\{> ([\w-]+)\}\}/g,
+		(_, raw, key, part) => (part ? render(need(partials, part), vars) : raw ? need(vars, raw) : esc(need(vars, key))));
+	return render;
+};
 
 const WA = 'https://wa.me/447934586612';
 const MAPS = 'https://www.google.com/maps/search/?api=1&query=34+Beaconsfield+Luton+LU2+0RW';
@@ -46,6 +50,8 @@ const homeCard = (h, inList) => `<li class="reveal" data-tags="|${h.tags.map(esc
 	+ `<div class="home-card-body"><${inList ? 'h2' : 'h3'}>${esc(h.name)}</${inList ? 'h2' : 'h3'}><p class="by-line">by Luton Homes</p><p class="facts-line">${esc(h.beds)}, ${esc(h.distance)}</p><p class="rate">${rateHtml(h)}</p>`
 	+ (inList ? '<p class="estimate" data-est hidden></p>' : '')
 	+ '</div></a></li>';
+// Departures design: the five homes as rows on an arrivals board.
+const boardRow = (h) => `<li><a class="board-row" href="/homes/${h.slug}/"><span class="board-home" data-flap>${esc(h.name)}</span><span class="board-gate">${esc(h.monogram)}</span><span class="board-info">${esc(h.beds)}</span><span class="board-rate">From £${h.rate} <span class="sample">(sample)</span></span></a></li>`;
 const listItems = (items) => items.map((x) => `<li>${esc(x)}</li>`).join('');
 const otherHomes = (h) => homes.filter((o) => o.slug !== h.slug).map((o) => `<li><a class="other-home" href="/homes/${o.slug}/" data-carry><span class="other-home-name">${esc(o.name)}</span><span class="rate">${rateHtml(o)}</span></a></li>`).join('');
 const galleryFor = (h) => {
@@ -64,27 +70,44 @@ const lightbox = (h) => (h.images?.length ? `<dialog id="lightbox" class="lightb
 // The booking pages read name and rate by slug from this inline JSON (no request).
 const homesJson = `<script id="lh-homes" type="application/json">${JSON.stringify(Object.fromEntries(homes.map((h) => [h.slug, { name: h.name, rate: h.rate }]))).replace(/</g, '\\u003c')}</script>`;
 
-// Preview only: the switcher markup (four designs, in menu order) and the design script that reads ?design= then localStorage before first paint.
-// Default is original; unknown values fall back to original. The html tag also carries data-design="original" for no-JS pages.
-const SWITCHER = '<div class="design-switcher" role="group" aria-label="Design preview switcher" data-switcher>'
+// Designs, in menu order. Each one is a full site built from the base templates in src/pages and src/partials,
+// with its own overrides in src/designs/<id>/{pages,partials} and its own stylesheet src/designs/<id>/design.css.
+// Original lives at the site root, the others under /d/<id>/. `attr` is the html data-design value the CSS keys on.
+const DESIGNS = [
+	{ id: 'original', name: 'Original', base: '', attr: 'original' },
+	{ id: 'sky', name: 'Sky', base: '/d/sky', attr: 'dawn' },
+	{ id: 'departures', name: 'Departures', base: '/d/departures', attr: 'departures' },
+	{ id: 'orbit', name: 'Orbit', base: '/d/orbit', attr: 'orbit' },
+];
+// The switcher lists every design as a plain link to the same page in that design, so it works without JavaScript.
+const switcherFor = (design, path) => '<div class="design-switcher" role="group" aria-label="Design preview switcher" data-switcher>'
 	+ '<button type="button" class="design-switcher-button" aria-haspopup="menu" aria-expanded="false" aria-controls="design-menu">'
-	+ '<span class="design-switcher-glyph" aria-hidden="true"></span><span class="design-switcher-text">Design: Original</span><span class="design-switcher-chev" aria-hidden="true"></span></button>'
+	+ `<span class="design-switcher-glyph" aria-hidden="true"></span><span class="design-switcher-text">Design: ${esc(design.name)}</span><span class="design-switcher-chev" aria-hidden="true"></span></button>`
 	+ '<div class="design-switcher-menu" id="design-menu" role="menu" hidden>'
-	+ '<button type="button" role="menuitemradio" aria-checked="true" data-design-value="original">Original</button>'
-	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="sky">Sky</button>'
-	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="dawn">Night to dawn</button>'
-	+ '<button type="button" role="menuitemradio" aria-checked="false" data-design-value="orbit">Orbit</button>'
+	+ DESIGNS.map((d) => `<a role="menuitemradio" aria-checked="${d === design}" data-design-value="${d.id}" href="${d.base}${path}">${esc(d.name)}</a>`).join('')
 	+ '</div></div><script src="/assets/switcher.js" defer></script>';
 const PREVIEW_HEAD = PREVIEW ? '<link rel="stylesheet" href="/assets/switcher.css">' : '';
-const DESIGN_SCRIPT = '<script>(function(){var d=document.documentElement,v="original",u=null,s=null;try{u=new URLSearchParams(location.search).get("design");s=localStorage.getItem("lh-design")}catch(e){}if(/^(original|sky|dawn|orbit)$/.test(u))v=u;else if(/^(original|sky|dawn|orbit)$/.test(s))v=s;d.dataset.design=v;if(v!=="dawn")return;var seen=null;try{seen=sessionStorage.getItem("lh-dawn-seen")}catch(e){}if(seen||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("dawn-go");else d.classList.add("dawn-pending")})();</script>';
+// Old links used ?design=<id> on the root site; send them to that design's address.
+const LEGACY = Object.fromEntries([...DESIGNS.map((d) => [d.id, d.base]), ['dawn', '/d/sky']].filter(([, b]) => b));
+const LEGACY_SCRIPT = `<script>(function(){var m=${JSON.stringify(LEGACY)};try{var q=new URLSearchParams(location.search),v=q.get("design");if(m[v]){q.delete("design");location.replace(m[v]+location.pathname+(q.size?"?"+q:""))}}catch(e){}})();</script>`;
+// The Sky design plays the night-to-dawn intro once per browser session (the switcher clears the flag so a chosen design replays it).
+const DAWN_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-dawn-seen")}catch(e){}d.classList.add(seen||matchMedia("(prefers-reduced-motion: reduce)").matches?"dawn-go":"dawn-pending")})();</script>';
+const designHead = (d) => [
+	d.id === 'original' ? '<link rel="stylesheet" href="/assets/theme-original.css">' : '',
+	existsSync(at('src/designs', d.id, 'design.css')) ? `<link rel="stylesheet" href="/assets/design-${d.id}.css">` : '',
+	d.id === 'original' && PREVIEW ? LEGACY_SCRIPT : '',
+	d.attr === 'dawn' ? DAWN_SCRIPT : '',
+].filter(Boolean).join('\n');
+// Root-relative site links in a design's pages are moved under its base; shared files (/assets, /fonts, /media, /favicon) are not.
+const withBase = (html, base) => (base ? html.replace(/(\s(?:href|action)=")\/(?!assets\/|fonts\/|media\/|favicon|d\/)/g, `$1${base}/`) : html);
 const VARIANT_HEAD = '<link rel="stylesheet" href="/assets/variants.css">\n<script src="/assets/variants.js" defer></script>';
-const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, designScript: PREVIEW ? DESIGN_SCRIPT : '', extraHead: PREVIEW_HEAD };
+const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, extraHead: PREVIEW_HEAD };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
 		title: 'Luton Homes: homes near Luton Airport, booked direct',
 		description: CANONICAL,
-		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), extraHead: PREVIEW ? PREVIEW_HEAD + '\n' + VARIANT_HEAD : '' },
+		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), boardRows: homes.map(boardRow).join(''), extraHead: PREVIEW ? PREVIEW_HEAD + '\n' + VARIANT_HEAD : '' },
 	},
 	{
 		file: 'homes.html', out: 'homes/index.html',
@@ -97,7 +120,7 @@ const pages = [
 		title: `${h.name} | Luton Homes`,
 		description: `${h.summary} Book direct with Luton Homes.`,
 		vars: {
-			slug: h.slug, name: h.name, summary: h.summary, rate: h.rate, sleeps: h.sleeps, beds: h.beds, distance: h.distance,
+			slug: h.slug, name: h.name, monogram: h.monogram, summary: h.summary, rate: h.rate, sleeps: h.sleeps, beds: h.beds, distance: h.distance,
 			ask: encodeURIComponent(`Hello Luton Homes, I am interested in ${h.name}.`),
 			gallery: galleryFor(h), lightbox: lightbox(h),
 			galleryCaption: h.images?.length ? '<p class="gallery-caption">Sample image</p>' : '',
@@ -121,12 +144,25 @@ cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
 for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
-for (const p of pages) {
-	const vars = { ...shared, title: p.title, description: p.description, ...p.vars };
-	const out = join(dist, p.out);
-	mkdirSync(dirname(out), { recursive: true });
-	let html = render(readFileSync(at('src/pages', p.file), 'utf8'), vars);
-	if (PREVIEW) html = html.replace('</body>', SWITCHER + '</body>');
-	writeFileSync(out, html);
+let built = 0;
+for (const d of DESIGNS) {
+	const dir = at('src/designs', d.id);
+	if (existsSync(join(dir, 'design.css'))) cpSync(join(dir, 'design.css'), join(dist, 'assets', `design-${d.id}.css`));
+	if (existsSync(join(dir, 'design.js'))) cpSync(join(dir, 'design.js'), join(dist, 'assets', `design-${d.id}.js`));
+	const render = renderWith({ ...basePartials, ...readHtmlDir(join(dir, 'partials')) });
+	const designVars = { design: d.attr, designId: d.id, designHead: designHead(d), base: d.base, designJs: existsSync(join(dir, 'design.js')) ? `<script src="/assets/design-${d.id}.js" defer></script>` : '' };
+	for (const p of pages) {
+		// Error pages exist once, at the root: the host serves /404.html for every missing path.
+		if (d.base && /^(404|500)\.html$/.test(p.out)) continue;
+		const own = join(dir, 'pages', p.file);
+		const vars = { ...shared, ...designVars, title: p.title, description: p.description, ...p.vars };
+		const out = join(dist, d.base, p.out);
+		mkdirSync(dirname(out), { recursive: true });
+		let html = withBase(render(readFileSync(existsSync(own) ? own : at('src/pages', p.file), 'utf8'), vars), d.base);
+		const path = '/' + p.out.replace(/index\.html$/, '');
+		if (PREVIEW && !/^(404|500)\.html$/.test(p.out)) html = html.replace('</body>', switcherFor(d, path) + '</body>');
+		writeFileSync(out, html);
+		built++;
+	}
 }
-console.log(`built ${pages.length} pages into dist/`);
+console.log(`built ${built} pages (${DESIGNS.length} designs) into dist/`);

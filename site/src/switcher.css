@@ -44,7 +44,7 @@
 	border: 1px solid var(--lh-ink);
 	border-radius: var(--lh-radius);
 }
-.design-switcher-menu button {
+.design-switcher-menu a {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -56,12 +56,12 @@
 	background: none;
 	color: var(--lh-ink);
 	font: inherit;
-	text-align: start;
+	text-decoration: none;
 	cursor: pointer;
 }
-.design-switcher-menu button:hover, .design-switcher-menu button:focus-visible { background: var(--lh-sky); }
-.design-switcher-menu button[aria-checked="true"] { font-weight: 700; background: var(--lh-paper); }
-.design-switcher-menu button[aria-checked="true"]::after {
+.design-switcher-menu a:hover, .design-switcher-menu a:focus-visible { background: var(--lh-sky); }
+.design-switcher-menu a[aria-checked="true"] { font-weight: 700; background: var(--lh-paper); }
+.design-switcher-menu a[aria-checked="true"]::after {
 	content: "";
 	width: 0.4rem;
 	height: 0.75rem;
