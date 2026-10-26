@@ -1,0 +1,135 @@
+{{> head}}
+<div class="c2-intro" data-c2-intro>
+<svg class="c2-noise-def" width="0" height="0" aria-hidden="true" focusable="false">
+<filter id="c2-cloud-tex" x="-20%" y="-20%" width="140%" height="140%">
+<feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="4" seed="7" result="n"/>
+<feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.1 0" result="w"/>
+<feComponentTransfer in="w" result="soft"><feFuncA type="gamma" amplitude="1" exponent="2.2" offset="0"/></feComponentTransfer>
+<feGaussianBlur in="soft" stdDeviation="3.5" result="blurred"/>
+<feMerge><feMergeNode in="blurred"/><feMergeNode in="blurred"/></feMerge>
+</filter>
+<filter id="c2-cloud-tex-2" x="-20%" y="-20%" width="140%" height="140%">
+<feTurbulence type="fractalNoise" baseFrequency="0.02 0.03" numOctaves="3" seed="23" result="n2"/>
+<feColorMatrix in="n2" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0" result="w2"/>
+<feGaussianBlur in="w2" stdDeviation="2.5"/>
+</filter>
+</svg>
+<div class="c2-veil c2-veil--top" aria-hidden="true"><div class="c2-tex"></div></div>
+<div class="c2-veil c2-veil--bottom" aria-hidden="true"><div class="c2-tex c2-tex--b"></div></div>
+<svg aria-hidden="true" class="c2-trail" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path pathLength="1" d="M-8 72 L108 18"/></svg>
+<svg aria-hidden="true" class="c2-plane" viewBox="0 0 120 40" focusable="false">
+<defs><linearGradient id="c2-fuse" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8A9AA1"/><stop offset=".5" stop-color="#4E6068"/><stop offset="1" stop-color="#22343C"/></linearGradient></defs>
+<path d="M2 23c0-2 2-3.5 5-3.5h30l16-13c1-.8 2.3-1.3 3.7-1.3h5l-7 14.3h22c3 0 6.5 1.3 9 3.5-2.5 2.2-6 3.5-9 3.5H56.7l7 14.3h-5c-1.4 0-2.7-.5-3.7-1.3l-16-13H7c-3 0-5-1.5-5-3.5z" fill="url(#c2-fuse)"/>
+<path d="M70 18.2h10.5c2 0 4.3.9 6.2 2.3-1.9 1.3-4.2 2.3-6.2 2.3H70z" fill="#9FB0B7"/>
+</svg>
+<button type="button" class="c2-skip" data-c2-skip>Skip intro</button>
+</div>
+{{> preview-strip}}
+{{> header}}
+<main id="content" tabindex="-1">
+<section class="hero c2-hero">
+<div class="hero-sky c2-land" aria-hidden="true">
+<span class="c2-sun"></span>
+<span class="c2-haze"></span>
+<svg class="c2-hills" viewBox="0 0 1440 360" preserveAspectRatio="none" focusable="false">
+<defs>
+<linearGradient id="c2-far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FC98C"/><stop offset="1" stop-color="#7FAE6C"/></linearGradient>
+<linearGradient id="c2-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6FA35A"/><stop offset="1" stop-color="#528040"/></linearGradient>
+<linearGradient id="c2-near" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3C6B35"/><stop offset="1" stop-color="#28492A"/></linearGradient>
+</defs>
+<path class="c2-hill c2-hill--far" fill="url(#c2-far)" d="M0 170 C 220 90 420 120 640 150 C 880 182 1080 80 1440 120 L1440 360 L0 360 Z"/>
+<g class="c2-fields" clip-path="url(#c2-fieldclip)">
+<path class="c2-hill c2-hill--mid" fill="url(#c2-mid)" d="M0 230 C 260 160 520 250 780 210 C 1020 172 1220 230 1440 190 L1440 360 L0 360 Z"/>
+</g>
+<clipPath id="c2-fieldclip"><path d="M0 230 C 260 160 520 250 780 210 C 1020 172 1220 230 1440 190 L1440 360 L0 360 Z"/></clipPath>
+<path class="c2-hill c2-hill--near" fill="url(#c2-near)" d="M0 300 C 300 250 560 320 860 285 C 1100 258 1280 300 1440 280 L1440 360 L0 360 Z"/>
+</svg>
+<svg class="contrail" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path pathLength="1" d="M-8 72 L108 18"/></svg>
+</div>
+<div class="wrap hero-inner">
+<div class="hero-copy">
+<h1>Somewhere calm to land</h1>
+<p class="lead">Five short-stay homes near Luton Airport, booked direct.</p>
+</div>
+<form id="search-form" class="search-card" action="/homes/" method="get" novalidate>
+<div class="search-card-head">
+<h2 class="search-card-title">Plan your stay</h2>
+<span class="search-card-code" aria-hidden="true">LTN</span>
+</div>
+<div class="search-card-body">
+<div class="field">
+<label for="search-in">Check in</label>
+<input id="search-in" name="in" type="date" aria-describedby="search-in-error">
+<p id="search-in-error" class="error" data-err="in" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-out">Check out</label>
+<input id="search-out" name="out" type="date" aria-describedby="search-out-error">
+<p id="search-out-error" class="error" data-err="out" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-guests">Guests</label>
+<input id="search-guests" name="guests" type="number" min="1" value="2" aria-describedby="search-guests-error">
+<p id="search-guests-error" class="error" data-err="guests" role="alert"></p>
+</div>
+<button type="submit" class="button button--primary button--block">Check availability<span class="arrow" aria-hidden="true"></span></button>
+<p class="note">Availability and prices are samples in this preview.</p>
+</div>
+</form>
+</div>
+</section>
+
+<section id="homes" class="page-section">
+<div class="wrap">
+<h2>Five homes, one team</h2>
+<p class="intro">Each home keeps its own name. Photos and details are on the way.</p>
+<ul class="home-cards">{{{homeCards}}}</ul>
+</div>
+</section>
+
+<section id="why-direct" class="page-section">
+<div class="wrap">
+<h2>Why book with us directly</h2>
+<ul class="why-rows">
+<li class="why-row reveal"><h3>Talk to a person.</h3><p>Message us on WhatsApp and the team that looks after the homes answers.</p></li>
+<li class="why-row reveal"><h3>Clear check-in details.</h3><p>We send check-in instructions before you arrive.</p></li>
+<li class="why-row reveal"><h3>Pay securely online.</h3><p>Secure online payment once booking opens.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="how-booking" class="page-section">
+<div class="wrap">
+<h2>How booking works</h2>
+<ul class="steps">
+<li><h3>Pick your dates</h3><p>Tell us when you arrive and when you leave.</p></li>
+<li><h3>Choose a home</h3><p>Each home has its own page with its rules and sample rate.</p></li>
+<li><h3>Pay securely</h3><p>Online payment is not connected in this preview.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="find-us" class="page-section find-us">
+<span class="find-us-ltn" aria-hidden="true">LTN</span>
+<div class="wrap">
+<h2>Find us</h2>
+<address>34 Beaconsfield, Luton LU2 0RW</address>
+<p>Luton Airport is nearby.</p>
+<div class="actions">
+<a class="link" href="{{maps}}">Get directions</a>
+<a class="link" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+</div>
+</section>
+
+<section class="band band--ink contact-band">
+<div class="wrap">
+<h2>Questions before you book?</h2>
+<p>Message us on WhatsApp or find us at 34 Beaconsfield, Luton LU2 0RW.</p>
+<a class="button button--primary" href="{{wa}}">Message us on WhatsApp<span class="arrow" aria-hidden="true"></span></a>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>

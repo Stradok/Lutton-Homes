@@ -79,6 +79,7 @@ const DESIGNS = [
 	{ id: 'departures', name: 'Departures', base: '/d/departures', attr: 'departures' },
 	{ id: 'orbit', name: 'Orbit', base: '/d/orbit', attr: 'orbit' },
 	{ id: 'custom-1', name: 'Custom 1', base: '/d/custom-1', attr: 'custom-1' },
+	{ id: 'custom-2', name: 'Custom 2', base: '/d/custom-2', attr: 'custom-2' },
 ];
 // The switcher lists every design as a plain link to the same page in that design, so it works without JavaScript.
 const switcherFor = (design, path) => '<div class="design-switcher" role="group" aria-label="Design preview switcher" data-switcher>'
@@ -95,12 +96,15 @@ const LEGACY_SCRIPT = `<script>(function(){var m=${JSON.stringify(LEGACY)};try{v
 const DAWN_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-dawn-seen")}catch(e){}d.classList.add(seen||matchMedia("(prefers-reduced-motion: reduce)").matches?"dawn-go":"dawn-pending")})();</script>';
 // Custom 1 plays its cloud-and-plane intro on the home page once per browser session; the class is set before first paint.
 const C1_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-c1-seen")}catch(e){}if(!seen&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&/^\\/d\\/custom-1\\/?$/.test(location.pathname))d.classList.add("c1-pending")})();</script>';
+// Custom 2 plays its own cloud-and-plane intro on the home page once per browser session.
+const C2_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-c2-seen")}catch(e){}if(!seen&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&/^\\/d\\/custom-2\\/?$/.test(location.pathname))d.classList.add("c2-pending")})();</script>';
 const designHead = (d) => [
 	d.id === 'original' ? '<link rel="stylesheet" href="/assets/theme-original.css">' : '',
 	existsSync(at('src/designs', d.id, 'design.css')) ? `<link rel="stylesheet" href="/assets/design-${d.id}.css">` : '',
 	d.id === 'original' && PREVIEW ? LEGACY_SCRIPT : '',
 	d.attr === 'dawn' ? DAWN_SCRIPT : '',
 	d.id === 'custom-1' ? C1_SCRIPT : '',
+	d.id === 'custom-2' ? C2_SCRIPT : '',
 ].filter(Boolean).join('\n');
 // Root-relative site links in a design's pages are moved under its base; shared files (/assets, /fonts, /media, /favicon) are not.
 const withBase = (html, base) => (base ? html.replace(/(\s(?:href|action)=")\/(?!assets\/|fonts\/|media\/|favicon|d\/)/g, `$1${base}/`) : html);
