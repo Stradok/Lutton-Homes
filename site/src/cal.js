@@ -11,10 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	const freeRange = (slug, a, b) => { for (let n = day(a); n < day(b); n++) if (taken(slug, n)) return false; return true; };
 	const nightsText = (n) => n + (n === 1 ? ' night' : ' nights');
 
-	const monthHtml = (y, m, cell) => {
-		const lead = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7;
+	const nav = (step, label, glyph, off) => '<button type="button" class="c3-nav" data-step="' + step + '" aria-label="' + label + '"' + (off ? ' disabled' : '') + '>' + glyph + '</button>';
+	const monthHtml = (y, m, cell, left, right) => {
+		const lead = new Date(Date.UTC(y, m, 1)).getUTCDay();
 		const total = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
-		let out = '<div class="c3-month"><h3>' + MONTHS[m] + ' ' + y + '</h3><div class="c3-grid">' + ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => '<span class="c3-dow">' + d + '</span>').join('') + '<span></span>'.repeat(lead);
+		let out = '<div class="c3-month"><div class="c3-mhead">' + left + '<h3>' + MONTHS[m] + ' ' + y + '</h3>' + right + '</div><div class="c3-grid">' + ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d) => '<span class="c3-dow">' + d + '</span>').join('') + '<span></span>'.repeat(lead);
 		for (let d = 1; d <= total; d++) out += cell(Math.floor(Date.UTC(y, m, d) / 864e5), d);
 		return out + '</div></div>';
 	};
@@ -45,7 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			trig[k] = b;
 		}
 		const slot = fout.closest('.field');
-		if (slot) slot.after(cal); else form.append(cal);
+		if (form.closest('.booking-panel')) form.closest('.booking-panel').append(cal);
+		else if (slot) slot.after(cal);
+		else form.append(cal);
 
 		const label = () => {
 			for (const [k, input] of [['in', fin], ['out', fout]]) {
@@ -68,15 +71,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			const cell = (n, d) => {
 				const gone = n < today || taken(slug, n);
 				const ok = !gone && (a === null || b !== null || n <= a) || (a !== null && b === null && n > a && n <= limit && n >= today);
-				const cls = (a === n ? ' is-start' : '') + (b === n ? ' is-end' : '') + (a !== null && b !== null && n > a && n < b ? ' is-range' : '') + (n >= today && taken(slug, n) ? ' is-taken' : '');
+				const cls = (a === n ? ' is-start' : '') + (b === n ? ' is-end' : '') + (a !== null && b !== null && n > a && n < b ? ' is-range' : '') + (gone ? ' is-taken' : '');
 				return '<button type="button" class="c3-day' + cls + '" data-d="' + iso(n) + '"' + (ok ? '' : ' disabled') + ' aria-label="' + lhFormatDate(iso(n)) + (n >= today && taken(slug, n) ? ', booked' : '') + '"' + (a === n || b === n ? ' aria-pressed="true"' : '') + '>' + d + '</button>';
 			};
 			const y = view.getUTCFullYear();
 			const m = view.getUTCMonth();
 			const now = new Date(today * 864e5);
 			const first = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1);
-			const hint = a === null ? 'Choose your check-in date.' : b === null ? 'Choose your check-out date.' : nightsText(b - a) + ' selected.';
-			cal.innerHTML = '<div class="c3-cal-nav"><button type="button" class="c3-nav" data-step="-1" aria-label="Previous month"' + (view.getTime() <= first ? ' disabled' : '') + '>&#8249;</button><p class="c3-hint">' + hint + '</p><button type="button" class="c3-nav" data-step="1" aria-label="Next month">&#8250;</button></div><div class="c3-months">' + monthHtml(y, m, cell) + monthHtml(m === 11 ? y + 1 : y, (m + 1) % 12, cell) + '</div><div class="c3-cal-foot"><p class="note">Sample availability.</p><button type="button" class="c3-clear" data-clear>Clear dates</button></div>';
+			const hint = a === null ? 'Add your travel dates for exact pricing' : b === null ? 'Now choose your check-out date' : nightsText(b - a) + ' selected';
+			const field = (k, name) => '<span class="c3-cf' + ((k === 'in') === (a === null || b !== null) ? ' is-on' : '') + '"><b>' + name + '</b>' + (fin.value && k === 'in' ? lhFormatDate(fin.value) : fout.value && k === 'out' ? lhFormatDate(fout.value) : 'Add date') + '</span>';
+			const ny = m === 11 ? y + 1 : y;
+			cal.innerHTML = '<div class="c3-cal-head"><div><h3 class="c3-cal-title">Select dates</h3><p class="c3-hint">' + hint + '</p></div><div class="c3-cal-fields">' + field('in', 'CHECK-IN') + field('out', 'CHECKOUT') + '</div></div><div class="c3-months">'
+				+ monthHtml(y, m, cell, nav(-1, 'Previous month', '&#8249;', view.getTime() <= first), nav(1, 'Next month', '&#8250;', false))
+				+ monthHtml(ny, (m + 1) % 12, cell, '<span></span>', nav(1, 'Next month', '&#8250;', false)) + '</div><div class="c3-cal-foot"><p class="note">Sample availability.</p><div><button type="button" class="c3-clear" data-clear>Clear dates</button><button type="button" class="c3-close" data-close>Close</button></div></div>';
 		};
 		const open = (k) => { render(); cal.hidden = false; (cal.querySelector('.is-start') || cal.querySelector('.c3-day:not(:disabled)') || cal.querySelector('.c3-nav:not(:disabled)')).focus(); cal.dataset.from = k; };
 		const close = (k) => { cal.hidden = true; trig[k || cal.dataset.from || 'in'].focus(); };
@@ -86,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (!btn) return;
 			const again = (sel) => { const t = cal.querySelector(sel); (t && !t.disabled ? t : cal.querySelector('.c3-nav:not(:disabled)')).focus(); };
 			if (btn.dataset.step) { view = new Date(Date.UTC(view.getUTCFullYear(), view.getUTCMonth() + Number(btn.dataset.step), 1)); render(); again('[data-step="' + btn.dataset.step + '"]'); return; }
+			if (btn.hasAttribute('data-close')) { close(); return; }
 			if (btn.hasAttribute('data-clear')) { fin.value = ''; fout.value = ''; changed(); render(); again('[data-clear]'); return; }
 			const n = day(btn.dataset.d);
 			if (!fin.value || fout.value || n <= day(fin.value)) { fin.value = btn.dataset.d; fout.value = ''; } else fout.value = btn.dataset.d;
@@ -139,7 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			$('booking-nights').textContent = 'Sample total £' + q.total + ' for ' + nightsText(est.nights) + ', with the cleaning fee.';
 			$('bar-text').textContent = '£' + q.total + ' for ' + nightsText(est.nights) + ' (sample)';
 		};
-		panel.addEventListener('input', show);
+		const go = panel.querySelector('button[type="submit"]');
+		const sync = () => { go.firstChild.textContent = panel.elements.out.value ? 'Reserve' : 'Check availability'; };
+		panel.addEventListener('input', () => { show(); sync(); });
+		// Without dates, the button opens the calendar instead of showing errors.
+		panel.addEventListener('submit', (e) => { if (!panel.elements.in.value || !panel.elements.out.value) { e.preventDefault(); e.stopImmediatePropagation(); panel.querySelector('.c3-date').click(); } }, true);
+		sync();
 		show();
 	}
 
