@@ -576,3 +576,8 @@
 	[data-design="client-original"] .c3-w3 { left: 25%; } [data-design="client-original"] .c3-w4 { left: 60%; }
 }
 @media (max-width: 760px) { [data-design="client-original"] :is(.c3-w4, .c3-bird.b2, .c3-bird.b3, .c3-flyer2, .c3-owl.o2, .c3-star.s3, .c3-star.s4) { display: none !important; } [data-design="client-original"] .c3-orb { left: 52%; } }
+[data-design="client-original"] .strip-go { display: none; }
+/* Sun and moon sit in the gap between the wordmark and the menu, above the header text. */
+[data-design="client-original"] .c3-orb { left: 190px; top: 8px; z-index: 2; }
+[data-design="client-original"] .c3-star.s1 { left: 170px; } [data-design="client-original"] .c3-star.s2 { left: 232px; }
+@media (max-width: 760px) { [data-design="client-original"] .c3-orb { left: 127px; top: 10px; width: 22px; height: 22px; } [data-design="client-original"] .c3-star.s1, [data-design="client-original"] .c3-star.s2 { display: none; } }

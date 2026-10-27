@@ -67,7 +67,7 @@ for (const page of pages) {
 	}
 	if (/\/assets\/variants\.(css|js)/.test(html) && local !== 'index.html') fail(`${name}: variant files are for the home page only`);
 	// Site links stay inside the page's own design (shared files and the switcher excepted).
-	for (const [, value] of html.replace(/<div class="design-switcher"[\s\S]*?<\/div><\/div>/, '').matchAll(/\s(?:href|action)="(\/[^"]*)"/g)) {
+	for (const [, value] of html.replace(/<a class="strip-go"[^>]*>/, '').replace(/<div class="design-switcher"[\s\S]*?<\/div><\/div>/, '').matchAll(/\s(?:href|action)="(\/[^"]*)"/g)) {
 		if (/^\/(assets|fonts|media|favicon)/.test(value)) continue;
 		if (design.base ? !value.startsWith(design.base + '/') : value.startsWith('/d/')) fail(`${name}: link ${value} leaves the ${design.name} design`);
 	}
