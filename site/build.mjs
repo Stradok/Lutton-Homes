@@ -89,6 +89,7 @@ const DESIGNS = [
 	{ id: 'custom-1', name: 'Custom 1', base: '/d/custom-1', attr: 'custom-1' },
 	{ id: 'custom-2', name: 'Custom 2', base: '/d/custom-2', attr: 'custom-2' },
 	{ id: 'client-original', name: 'Client Original', base: '/d/client-original', attr: 'client-original' },
+	{ id: 'client-original2', name: 'Client Original 2', base: '/d/client-original2', attr: 'client-original2' },
 	{ id: 'cinematic', name: 'Cinematic', base: '/d/cinematic', attr: 'cinematic' },
 ];
 // The switcher lists every design as a plain link to the same page in that design, so it works without JavaScript.
@@ -110,6 +111,8 @@ const C1_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;
 const C2_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-c2-seen")}catch(e){}if(!seen&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&/^\\/d\\/custom-2\\/?$/.test(location.pathname))d.classList.add("c2-pending")})();</script>';
 // Client Original plays the same plane-and-clouds intro as Custom 1 before its white landing page.
 const C3_SCRIPT = C1_SCRIPT.replace(/c1|custom-1/g, (m) => (m === 'c1' ? 'c3' : 'client-original'));
+// Client Original 2 keeps the earlier gradient-cloud intro; its own session key so both intros can play.
+const C3B_SCRIPT = C3_SCRIPT.replace('client-original', 'client-original2').replace('lh-c3-seen', 'lh-c3b-seen');
 const designHead = (d) => [
 	d.id === 'original' ? '<link rel="stylesheet" href="/assets/theme-original.css">' : '',
 	existsSync(at('src/designs', d.id, 'design.css')) ? `<link rel="stylesheet" href="/assets/design-${d.id}.css">` : '',
@@ -118,6 +121,7 @@ const designHead = (d) => [
 	d.id === 'custom-1' ? C1_SCRIPT : '',
 	d.id === 'custom-2' ? C2_SCRIPT : '',
 	d.id === 'client-original' ? C3_SCRIPT : '',
+	d.id === 'client-original2' ? C3B_SCRIPT : '',
 ].filter(Boolean).join('\n');
 // Root-relative site links in a design's pages are moved under its base; shared files (/assets, /fonts, /media, /favicon) are not.
 const withBase = (html, base) => (base ? html.replace(/(\s(?:href|action)=")\/(?!assets\/|fonts\/|media\/|favicon|d\/)/g, `$1${base}/`) : html);

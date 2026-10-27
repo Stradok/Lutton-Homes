@@ -1,0 +1,251 @@
+/* Client Original 2: the earlier soft-gradient cloud intro, kept as its own profile; otherwise the same as Client Original.
+   Client Original: the look the client asked for (a clean, white, photo-first stay-booking site). A clean, white, photo-first stay-booking look: flat white header, a search pill,
+   rounded photo cards in a scrolling row, a photo-grid property page with a sticky booking card, and a coral
+   accent (a deeper coral so white text keeps WCAG AA contrast). The plane-and-clouds intro plays first, then
+   the page is revealed. Scoped to [data-design="client-original2"]. */
+[data-design="client-original2"] {
+	--c3-coral: #E31C5F;
+	--c3-coral-deep: #D70466;
+	--c3-ink: #222222;
+	--c3-grey: #6A6A6A;
+	--c3-line: #DDDDDD;
+	--c3-wash: #F7F7F7;
+	--lh-ink: var(--c3-ink);
+	--lh-ink-2: var(--c3-grey);
+	--lh-slate: var(--c3-grey);
+	--lh-line: var(--c3-line);
+	--lh-paper: var(--c3-wash);
+	--lh-paper-deep: #EBEBEB;
+	--lh-amber: var(--c3-coral);
+	--lh-amber-hover: var(--c3-coral-deep);
+}
+[data-design="client-original2"] body { background: #fff; color: var(--c3-ink); }
+[data-design="client-original2"] main { margin-top: 0; }
+[data-design="client-original2"] :is(h1, h2, h3) { color: var(--c3-ink); font-stretch: 100%; font-weight: 700; letter-spacing: -0.01em; }
+[data-design="client-original2"] .button--primary { background: linear-gradient(90deg, var(--c3-coral), var(--c3-coral-deep)); color: #fff; border-radius: 10px; }
+[data-design="client-original2"] .button--primary:hover { background: var(--c3-coral-deep); }
+
+/* ---------- Intro: cloud cover, the plane, the parting ---------- */
+[data-design="client-original2"] .c3-intro { display: none; }
+[data-design="client-original2"].c3-pending .c3-intro {
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	display: block;
+	pointer-events: none;
+	animation: c3-gone 300ms ease-out 3000ms forwards;
+}
+[data-design="client-original2"].c3-pending { overflow: hidden; }
+/* The two cloud halves meet along the flight line: from (-8%, 72%) to (108%, 18%), i.e. 68.3% on the left edge and 21.7% on the right. */
+[data-design="client-original2"] .c3-veil {
+	position: absolute;
+	inset: -10%;
+	background:
+		radial-gradient(38% 30% at 18% 30%, #FFFFFF 0 40%, transparent 70%),
+		radial-gradient(34% 28% at 62% 22%, #FFFFFF 0 38%, transparent 72%),
+		radial-gradient(40% 32% at 82% 64%, #FFFFFF 0 40%, transparent 72%),
+		radial-gradient(36% 30% at 34% 74%, #FFFFFF 0 36%, transparent 70%),
+		radial-gradient(30% 26% at 50% 50%, #F8FAFB 0 40%, transparent 75%),
+		linear-gradient(180deg, #E6EDF0, #DCE6EA);
+	will-change: transform, opacity;
+}
+[data-design="client-original2"] .c3-veil--top { clip-path: polygon(0 0, 100% 0, 100% 24.5%, 0 65.5%); }
+[data-design="client-original2"] .c3-veil--bottom { clip-path: polygon(0 65.5%, 100% 24.5%, 100% 100%, 0 100%); }
+[data-design="client-original2"].c3-pending .c3-veil--top { animation: c3-part-up 1800ms cubic-bezier(.65, 0, .35, 1) 1300ms forwards; }
+[data-design="client-original2"].c3-pending .c3-veil--bottom { animation: c3-part-down 1800ms cubic-bezier(.65, 0, .35, 1) 1300ms forwards; }
+@keyframes c3-part-up { to { transform: translate3d(-4vw, -62vh, 0); opacity: 0; } }
+@keyframes c3-part-down { to { transform: translate3d(4vw, 62vh, 0); opacity: 0; } }
+@keyframes c3-gone { to { opacity: 0; visibility: hidden; } }
+
+/* The trail draws behind the plane; both cover the same line in the same time. */
+[data-design="client-original2"] .c3-trail { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* No non-scaling-stroke here: with it, Chrome ignores pathLength and the dash pattern repeats as streaks. */
+[data-design="client-original2"] .c3-trail path { fill: none; stroke: #FFFFFF; stroke-width: 0.3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+[data-design="client-original2"].c3-pending .c3-trail path { animation: c3-draw 1800ms cubic-bezier(.45, 0, .55, 1) 300ms forwards; }
+@keyframes c3-draw { to { stroke-dashoffset: 0; } }
+[data-design="client-original2"] .c3-plane {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: clamp(40px, 4.5vw, 64px);
+	height: auto;
+	margin: calc(clamp(40px, 4.5vw, 64px) / -2) 0 0 calc(clamp(40px, 4.5vw, 64px) / -2);
+	fill: var(--lh-ink);
+	translate: -8vw 72vh;
+	rotate: atan2(-54vh, 116vw);
+	filter: drop-shadow(0 6px 8px rgba(15, 47, 58, 0.25));
+}
+[data-design="client-original2"].c3-pending .c3-plane { animation: c3-fly 1800ms cubic-bezier(.45, 0, .55, 1) 300ms forwards; }
+@keyframes c3-fly { from { translate: -8vw 72vh; } to { translate: 108vw 18vh; } }
+[data-design="client-original2"] .c3-skip {
+	position: absolute;
+	right: 1rem;
+	bottom: 1rem;
+	min-height: 44px;
+	padding: 0 1rem;
+	border: 1px solid rgba(15, 47, 58, 0.3);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.85);
+	color: var(--lh-ink);
+	font: 700 0.9rem var(--lh-font-body);
+	pointer-events: auto;
+	cursor: pointer;
+}
+/* The hero text and card rise as the clouds clear. */
+[data-design="client-original2"].c3-pending .c3-hero :is(h1, .lead, .c3-search) { animation: c3-rise 600ms ease-out 2300ms both; }
+@keyframes c3-rise { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+
+/* ---------- Header: flat, white, hairline ---------- */
+[data-design="client-original2"] .site-header { width: 100%; margin: 0; padding: 0.6rem max(1rem, calc((100% - 80rem) / 2)); border-radius: 0; background: #fff; backdrop-filter: none; box-shadow: none; border-bottom: 1px solid var(--c3-line); justify-content: space-between; }
+[data-design="client-original2"] .site-header::after { display: none; }
+[data-design="client-original2"] .wordmark { color: var(--c3-coral); font-weight: 800; font-stretch: 100%; letter-spacing: -0.02em; }
+[data-design="client-original2"] .site-nav a { color: var(--c3-ink); font-weight: 600; }
+[data-design="client-original2"] .header-cta { border-radius: 999px; }
+
+/* ---------- Landing: heading, search pill ---------- */
+[data-design="client-original2"] .c3-hero { padding: 3rem 0 2.5rem; text-align: center; background: linear-gradient(180deg, var(--c3-wash), #fff); border-bottom: 1px solid var(--c3-line); }
+[data-design="client-original2"] .c3-hero h1 { margin: 0 0 0.5rem; font-size: clamp(2rem, 5vw, 3.2rem); }
+[data-design="client-original2"] .c3-hero .lead { margin: 0 auto 2rem; color: var(--c3-grey); }
+[data-design="client-original2"] .c3-search { position: relative; display: grid; grid-template-columns: 1.3fr 1fr 1fr 0.8fr auto; align-items: center; max-width: 56rem; margin: 0 auto; padding: 0.5rem 0.5rem 0.5rem 0; border: 1px solid var(--c3-line); border-radius: 999px; background: #fff; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1); text-align: left; }
+[data-design="client-original2"] .c3-seg { display: grid; gap: 0.1rem; padding: 0.4rem 1.5rem; min-width: 0; border-radius: 999px; }
+[data-design="client-original2"] .c3-seg + .c3-seg { border-left: 1px solid var(--c3-line); }
+[data-design="client-original2"] .c3-seg:focus-within { background: var(--c3-wash); }
+[data-design="client-original2"] .c3-seg label, [data-design="client-original2"] .c3-seg-label { font-size: 0.8rem; font-weight: 700; color: var(--c3-ink); }
+[data-design="client-original2"] .c3-seg-value { color: var(--c3-grey); }
+[data-design="client-original2"] .c3-seg input { width: 100%; padding: 0; border: 0; background: transparent; color: var(--c3-grey); font: inherit; min-height: 1.6rem; }
+[data-design="client-original2"] .c3-go { position: relative; width: 48px; height: 48px; border: 0; border-radius: 50%; background: linear-gradient(90deg, var(--c3-coral), var(--c3-coral-deep)); cursor: pointer; }
+[data-design="client-original2"] .c3-go span { position: absolute; left: 14px; top: 13px; width: 14px; height: 14px; border: 2.5px solid #fff; border-radius: 50%; }
+[data-design="client-original2"] .c3-go span::after { content: ""; position: absolute; left: 11px; top: 11px; width: 7px; height: 2.5px; background: #fff; border-radius: 2px; rotate: 45deg; transform-origin: 0 50%; }
+[data-design="client-original2"] .c3-search .error { grid-column: 1 / -1; margin: 0; padding: 0 1.5rem; }
+[data-design="client-original2"] .c3-note { margin: 0.9rem 0 0; color: var(--c3-grey); }
+
+/* ---------- Photo cards: a scrolling row on the landing page, a grid on /homes/ ---------- */
+[data-design="client-original2"] .page-section { background: #fff; }
+[data-design="client-original2"] #homes { background: #fff; color: var(--c3-ink); }
+[data-design="client-original2"] #homes h2, [data-design="client-original2"] #homes .intro { color: inherit; }
+[data-design="client-original2"] #homes .intro { color: var(--c3-grey); }
+[data-design="client-original2"] #homes .home-cards { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x proximity; padding: 0 0 1rem; }
+[data-design="client-original2"] #homes .home-cards > li { flex: 0 0 min(16.5rem, 72vw); scroll-snap-align: start; }
+[data-design="client-original2"] .home-card { border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible; transform: none; }
+[data-design="client-original2"] .home-card:hover, [data-design="client-original2"] .home-card:focus-visible { transform: none; box-shadow: none; }
+[data-design="client-original2"] .home-card .gate-sign { aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; background: var(--c3-wash); transition: scale 300ms ease; }
+[data-design="client-original2"] .home-card:hover .gate-sign { scale: 1.02; }
+[data-design="client-original2"] .gate-sign img { width: 100%; height: 100%; object-fit: cover; }
+[data-design="client-original2"] .gate-sign--sky, [data-design="client-original2"] .gate-sign--paper, [data-design="client-original2"] .gate-sign--ink { background: linear-gradient(160deg, #F7F7F7, #E4E4E4); color: var(--c3-ink); }
+[data-design="client-original2"] .home-card-body { padding: 0.7rem 0 0; gap: 0.1rem; }
+[data-design="client-original2"] .home-card-body :is(h2, h3) { font-size: 1rem; margin: 0; }
+[data-design="client-original2"] .home-card-body .by-line, [data-design="client-original2"] .home-card-body .facts-line { color: var(--c3-grey); font-size: 0.95rem; }
+[data-design="client-original2"] .home-card .rate { margin-top: 0.3rem; font-weight: 700; }
+[data-design="client-original2"] .homes-main .home-cards { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
+
+/* ---------- Landing sections ---------- */
+[data-design="client-original2"] #why-direct { background: var(--c3-wash); }
+[data-design="client-original2"] .why-row { border-color: var(--c3-line); }
+[data-design="client-original2"] .steps li::before { background: var(--c3-coral); }
+[data-design="client-original2"] .find-us { background: #fff; border-top: 1px solid var(--c3-line); }
+[data-design="client-original2"] .find-us-ltn { color: rgba(0, 0, 0, 0.05); }
+[data-design="client-original2"] .link { color: var(--c3-ink); text-decoration-color: var(--c3-coral); }
+[data-design="client-original2"] .band--ink.contact-band { background: var(--c3-wash); color: var(--c3-ink); border-top: 1px solid var(--c3-line); }
+[data-design="client-original2"] .band--ink.contact-band :is(h2, p) { color: var(--c3-ink); }
+[data-design="client-original2"] .site-footer { background: var(--c3-wash); color: var(--c3-grey); border-top: 1px solid var(--c3-line); }
+[data-design="client-original2"] .site-footer a { color: var(--c3-ink); }
+
+/* ---------- Property page: title, photo grid, sticky booking card ---------- */
+[data-design="client-original2"] .page-band { background: #fff; padding-block: 1.5rem 1rem; }
+[data-design="client-original2"] .page-band::after { display: none; }
+[data-design="client-original2"] .page-band h1 { font-size: clamp(1.5rem, 3.4vw, 2rem); margin-bottom: 0.25rem; }
+[data-design="client-original2"] .page-band :is(.by-line, .lead, .intro) { color: var(--c3-grey); }
+[data-design="client-original2"] .gallery { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; gap: 0.5rem; height: clamp(16rem, 42vw, 30rem); border-radius: 16px; overflow: hidden; }
+[data-design="client-original2"] .gallery .gate-sign { aspect-ratio: auto; height: 100%; border-radius: 0; }
+[data-design="client-original2"] .gallery .gate-sign:first-child { grid-column: 1; grid-row: 1 / 3; aspect-ratio: auto; }
+[data-design="client-original2"] .gallery .gate-sign img { height: 100%; }
+[data-design="client-original2"] .gallery-open:hover img { filter: brightness(0.92); }
+[data-design="client-original2"] .facts { margin-top: 1.5rem; grid-template-columns: repeat(3, 1fr); border-top: 0; border-bottom: 1px solid var(--c3-line); }
+[data-design="client-original2"] .facts > div { display: grid; border-bottom: 0; padding-block: 0 1.25rem; }
+[data-design="client-original2"] .facts dd { text-align: start; font-stretch: 100%; font-weight: 700; }
+[data-design="client-original2"] .booking-panel { padding: 1.5rem; border: 1px solid var(--c3-line); border-radius: 14px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); }
+[data-design="client-original2"] .booking-panel h2 { font-size: 1.25rem; }
+[data-design="client-original2"] .booking-panel .rate { font-size: 1.15rem; }
+[data-design="client-original2"] .booking-panel input { border-radius: 10px; border: 1px solid var(--c3-line); }
+[data-design="client-original2"] .estimate-box, [data-design="client-original2"] .other-home { border-radius: 12px; }
+[data-design="client-original2"] .other-homes { background: #fff; border-top: 1px solid var(--c3-line); }
+[data-design="client-original2"] .chip[aria-pressed="true"] { background: var(--c3-ink); border-color: var(--c3-ink); color: #fff; }
+[data-design="client-original2"] .bottom-bar { background: #fff; border-top: 1px solid var(--c3-line); }
+
+/* Booking card: check-in and checkout side by side over a guests row, one bordered box, native calendar pickers. */
+[data-design="client-original2"] .booking-panel form { grid-template-columns: 1fr 1fr; gap: 0; }
+[data-design="client-original2"] .booking-panel form > :not(.field) { grid-column: 1 / -1; }
+[data-design="client-original2"] .booking-panel form > h2, [data-design="client-original2"] .booking-panel form > .rate { margin-bottom: 0.75rem; }
+[data-design="client-original2"] .booking-panel form > .rate { font-size: 1.4rem; }
+[data-design="client-original2"] .booking-panel .field { gap: 0.1rem; padding: 0.6rem 0.8rem; border: 1px solid #717171; }
+[data-design="client-original2"] .booking-panel .field:nth-of-type(1) { border-radius: 10px 0 0 0; }
+[data-design="client-original2"] .booking-panel .field:nth-of-type(2) { border-radius: 0 10px 0 0; border-left: 0; }
+[data-design="client-original2"] .booking-panel .field:nth-of-type(3) { grid-column: 1 / -1; border-top: 0; border-radius: 0 0 10px 10px; }
+[data-design="client-original2"] .booking-panel .field label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; }
+[data-design="client-original2"] .booking-panel .field input { min-height: 1.8rem; padding: 0; border: 0; background: transparent; }
+[data-design="client-original2"] .booking-panel .field:focus-within { outline: 2px solid var(--c3-ink); outline-offset: -2px; border-radius: 10px; }
+[data-design="client-original2"] .booking-panel .estimate-box { margin: 1rem 0 0.75rem; background: var(--c3-wash); }
+[data-design="client-original2"] .booking-panel .note { text-align: center; margin: 0.75rem 0 0; }
+
+/* Section sub-nav and host row, as on the reference property page. */
+[data-design="client-original2"] .c3-subnav { position: sticky; top: 0; z-index: 10; display: flex; gap: 1.5rem; padding: 0.4rem 0; margin-bottom: 1rem; background: #fff; border-bottom: 1px solid var(--c3-line); }
+[data-design="client-original2"] .c3-subnav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--c3-ink); font-weight: 600; text-decoration: none; }
+[data-design="client-original2"] .c3-subnav a:hover { text-decoration: underline; }
+[data-design="client-original2"] .c3-host { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--c3-line); }
+[data-design="client-original2"] .c3-host p { margin: 0; display: grid; }
+[data-design="client-original2"] .c3-host span:not(.c3-host-mark) { color: var(--c3-grey); }
+[data-design="client-original2"] .c3-host-mark { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--c3-coral); color: #fff; font-weight: 800; }
+[data-design="client-original2"] .facts { margin-top: 0; border-bottom: 0; }
+[data-design="client-original2"] :is(#amenities, #location, #photos) { scroll-margin-top: 4rem; }
+
+/* ---------- Photo tour: gallery button, room tiles, full-screen dialog. Phone first: one column, big targets. ---------- */
+[data-design="client-original2"] .c3-gallery-wrap { position: relative; }
+[data-design="client-original2"] .gallery:has(> :nth-child(5)) { grid-template-columns: 2fr 1fr 1fr; }
+[data-design="client-original2"] .gallery:has(> :nth-child(5)) .gate-sign:first-child { grid-row: 1 / 3; }
+[data-design="client-original2"] .c3-show-all { position: absolute; right: 0.75rem; bottom: 0.75rem; min-height: 44px; padding: 0 1rem; border: 1px solid var(--c3-ink); border-radius: 10px; background: #fff; color: var(--c3-ink); font: 700 0.95rem var(--lh-font-body); cursor: pointer; }
+[data-design="client-original2"] .c3-show-all:hover { background: var(--c3-wash); }
+[data-design="client-original2"] .c3-tiles { margin-top: 1.5rem; }
+[data-design="client-original2"] .c3-tiles h2 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+[data-design="client-original2"] .c3-rooms { display: flex; gap: 0.75rem; margin: 0; padding: 0 0 0.5rem; overflow-x: auto; scroll-snap-type: x proximity; list-style: none; }
+[data-design="client-original2"] .c3-rooms li { flex: 0 0 9.5rem; scroll-snap-align: start; }
+[data-design="client-original2"] .c3-room { display: grid; gap: 0.1rem; width: 100%; padding: 0; border: 0; background: none; color: var(--c3-ink); font: inherit; text-align: left; cursor: pointer; }
+[data-design="client-original2"] .c3-room img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; margin-bottom: 0.4rem; }
+[data-design="client-original2"] .c3-room-name { font-weight: 700; }
+[data-design="client-original2"] .c3-room-count { color: var(--c3-grey); font-size: 0.9rem; }
+[data-design="client-original2"] .c3-tour-dialog { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; background: #fff; color: var(--c3-ink); overflow: hidden; }
+[data-design="client-original2"] .c3-tour-dialog[open] { display: flex; flex-direction: column; }
+[data-design="client-original2"] .c3-tour-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; border-bottom: 1px solid var(--c3-line); background: #fff; }
+[data-design="client-original2"] .c3-tour-close { flex: none; min-height: 44px; padding: 0 1rem; border: 1px solid var(--c3-line); border-radius: 999px; background: #fff; color: var(--c3-ink); font: 700 0.95rem var(--lh-font-body); cursor: pointer; }
+[data-design="client-original2"] .c3-tour-bar nav { min-width: 0; overflow-x: auto; }
+[data-design="client-original2"] .c3-tour-bar ul { display: flex; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+[data-design="client-original2"] .c3-tour-bar a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.9rem; border-radius: 999px; background: var(--c3-wash); color: var(--c3-ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
+[data-design="client-original2"] .c3-tour-body { flex: 1; overflow-y: auto; padding: 1rem 1rem 3rem; scroll-behavior: auto; }
+[data-design="client-original2"] .c3-tour-body section { max-width: 60rem; margin: 0 auto 2rem; scroll-margin-top: 0.5rem; }
+[data-design="client-original2"] .c3-tour-body h2 { margin: 0 0 0.75rem; font-size: 1.35rem; }
+[data-design="client-original2"] .c3-tour-imgs { display: grid; gap: 0.5rem; }
+[data-design="client-original2"] .c3-tour-imgs img { width: 100%; height: auto; border-radius: 12px; background: var(--c3-wash); }
+[data-design="client-original2"].c3-lock { overflow: hidden; }
+@media (min-width: 761px) {
+	[data-design="client-original2"] .c3-tour-imgs { grid-template-columns: 1fr 1fr; align-items: start; }
+	[data-design="client-original2"] .c3-tour-imgs img:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+	[data-design="client-original2"] .c3-rooms li { flex-basis: 12rem; }
+}
+
+@media (max-width: 760px) {
+	/* Phones: one big photo and a clear button, not a busy grid. */
+	[data-design="client-original2"] .gallery, [data-design="client-original2"] .gallery:has(> :nth-child(5)) { display: block; height: auto; }
+	[data-design="client-original2"] .gallery .gate-sign { display: none; }
+	[data-design="client-original2"] .gallery .gate-sign:first-child { display: block; aspect-ratio: 4 / 3; height: auto; }
+	[data-design="client-original2"] .facts dd { font-size: 1rem; }
+	[data-design="client-original2"] .c3-search { grid-template-columns: 1fr 1fr; border-radius: 20px; padding: 0.5rem; gap: 0.25rem; }
+	[data-design="client-original2"] .c3-seg { padding: 0.5rem 0.9rem; border: 1px solid var(--c3-line); border-radius: 12px; }
+	[data-design="client-original2"] .c3-seg + .c3-seg { border-left: 1px solid var(--c3-line); }
+	[data-design="client-original2"] .c3-seg--where, [data-design="client-original2"] .c3-seg:last-of-type { grid-column: 1 / -1; }
+	[data-design="client-original2"] .c3-go { grid-column: 1 / -1; width: 100%; height: 52px; border-radius: 12px; color: #fff; font: 700 1rem var(--lh-font-body); }
+	[data-design="client-original2"] .c3-go::after { content: "Check availability"; }
+	[data-design="client-original2"] .c3-go span { display: none; }
+	[data-design="client-original2"] .facts { grid-template-columns: 1fr; gap: 0.75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+	[data-design="client-original2"] .c3-intro { display: none !important; }
+}

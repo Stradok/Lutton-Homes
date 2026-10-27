@@ -1,0 +1,83 @@
+{{> head}}
+<div class="c3-intro" data-c3-intro>
+<div class="c3-veil c3-veil--top" aria-hidden="true"></div>
+<div class="c3-veil c3-veil--bottom" aria-hidden="true"></div>
+<svg aria-hidden="true" class="c3-trail" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path pathLength="1" d="M-8 72 L108 18"/></svg>
+<svg aria-hidden="true" class="c3-plane" viewBox="0 0 64 64" focusable="false"><path d="M62 30.5c0-1.7-1.6-3-3.5-3H40.6L26.4 6.6A2.6 2.6 0 0 0 24.2 5.4h-4.3l7.4 22.1H13.8L8.6 20.6A2 2 0 0 0 7 19.8H3.2l3.7 12.2L3.2 44.2H7a2 2 0 0 0 1.6-.8l5.2-6.9h13.5l-7.4 22.1h4.3c.9 0 1.7-.5 2.2-1.2l14.2-20.9h18.9c1.9 0 3.5-1.3 3.5-3Z"/></svg>
+<button type="button" class="c3-skip" data-c3-skip>Skip intro</button>
+</div>
+{{> preview-strip}}
+{{> header}}
+<main id="content" tabindex="-1">
+<section class="c3-hero">
+<div class="wrap">
+<h1>Somewhere calm to land</h1>
+<p class="lead">Five short-stay homes near Luton Airport, booked direct.</p>
+<form id="search-form" class="c3-search" action="/homes/" method="get" novalidate>
+<div class="c3-seg c3-seg--where"><span class="c3-seg-label">Where</span><span class="c3-seg-value">Near Luton Airport</span></div>
+<div class="c3-seg"><label for="search-in">Check in</label><input id="search-in" name="in" type="date" aria-describedby="search-in-error"></div>
+<div class="c3-seg"><label for="search-out">Check out</label><input id="search-out" name="out" type="date" aria-describedby="search-out-error"></div>
+<div class="c3-seg"><label for="search-guests">Who</label><input id="search-guests" name="guests" type="number" min="1" value="2" aria-describedby="search-guests-error"></div>
+<button type="submit" class="c3-go" aria-label="Check availability"><span aria-hidden="true"></span></button>
+<p id="search-in-error" class="error" data-err="in" role="alert"></p>
+<p id="search-out-error" class="error" data-err="out" role="alert"></p>
+<p id="search-guests-error" class="error" data-err="guests" role="alert"></p>
+</form>
+<p class="note c3-note">Availability and prices are samples in this preview.</p>
+</div>
+</section>
+
+<section id="homes" class="page-section">
+<div class="wrap">
+<h2>Homes near Luton Airport</h2>
+<p class="intro">Each home keeps its own name. Photos and details are on the way.</p>
+<ul class="home-cards">{{{homeCards}}}</ul>
+</div>
+</section>
+
+<section id="why-direct" class="page-section">
+<div class="wrap">
+<h2>Why book with us directly</h2>
+<ul class="why-rows">
+<li class="why-row reveal"><h3>Talk to a person.</h3><p>Message us on WhatsApp and the team that looks after the homes answers.</p></li>
+<li class="why-row reveal"><h3>Clear check-in details.</h3><p>We send check-in instructions before you arrive.</p></li>
+<li class="why-row reveal"><h3>Pay securely online.</h3><p>Secure online payment once booking opens.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="how-booking" class="page-section">
+<div class="wrap">
+<h2>How booking works</h2>
+<ul class="steps">
+<li><h3>Pick your dates</h3><p>Tell us when you arrive and when you leave.</p></li>
+<li><h3>Choose a home</h3><p>Each home has its own page with its rules and sample rate.</p></li>
+<li><h3>Pay securely</h3><p>Online payment is not connected in this preview.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="find-us" class="page-section find-us">
+<span class="find-us-ltn" aria-hidden="true">LTN</span>
+<div class="wrap">
+<h2>Find us</h2>
+<address>34 Beaconsfield, Luton LU2 0RW</address>
+<p>Luton Airport is nearby.</p>
+<div class="actions">
+<a class="link" href="{{maps}}">Get directions</a>
+<a class="link" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+</div>
+</section>
+
+<section class="band band--ink contact-band">
+<div class="wrap">
+<h2>Questions before you book?</h2>
+<p>Message us on WhatsApp or find us at 34 Beaconsfield, Luton LU2 0RW.</p>
+<a class="button button--primary" href="{{wa}}">Message us on WhatsApp<span class="arrow" aria-hidden="true"></span></a>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>
