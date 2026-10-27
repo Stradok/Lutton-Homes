@@ -581,3 +581,4 @@
 [data-design="client-original"] .c3-orb { left: 190px; top: 8px; z-index: 2; }
 [data-design="client-original"] .c3-star.s1 { left: 170px; } [data-design="client-original"] .c3-star.s2 { left: 232px; }
 @media (max-width: 760px) { [data-design="client-original"] .c3-orb { left: 127px; top: 10px; width: 22px; height: 22px; } [data-design="client-original"] .c3-star.s1, [data-design="client-original"] .c3-star.s2 { display: none; } }
+[data-design="client-original"][data-theme="night"] a.button[href*="wa.me"] { background-color: #0F7B3F; color: #fff; border-color: #0F7B3F; }
