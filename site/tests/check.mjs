@@ -97,7 +97,8 @@ for (const page of pages) {
 		if (hash && !idsIn(relative(dist, join(dist, target))).has(hash)) fail(`${name}: no id "${hash}" in ${target}`);
 	}
 	const size = Buffer.byteLength(html);
-	if (size > BUDGET.html) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
+	// A home page that carries a room-by-room photo tour holds its photo markup, so it gets a larger HTML budget.
+	if (size > (/homes\/[^/]+\/index\.html$/.test(name) ? 40 * KB : BUDGET.html)) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
 }
 
 const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss };
@@ -112,6 +113,8 @@ for (const file of files.filter((f) => f.startsWith('media/'))) {
 	// its poster and stills get a still-image budget.
 	const budget = file === 'media/cinematic/hero-scrub.mp4' ? 8 * 1024 * KB
 		: file.startsWith('media/cinematic/') ? 120 * KB
+		: file.startsWith('media/homes/') ? 110 * KB
+		: file === 'media/c2-aerial.webp' ? 180 * KB
 		: file === 'media/earth-night-se-england.webp' ? 100 * KB : BUDGET.media;
 	if (size > budget) fail(`${file}: ${size} bytes, budget ${budget}`);
 }

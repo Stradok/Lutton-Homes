@@ -36,6 +36,38 @@
         "Living room with a grey sofa, a table for two and sheer curtains by a window",
         "Bedroom with two single beds, white bedding and bedside lamps",
         "Kitchen with white cabinets, a wooden worktop and a kettle"
+      ],
+      "tour": [
+        {
+          "title": "Living room",
+          "images": [
+            {
+              "src": "/media/easystay-1-1600.webp",
+              "w": 1600,
+              "h": 1067
+            }
+          ]
+        },
+        {
+          "title": "Bedroom",
+          "images": [
+            {
+              "src": "/media/easystay-2-1600.webp",
+              "w": 1600,
+              "h": 1067
+            }
+          ]
+        },
+        {
+          "title": "Kitchen",
+          "images": [
+            {
+              "src": "/media/easystay-3-1600.webp",
+              "w": 1600,
+              "h": 1067
+            }
+          ]
+        }
       ]
     },
     {
@@ -63,6 +95,227 @@
         "Check out by 10am",
         "No smoking inside",
         "No parties or events"
+      ],
+      "tour": [
+        {
+          "title": "Living room",
+          "images": [
+            {
+              "src": "/media/homes/easystay-studio-01-1600.webp",
+              "w": 1600,
+              "h": 900
+            },
+            {
+              "src": "/media/homes/easystay-studio-02-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-03-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-04-1600.webp",
+              "w": 1200,
+              "h": 675
+            },
+            {
+              "src": "/media/homes/easystay-studio-05-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-06-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-07-1600.webp",
+              "w": 1200,
+              "h": 675
+            }
+          ]
+        },
+        {
+          "title": "Kitchen",
+          "images": [
+            {
+              "src": "/media/homes/easystay-studio-08-1600.webp",
+              "w": 1600,
+              "h": 900
+            },
+            {
+              "src": "/media/homes/easystay-studio-09-1600.webp",
+              "w": 720,
+              "h": 1280
+            }
+          ]
+        },
+        {
+          "title": "Bedroom",
+          "images": [
+            {
+              "src": "/media/homes/easystay-studio-10-1600.webp",
+              "w": 1600,
+              "h": 900
+            },
+            {
+              "src": "/media/homes/easystay-studio-11-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-12-1600.webp",
+              "w": 720,
+              "h": 1280
+            },
+            {
+              "src": "/media/homes/easystay-studio-13-1600.webp",
+              "w": 720,
+              "h": 1077
+            },
+            {
+              "src": "/media/homes/easystay-studio-14-1600.webp",
+              "w": 720,
+              "h": 1280
+            },
+            {
+              "src": "/media/homes/easystay-studio-15-1600.webp",
+              "w": 720,
+              "h": 1061
+            },
+            {
+              "src": "/media/homes/easystay-studio-16-1600.webp",
+              "w": 1200,
+              "h": 675
+            },
+            {
+              "src": "/media/homes/easystay-studio-17-1600.webp",
+              "w": 720,
+              "h": 404
+            },
+            {
+              "src": "/media/homes/easystay-studio-18-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-19-1600.webp",
+              "w": 1200,
+              "h": 671
+            },
+            {
+              "src": "/media/homes/easystay-studio-20-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-21-1600.webp",
+              "w": 720,
+              "h": 403
+            },
+            {
+              "src": "/media/homes/easystay-studio-22-1600.webp",
+              "w": 1200,
+              "h": 675
+            },
+            {
+              "src": "/media/homes/easystay-studio-23-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-24-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-25-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-26-1600.webp",
+              "w": 720,
+              "h": 405
+            }
+          ]
+        },
+        {
+          "title": "Bathroom",
+          "images": [
+            {
+              "src": "/media/homes/easystay-studio-27-1600.webp",
+              "w": 1600,
+              "h": 900
+            }
+          ]
+        },
+        {
+          "title": "Patio",
+          "images": [
+            {
+              "src": "/media/homes/easystay-studio-28-1600.webp",
+              "w": 1600,
+              "h": 846
+            }
+          ]
+        },
+        {
+          "title": "More photos",
+          "images": [
+            {
+              "src": "/media/homes/easystay-studio-29-1600.webp",
+              "w": 1600,
+              "h": 888
+            },
+            {
+              "src": "/media/homes/easystay-studio-30-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-31-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-32-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-33-1600.webp",
+              "w": 720,
+              "h": 405
+            },
+            {
+              "src": "/media/homes/easystay-studio-34-1600.webp",
+              "w": 720,
+              "h": 1280
+            },
+            {
+              "src": "/media/homes/easystay-studio-35-1600.webp",
+              "w": 1200,
+              "h": 675
+            }
+          ]
+        }
+      ],
+      "images": [
+        "/media/homes/easystay-studio-01-1600.webp",
+        "/media/homes/easystay-studio-02-1600.webp",
+        "/media/homes/easystay-studio-03-1600.webp",
+        "/media/homes/easystay-studio-04-1600.webp",
+        "/media/homes/easystay-studio-05-1600.webp"
+      ],
+      "alts": [
+        "Living room, photo 1 of 7 (sample image)",
+        "Living room, photo 2 of 7 (sample image)",
+        "Living room, photo 3 of 7 (sample image)",
+        "Living room, photo 4 of 7 (sample image)",
+        "Living room, photo 5 of 7 (sample image)"
       ]
     },
     {
@@ -91,6 +344,152 @@
         "Check out by 10am",
         "No smoking inside",
         "Maximum four guests"
+      ],
+      "tour": [
+        {
+          "title": "Living room",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-01-1600.webp",
+              "w": 1600,
+              "h": 1346
+            },
+            {
+              "src": "/media/homes/luton-lodge-02-1600.webp",
+              "w": 720,
+              "h": 931
+            },
+            {
+              "src": "/media/homes/luton-lodge-03-1600.webp",
+              "w": 720,
+              "h": 480
+            },
+            {
+              "src": "/media/homes/luton-lodge-04-1600.webp",
+              "w": 1200,
+              "h": 800
+            },
+            {
+              "src": "/media/homes/luton-lodge-05-1600.webp",
+              "w": 720,
+              "h": 480
+            },
+            {
+              "src": "/media/homes/luton-lodge-06-1600.webp",
+              "w": 720,
+              "h": 462
+            }
+          ]
+        },
+        {
+          "title": "Kitchenette",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-07-1600.webp",
+              "w": 1600,
+              "h": 944
+            },
+            {
+              "src": "/media/homes/luton-lodge-08-1600.webp",
+              "w": 720,
+              "h": 466
+            },
+            {
+              "src": "/media/homes/luton-lodge-09-1600.webp",
+              "w": 720,
+              "h": 480
+            }
+          ]
+        },
+        {
+          "title": "Bedroom 1",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-10-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/luton-lodge-11-1600.webp",
+              "w": 720,
+              "h": 480
+            },
+            {
+              "src": "/media/homes/luton-lodge-12-1600.webp",
+              "w": 1200,
+              "h": 857
+            },
+            {
+              "src": "/media/homes/luton-lodge-13-1600.webp",
+              "w": 720,
+              "h": 540
+            }
+          ]
+        },
+        {
+          "title": "Bedroom 2",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-14-1600.webp",
+              "w": 1600,
+              "h": 2099
+            },
+            {
+              "src": "/media/homes/luton-lodge-15-1600.webp",
+              "w": 720,
+              "h": 1544
+            }
+          ]
+        },
+        {
+          "title": "Bathroom 1",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-16-1600.webp",
+              "w": 1600,
+              "h": 2132
+            }
+          ]
+        },
+        {
+          "title": "Bathroom 2",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-17-1600.webp",
+              "w": 1600,
+              "h": 2133
+            }
+          ]
+        },
+        {
+          "title": "Exterior",
+          "images": [
+            {
+              "src": "/media/homes/luton-lodge-18-1600.webp",
+              "w": 1600,
+              "h": 1067
+            },
+            {
+              "src": "/media/homes/luton-lodge-19-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        }
+      ],
+      "images": [
+        "/media/homes/luton-lodge-01-1600.webp",
+        "/media/homes/luton-lodge-02-1600.webp",
+        "/media/homes/luton-lodge-03-1600.webp",
+        "/media/homes/luton-lodge-04-1600.webp",
+        "/media/homes/luton-lodge-05-1600.webp"
+      ],
+      "alts": [
+        "Living room, photo 1 of 6 (sample image)",
+        "Living room, photo 2 of 6 (sample image)",
+        "Living room, photo 3 of 6 (sample image)",
+        "Living room, photo 4 of 6 (sample image)",
+        "Living room, photo 5 of 6 (sample image)"
       ]
     },
     {
@@ -119,6 +518,262 @@
         "Check out by 10am",
         "No smoking inside",
         "Pets by arrangement"
+      ],
+      "tour": [
+        {
+          "title": "Living room",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-01-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-02-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-03-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-04-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-05-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-06-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-07-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-08-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-09-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-10-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-11-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-12-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-13-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        },
+        {
+          "title": "Kitchen",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-14-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-15-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-16-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-17-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-18-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        },
+        {
+          "title": "Bedroom",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-19-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-20-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-21-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-22-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-23-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-24-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-25-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        },
+        {
+          "title": "Bathroom",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-26-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-27-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-28-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        },
+        {
+          "title": "Laundry area",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-29-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-30-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        },
+        {
+          "title": "Exterior",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-31-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-32-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        },
+        {
+          "title": "More photos",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-nest-33-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-nest-34-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-35-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-36-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-37-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-38-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-39-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-40-1600.webp",
+              "w": 720,
+              "h": 960
+            },
+            {
+              "src": "/media/homes/the-garden-nest-41-1600.webp",
+              "w": 720,
+              "h": 960
+            }
+          ]
+        }
+      ],
+      "images": [
+        "/media/homes/the-garden-nest-01-1600.webp",
+        "/media/homes/the-garden-nest-02-1600.webp",
+        "/media/homes/the-garden-nest-03-1600.webp",
+        "/media/homes/the-garden-nest-04-1600.webp",
+        "/media/homes/the-garden-nest-05-1600.webp"
+      ],
+      "alts": [
+        "Living room, photo 1 of 13 (sample image)",
+        "Living room, photo 2 of 13 (sample image)",
+        "Living room, photo 3 of 13 (sample image)",
+        "Living room, photo 4 of 13 (sample image)",
+        "Living room, photo 5 of 13 (sample image)"
       ]
     },
     {

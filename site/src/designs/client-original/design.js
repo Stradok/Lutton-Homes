@@ -25,3 +25,25 @@
 	// The flight and the parting clouds take 3.2s in the CSS.
 	setTimeout(finish, 3300);
 })();
+
+// Photo tour dialog: tiles and the "Show all photos" button open it (at a room, or at the top); room chips jump to a room.
+(function () {
+	var dlg = document.getElementById('tour-dialog');
+	if (!dlg || !dlg.showModal) return;
+	var root = document.documentElement;
+	document.addEventListener('click', function (e) {
+		var open = e.target.closest('[data-tour-open]');
+		if (open) {
+			e.preventDefault();
+			dlg.showModal();
+			root.classList.add('c3-lock');
+			var room = open.getAttribute('data-tour-open'), sec = room && dlg.querySelector('#tour-' + room);
+			if (sec) sec.scrollIntoView(); else dlg.querySelector('.c3-tour-body').scrollTop = 0;
+			return;
+		}
+		var chip = dlg.contains(e.target) && e.target.closest('.c3-tour-bar a');
+		if (chip) { e.preventDefault(); dlg.querySelector('#tour-' + chip.getAttribute('data-room')).scrollIntoView(); return; }
+		if (e.target.closest('[data-tour-close]')) dlg.close();
+	});
+	dlg.addEventListener('close', function () { root.classList.remove('c3-lock'); });
+})();

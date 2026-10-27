@@ -197,12 +197,52 @@
 [data-design="client-original"] .facts { margin-top: 0; border-bottom: 0; }
 [data-design="client-original"] :is(#amenities, #location, #photos) { scroll-margin-top: 4rem; }
 
+/* ---------- Photo tour: gallery button, room tiles, full-screen dialog. Phone first: one column, big targets. ---------- */
+[data-design="client-original"] .c3-gallery-wrap { position: relative; }
+[data-design="client-original"] .gallery:has(> :nth-child(5)) { grid-template-columns: 2fr 1fr 1fr; }
+[data-design="client-original"] .gallery:has(> :nth-child(5)) .gate-sign:first-child { grid-row: 1 / 3; }
+[data-design="client-original"] .c3-show-all { position: absolute; right: 0.75rem; bottom: 0.75rem; min-height: 44px; padding: 0 1rem; border: 1px solid var(--c3-ink); border-radius: 10px; background: #fff; color: var(--c3-ink); font: 700 0.95rem var(--lh-font-body); cursor: pointer; }
+[data-design="client-original"] .c3-show-all:hover { background: var(--c3-wash); }
+[data-design="client-original"] .c3-tiles { margin-top: 1.5rem; }
+[data-design="client-original"] .c3-tiles h2 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+[data-design="client-original"] .c3-rooms { display: flex; gap: 0.75rem; margin: 0; padding: 0 0 0.5rem; overflow-x: auto; scroll-snap-type: x proximity; list-style: none; }
+[data-design="client-original"] .c3-rooms li { flex: 0 0 9.5rem; scroll-snap-align: start; }
+[data-design="client-original"] .c3-room { display: grid; gap: 0.1rem; width: 100%; padding: 0; border: 0; background: none; color: var(--c3-ink); font: inherit; text-align: left; cursor: pointer; }
+[data-design="client-original"] .c3-room img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; margin-bottom: 0.4rem; }
+[data-design="client-original"] .c3-room-name { font-weight: 700; }
+[data-design="client-original"] .c3-room-count { color: var(--c3-grey); font-size: 0.9rem; }
+[data-design="client-original"] .c3-tour-dialog { width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0; background: #fff; color: var(--c3-ink); overflow: hidden; }
+[data-design="client-original"] .c3-tour-dialog[open] { display: flex; flex-direction: column; }
+[data-design="client-original"] .c3-tour-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; border-bottom: 1px solid var(--c3-line); background: #fff; }
+[data-design="client-original"] .c3-tour-close { flex: none; min-height: 44px; padding: 0 1rem; border: 1px solid var(--c3-line); border-radius: 999px; background: #fff; color: var(--c3-ink); font: 700 0.95rem var(--lh-font-body); cursor: pointer; }
+[data-design="client-original"] .c3-tour-bar nav { min-width: 0; overflow-x: auto; }
+[data-design="client-original"] .c3-tour-bar ul { display: flex; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+[data-design="client-original"] .c3-tour-bar a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.9rem; border-radius: 999px; background: var(--c3-wash); color: var(--c3-ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
+[data-design="client-original"] .c3-tour-body { flex: 1; overflow-y: auto; padding: 1rem 1rem 3rem; scroll-behavior: auto; }
+[data-design="client-original"] .c3-tour-body section { max-width: 60rem; margin: 0 auto 2rem; scroll-margin-top: 0.5rem; }
+[data-design="client-original"] .c3-tour-body h2 { margin: 0 0 0.75rem; font-size: 1.35rem; }
+[data-design="client-original"] .c3-tour-imgs { display: grid; gap: 0.5rem; }
+[data-design="client-original"] .c3-tour-imgs img { width: 100%; height: auto; border-radius: 12px; background: var(--c3-wash); }
+[data-design="client-original"].c3-lock { overflow: hidden; }
+@media (min-width: 761px) {
+	[data-design="client-original"] .c3-tour-imgs { grid-template-columns: 1fr 1fr; align-items: start; }
+	[data-design="client-original"] .c3-tour-imgs img:first-child:nth-last-child(odd) { grid-column: 1 / -1; }
+	[data-design="client-original"] .c3-rooms li { flex-basis: 12rem; }
+}
+
 @media (max-width: 760px) {
+	/* Phones: one big photo and a clear button, not a busy grid. */
+	[data-design="client-original"] .gallery, [data-design="client-original"] .gallery:has(> :nth-child(5)) { display: block; height: auto; }
+	[data-design="client-original"] .gallery .gate-sign { display: none; }
+	[data-design="client-original"] .gallery .gate-sign:first-child { display: block; aspect-ratio: 4 / 3; height: auto; }
+	[data-design="client-original"] .facts dd { font-size: 1rem; }
 	[data-design="client-original"] .c3-search { grid-template-columns: 1fr 1fr; border-radius: 20px; padding: 0.5rem; gap: 0.25rem; }
 	[data-design="client-original"] .c3-seg { padding: 0.5rem 0.9rem; border: 1px solid var(--c3-line); border-radius: 12px; }
 	[data-design="client-original"] .c3-seg + .c3-seg { border-left: 1px solid var(--c3-line); }
-	[data-design="client-original"] .c3-seg--where { grid-column: 1 / -1; }
-	[data-design="client-original"] .c3-go { grid-column: 1 / -1; width: 100%; height: 48px; border-radius: 12px; }
+	[data-design="client-original"] .c3-seg--where, [data-design="client-original"] .c3-seg:last-of-type { grid-column: 1 / -1; }
+	[data-design="client-original"] .c3-go { grid-column: 1 / -1; width: 100%; height: 52px; border-radius: 12px; color: #fff; font: 700 1rem var(--lh-font-body); }
+	[data-design="client-original"] .c3-go::after { content: "Check availability"; }
+	[data-design="client-original"] .c3-go span { display: none; }
 	[data-design="client-original"] .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 2fr 1fr; height: 22rem; }
 	[data-design="client-original"] .gallery .gate-sign:first-child { grid-column: 1 / -1; grid-row: 1; }
 	[data-design="client-original"] .facts { grid-template-columns: 1fr; gap: 0.75rem; }

@@ -59,8 +59,14 @@ const otherHomes = (h) => homes.filter((o) => o.slug !== h.slug).map((o) => `<li
 const galleryFor = (h) => {
 	const start = TONES.indexOf(h.tone);
 	const sizes = (k) => (k === 0 ? '(min-width: 1140px) 1104px, 100vw' : '(min-width: 1140px) 540px, 50vw');
-	return [0, 1, 2].map((k) => gateSign(h, TONES[(start + k) % 3], { named: k === 0, eager: k === 0, src: h.images?.[k], alt: h.alts?.[k], sizes: sizes(k), open: true })).join('');
+	return [0, 1, 2, 3, 4].filter((k) => k < 3 || h.images?.[k]).map((k) => gateSign(h, TONES[(start + k) % 3], { named: k === 0, eager: k === 0, src: h.images?.[k], alt: h.alts?.[k], sizes: sizes(k), open: true })).join('');
 };
+// Room-by-room photo tour (home.tour in data/homes.json): tiles on the page and a scrollable dialog, like a listing photo tour.
+const roomId = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const small = (src) => src.replace('-1600.webp', '-800.webp');
+const tourTiles = (h) => (h.tour ? `<section id="tour" class="c3-tiles"><h2>Photo tour</h2><ul class="c3-rooms">${h.tour.map((r) => `<li><button type="button" class="c3-room" data-tour-open="${roomId(r.title)}"><img src="${esc(small(r.images[0].src))}" alt="${esc(r.title)} photo" width="${r.images[0].w}" height="${r.images[0].h}" loading="lazy" decoding="async"><span class="c3-room-name">${esc(r.title)}</span><span class="c3-room-count">${r.images.length} ${r.images.length === 1 ? 'photo' : 'photos'}</span></button></li>`).join('')}</ul></section>` : '');
+const showAll = (h) => (h.tour ? '<button type="button" class="c3-show-all" data-tour-open="">Show all photos</button>' : '');
+const tourDialog = (h) => (h.tour ? `<dialog id="tour-dialog" class="c3-tour-dialog" aria-label="${esc(h.name)} photo tour"><div class="c3-tour-bar"><button type="button" class="c3-tour-close" data-tour-close>Close</button><nav aria-label="Rooms"><ul>${h.tour.map((r) => `<li><a href="#tour-${roomId(r.title)}" data-room="${roomId(r.title)}">${esc(r.title)}</a></li>`).join('')}</ul></nav></div><div class="c3-tour-body">${h.tour.map((r) => `<section id="tour-${roomId(r.title)}"><h2>${esc(r.title)}</h2><div class="c3-tour-imgs">${r.images.map((im, k) => `<img src="${esc(im.src)}" srcset="${esc(small(im.src))} 800w, ${esc(im.src)} 1600w" sizes="(min-width: 900px) 440px, 100vw" alt="${esc(r.title)}, photo ${k + 1} of ${r.images.length} (sample image)" width="${im.w}" height="${im.h}" loading="lazy" decoding="async">`).join('')}</div></section>`).join('')}</div></dialog>` : '');
 // Lightbox dialog for a home with photos. app.js fills in the image, caption and count.
 const lightbox = (h) => (h.images?.length ? `<dialog id="lightbox" class="lightbox" aria-label="${esc(h.name)} photos">`
 	+ `<figure class="lightbox-figure"><img id="lightbox-img" src="${esc(h.images[0])}" alt="${esc(h.alts[0])}" width="1600" height="1067"><figcaption id="lightbox-caption"></figcaption></figure>`
@@ -137,7 +143,7 @@ const pages = [
 		vars: {
 			slug: h.slug, name: h.name, monogram: h.monogram, summary: h.summary, rate: h.rate, sleeps: h.sleeps, beds: h.beds, distance: h.distance,
 			ask: encodeURIComponent(`Hello Luton Homes, I am interested in ${h.name}.`),
-			gallery: galleryFor(h), lightbox: lightbox(h),
+			gallery: galleryFor(h), lightbox: lightbox(h), tourTiles: tourTiles(h), showAll: showAll(h), tourDialog: tourDialog(h),
 			galleryCaption: h.images?.length ? '<p class="gallery-caption">Sample image</p>' : '',
 			amenities: listItems(h.amenities), rules: listItems(h.rules), otherHomes: otherHomes(h),
 		},

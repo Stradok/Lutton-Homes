@@ -12,10 +12,12 @@
 
 <div class="wrap">
 <nav class="c3-subnav" aria-label="On this page"><a href="#photos">Photos</a><a href="#amenities">Amenities</a><a href="#location">Location</a></nav>
-<div id="photos" class="gallery">{{{gallery}}}</div>
+<div class="c3-gallery-wrap"><div id="photos" class="gallery">{{{gallery}}}</div>{{{showAll}}}</div>
 {{{galleryCaption}}}
 
 <div class="c3-host"><span class="c3-host-mark" aria-hidden="true">LH</span><p><strong>Hosted by Luton Homes</strong><span>Near Luton Airport, 34 Beaconsfield, Luton LU2 0RW</span></p></div>
+
+{{{tourTiles}}}
 
 <dl class="facts">
 <div><dt>Sleeps</dt><dd>{{sleeps}}</dd></div>
@@ -92,6 +94,7 @@
 <a class="button button--primary" href="#book">Check dates<span class="arrow" aria-hidden="true"></span></a>
 </div>
 {{{lightbox}}}
+{{{tourDialog}}}
 {{> footer}}
 <script src="/assets/homes.js" defer></script>
 </body>
