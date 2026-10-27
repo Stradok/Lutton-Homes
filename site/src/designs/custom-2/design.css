@@ -26,7 +26,7 @@
 	z-index: 60;
 	display: block;
 	pointer-events: none;
-	animation: c2-gone 300ms ease-out 3000ms forwards;
+	animation: c2-gone 400ms ease-out 5200ms forwards;
 }
 [data-design="custom-2"].c2-pending { overflow: hidden; }
 /* Each veil is a soft-lit cloud layer: a base tone plus a feTurbulence texture masked over it for volume,
@@ -96,9 +96,34 @@
 	pointer-events: auto;
 	cursor: pointer;
 }
-[data-design="custom-2"].c2-pending .hero-copy h1 { animation-delay: 2100ms; }
-[data-design="custom-2"].c2-pending .hero .lead { animation-delay: 2200ms; }
-[data-design="custom-2"].c2-pending .search-card { animation-delay: 2300ms; }
+[data-design="custom-2"].c2-pending .hero-copy h1 { animation-delay: 5000ms; }
+[data-design="custom-2"].c2-pending .hero .lead { animation-delay: 5100ms; }
+[data-design="custom-2"].c2-pending .search-card { animation-delay: 5200ms; }
+
+/* ---------- Intro aerial: the land under the clouds, seen from above, with the two places that matter ---------- */
+[data-design="custom-2"] .c2-aerial { position: absolute; inset: 0; background: #6FA35A; }
+[data-design="custom-2"] .c2-aerial svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+[data-design="custom-2"] .c2-pin { opacity: 0; }
+[data-design="custom-2"] .c2-label,
+[data-design="custom-2"] .c2-caption { position: absolute; margin: 0; opacity: 0; color: var(--c2-leaf-deep); font: 600 clamp(0.8rem, 1.5vw, 1rem) var(--lh-font-body); }
+[data-design="custom-2"] .c2-label { padding: 0.45rem 0.75rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); box-shadow: 0 8px 20px -8px rgba(15, 47, 58, 0.5); white-space: nowrap; }
+[data-design="custom-2"] .c2-label b { margin-right: 0.35rem; padding: 0.1rem 0.4rem; border-radius: 6px; background: var(--c2-leaf-deep); color: #fff; }
+[data-design="custom-2"] .c2-label--ltn { left: 33%; top: 33%; }
+[data-design="custom-2"] .c2-label--lh { left: 40%; top: 74%; }
+[data-design="custom-2"] .c2-caption { left: 50%; bottom: 8%; translate: -50% 0; max-width: 90vw; padding: 0.7rem 1.1rem; border-radius: 14px; background: rgba(26, 59, 42, 0.86); color: #fff; text-align: center; }
+[data-design="custom-2"].c2-pending .c2-pin--ltn { animation: c2-pop 500ms ease-out 2600ms forwards; }
+[data-design="custom-2"].c2-pending .c2-pin--lh { animation: c2-pop 500ms ease-out 3000ms forwards; }
+[data-design="custom-2"].c2-pending .c2-label--ltn { animation: c2-fade-in 500ms ease-out 2700ms forwards; }
+[data-design="custom-2"].c2-pending .c2-label--lh { animation: c2-fade-in 500ms ease-out 3100ms forwards; }
+[data-design="custom-2"].c2-pending .c2-caption { animation: c2-fade-in 600ms ease-out 3500ms forwards; }
+@keyframes c2-pop { from { opacity: 0; } to { opacity: 1; } }
+@keyframes c2-fade-in { to { opacity: 1; } }
+/* The title card sits on the cloud deck, then leaves just before the clouds part. */
+[data-design="custom-2"] .c2-title { position: absolute; left: 0; right: 0; top: 38%; margin: 0; max-width: none; width: 100%; text-align: center; color: var(--c2-leaf-deep); opacity: 0; z-index: 1; }
+[data-design="custom-2"] .c2-title b { display: block; font: 800 clamp(2rem, 7vw, 4.5rem) var(--lh-font-display, var(--lh-font-body)); letter-spacing: 0.04em; text-transform: uppercase; }
+[data-design="custom-2"] .c2-title span { display: block; margin-top: 0.4rem; font: 500 clamp(1rem, 2.4vw, 1.5rem) var(--lh-font-body); }
+[data-design="custom-2"].c2-pending .c2-title { animation: c2-title 1500ms ease-in-out forwards; }
+@keyframes c2-title { 0% { opacity: 0; } 25%, 70% { opacity: 1; } 100% { opacity: 0; } }
 
 /* ---------- The revealed land: hazy sky, low sun, a shaded patchwork ---------- */
 [data-design="custom-2"] .c2-hero { background: linear-gradient(180deg, var(--c2-sky-hi) 0%, var(--c2-sky-lo) 55%, var(--c2-mist) 100%); padding-bottom: 14rem; }
@@ -137,6 +162,8 @@
 [data-design="custom-2"] .find-us { background: linear-gradient(180deg, var(--c2-mist), #E3EFDE); }
 [data-design="custom-2"] .find-us-ltn { color: rgba(26, 59, 42, 0.08); }
 [data-design="custom-2"] .band--ink.contact-band { background: linear-gradient(180deg, var(--c2-leaf), var(--c2-leaf-deep)); }
+/* The h2 rule at the top would paint this heading leaf-deep on a leaf band; keep it white for contrast. */
+[data-design="custom-2"] .band--ink.contact-band h2 { color: var(--lh-white); }
 [data-design="custom-2"] .band--ink.contact-band p { color: #D8E9D8; }
 
 /* ---------- Inner pages ---------- */

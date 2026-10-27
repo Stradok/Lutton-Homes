@@ -22,6 +22,6 @@
 
 	intro.querySelector('[data-c2-skip]').addEventListener('click', finish);
 	document.addEventListener('keydown', onKey);
-	// The flight and the parting clouds take 3.2s in the CSS.
-	setTimeout(finish, 3300);
+	// The title, flight, parting clouds and aerial view take 5.2s in the CSS.
+	setTimeout(finish, 5300);
 })();
