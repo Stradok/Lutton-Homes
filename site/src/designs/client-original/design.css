@@ -269,3 +269,4 @@
 @media (prefers-reduced-motion: reduce) {
 	[data-design="client-original"] .c3-intro { display: none !important; }
 }
+[data-design="client-original"] .footer-name { color: var(--c3-ink); }

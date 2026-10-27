@@ -48,6 +48,7 @@ const gateSign = (h, tone, { named = false, src = '', eager = false, alt = '', s
 	return `<div class="${cls}"${vt}><span class="gate-sign-mark">${esc(h.monogram)}</span><span class="gate-sign-note">Photo coming soon</span></div>`;
 };
 // On /homes/ the card title is h2 (the page has one h1); on the home page the cards sit under an h2 and stay h3.
+const distances = homes.map((h) => `<li><a class="link" href="/homes/${h.slug}/">${esc(h.name)}</a>: ${esc(h.distance)} <span class="sample">(sample)</span></li>`).join('');
 const homeCard = (h, inList) => `<li class="reveal" data-tags="|${h.tags.map(esc).join('|')}|"><a class="home-card" href="/homes/${h.slug}/"${inList ? ` data-carry data-rate="${h.rate}"` : ''}>`
 	+ gateSign(h, h.tone, { named: true, src: h.images?.[0], alt: h.alts?.[0], sizes: '(min-width: 768px) 36rem, 100vw' })
 	+ `<div class="home-card-body"><${inList ? 'h2' : 'h3'}>${esc(h.name)}</${inList ? 'h2' : 'h3'}><p class="by-line">by Luton Homes</p><p class="facts-line">${esc(h.beds)}, ${esc(h.distance)}</p><p class="rate">${rateHtml(h)}</p>`
@@ -161,6 +162,11 @@ const pages = [
 	{ file: 'book-confirmed.html', out: 'book/confirmed/index.html', title: 'Booking confirmed (preview) | Luton Homes', description: 'Preview confirmation for a Luton Homes stay. No booking is made.', vars: {} },
 	{ file: 'about.html', out: 'about/index.html', title: 'About | Luton Homes', description: 'Luton Homes runs five short-stay homes near Luton Airport, with one team behind them.', vars: {} },
 	{ file: 'contact.html', out: 'contact/index.html', title: 'Contact | Luton Homes', description: 'Message Luton Homes on WhatsApp or visit us at 34 Beaconsfield, Luton LU2 0RW.', vars: {} },
+	{ file: 'local-area.html', out: 'local-area/index.html', title: 'Getting here | Luton Homes', description: 'Where Luton Homes is, and how far each home is from Luton Airport.', vars: { distances } },
+	{ file: 'terms.html', out: 'terms/index.html', title: 'Terms and booking conditions | Luton Homes', description: 'Draft terms for booking a Luton Homes stay direct.', vars: {} },
+	{ file: 'cancellation.html', out: 'cancellation/index.html', title: 'Cancellation policy | Luton Homes', description: 'Draft cancellation policy placeholder for Luton Homes.', vars: {} },
+	{ file: 'privacy.html', out: 'privacy/index.html', title: 'Privacy policy | Luton Homes', description: 'Draft privacy policy for Luton Homes.', vars: {} },
+	{ file: 'cookies.html', out: 'cookies/index.html', title: 'Cookie policy | Luton Homes', description: 'What the Luton Homes site stores in your browser.', vars: {} },
 	{ file: 'faq.html', out: 'faq/index.html', title: 'FAQ | Luton Homes', description: 'Short answers about booking a Luton Homes stay direct.', vars: {} },
 	{ file: '404.html', out: '404.html', title: 'Page not found | Luton Homes', description: 'This page is not here. Find a home or message us on WhatsApp.', vars: {} },
 	{ file: '500.html', out: '500.html', title: 'Something went wrong | Luton Homes', description: 'Our site is having a problem right now. We are working on it. Go back to the home page.', vars: {} },
