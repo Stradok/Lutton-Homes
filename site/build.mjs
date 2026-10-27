@@ -35,11 +35,14 @@ const rateHtml = (h) => `From £${h.rate} a night <span class="sample">(sample)<
 // without one the monogram panel stays.
 // Images are published as name-1600.webp with a name-800.webp twin for srcset.
 // Open photos are buttons that the lightbox in app.js opens.
+// A photo with an AI night version (name-night-1600.webp beside it) carries it in data-night so a design can swap it in.
+const nightOf = (src) => { const n = src.replace('-1600.webp', '-night-1600.webp'); return n !== src && existsSync(at('public', n)) ? n : ''; };
+const nightAttr = (src) => (nightOf(src) ? ` data-night="${esc(nightOf(src))}"` : '');
 const gateSign = (h, tone, { named = false, src = '', eager = false, alt = '', sizes = '', open = false } = {}) => {
 	const cls = `gate-sign gate-sign--${tone}`;
 	const vt = named ? ` style="view-transition-name: home-${h.slug}"` : '';
 	if (src) {
-		const img = `<img src="${esc(src)}" srcset="${esc(src.replace('-1600.webp', '-800.webp'))} 800w, ${esc(src)} 1600w" sizes="${sizes}" alt="${esc(alt)}" width="1600" height="1067" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+		const img = `<img src="${esc(src)}" srcset="${esc(src.replace('-1600.webp', '-800.webp'))} 800w, ${esc(src)} 1600w" sizes="${sizes}" alt="${esc(alt)}"${nightAttr(src)} width="1600" height="1067" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
 		return open ? `<button type="button" class="${cls} gallery-open" data-open aria-haspopup="dialog"${vt}>${img}</button>` : `<div class="${cls}"${vt}>${img}</div>`;
 	}
 	return `<div class="${cls}"${vt}><span class="gate-sign-mark">${esc(h.monogram)}</span><span class="gate-sign-note">Photo coming soon</span></div>`;
@@ -64,9 +67,9 @@ const galleryFor = (h) => {
 // Room-by-room photo tour (home.tour in data/homes.json): tiles on the page and a scrollable dialog, like a listing photo tour.
 const roomId = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const small = (src) => src.replace('-1600.webp', '-800.webp');
-const tourTiles = (h) => (h.tour ? `<section id="tour" class="c3-tiles"><h2>Photo tour</h2><ul class="c3-rooms">${h.tour.map((r) => `<li><button type="button" class="c3-room" data-tour-open="${roomId(r.title)}"><img src="${esc(small(r.images[0].src))}" alt="${esc(r.title)} photo" width="${r.images[0].w}" height="${r.images[0].h}" loading="lazy" decoding="async"><span class="c3-room-name">${esc(r.title)}</span><span class="c3-room-count">${r.images.length} ${r.images.length === 1 ? 'photo' : 'photos'}</span></button></li>`).join('')}</ul></section>` : '');
+const tourTiles = (h) => (h.tour ? `<section id="tour" class="c3-tiles"><h2>Photo tour</h2><ul class="c3-rooms">${h.tour.map((r) => `<li><button type="button" class="c3-room" data-tour-open="${roomId(r.title)}"><img src="${esc(small(r.images[0].src))}" alt="${esc(r.title)} photo"${nightAttr(r.images[0].src)} width="${r.images[0].w}" height="${r.images[0].h}" loading="lazy" decoding="async"><span class="c3-room-name">${esc(r.title)}</span><span class="c3-room-count">${r.images.length} ${r.images.length === 1 ? 'photo' : 'photos'}</span></button></li>`).join('')}</ul></section>` : '');
 const showAll = (h) => (h.tour ? '<button type="button" class="c3-show-all" data-tour-open="">Show all photos</button>' : '');
-const tourDialog = (h) => (h.tour ? `<dialog id="tour-dialog" class="c3-tour-dialog" aria-label="${esc(h.name)} photo tour"><div class="c3-tour-bar"><button type="button" class="c3-tour-close" data-tour-close>Close</button><nav aria-label="Rooms"><ul>${h.tour.map((r) => `<li><a href="#tour-${roomId(r.title)}" data-room="${roomId(r.title)}">${esc(r.title)}</a></li>`).join('')}</ul></nav></div><div class="c3-tour-body">${h.tour.map((r) => `<section id="tour-${roomId(r.title)}"><h2>${esc(r.title)}</h2><div class="c3-tour-imgs">${r.images.map((im, k) => `<img src="${esc(im.src)}" srcset="${esc(small(im.src))} 800w, ${esc(im.src)} 1600w" sizes="(min-width: 900px) 440px, 100vw" alt="${esc(r.title)}, photo ${k + 1} of ${r.images.length} (sample image)" width="${im.w}" height="${im.h}" loading="lazy" decoding="async">`).join('')}</div></section>`).join('')}</div></dialog>` : '');
+const tourDialog = (h) => (h.tour ? `<dialog id="tour-dialog" class="c3-tour-dialog" aria-label="${esc(h.name)} photo tour"><div class="c3-tour-bar"><button type="button" class="c3-tour-close" data-tour-close>Close</button><nav aria-label="Rooms"><ul>${h.tour.map((r) => `<li><a href="#tour-${roomId(r.title)}" data-room="${roomId(r.title)}">${esc(r.title)}</a></li>`).join('')}</ul></nav></div><div class="c3-tour-body">${h.tour.map((r) => `<section id="tour-${roomId(r.title)}"><h2>${esc(r.title)}</h2><div class="c3-tour-imgs">${r.images.map((im, k) => `<img src="${esc(im.src)}" srcset="${esc(small(im.src))} 800w, ${esc(im.src)} 1600w" sizes="(min-width: 900px) 440px, 100vw" alt="${esc(r.title)}, photo ${k + 1} of ${r.images.length} (sample image)"${nightAttr(im.src)} width="${im.w}" height="${im.h}" loading="lazy" decoding="async">`).join('')}</div></section>`).join('')}</div></dialog>` : '');
 // Lightbox dialog for a home with photos. app.js fills in the image, caption and count.
 const lightbox = (h) => (h.images?.length ? `<dialog id="lightbox" class="lightbox" aria-label="${esc(h.name)} photos">`
 	+ `<figure class="lightbox-figure"><img id="lightbox-img" src="${esc(h.images[0])}" alt="${esc(h.alts[0])}" width="1600" height="1067"><figcaption id="lightbox-caption"></figcaption></figure>`
@@ -113,6 +116,8 @@ const C2_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;
 const C3_SCRIPT = C1_SCRIPT.replace(/c1|custom-1/g, (m) => (m === 'c1' ? 'c3' : 'client-original'));
 // Client Original 2 keeps the earlier gradient-cloud intro; its own session key so both intros can play.
 const C3B_SCRIPT = C3_SCRIPT.replace('client-original', 'client-original2').replace('lh-c3-seen', 'lh-c3b-seen');
+// Client Original picks day or night from the visitor's local time (night 19:00 to 07:00) unless they chose; set before first paint.
+const THEME_SCRIPT = '<script>(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem("lh-theme")}catch(e){}if(t!=="day"&&t!=="night"){var h=new Date().getHours();t=h>=19||h<7?"night":"day"}d.setAttribute("data-theme",t)})();</script>';
 const designHead = (d) => [
 	d.id === 'original' ? '<link rel="stylesheet" href="/assets/theme-original.css">' : '',
 	existsSync(at('src/designs', d.id, 'design.css')) ? `<link rel="stylesheet" href="/assets/design-${d.id}.css">` : '',
@@ -120,7 +125,7 @@ const designHead = (d) => [
 	d.attr === 'dawn' ? DAWN_SCRIPT : '',
 	d.id === 'custom-1' ? C1_SCRIPT : '',
 	d.id === 'custom-2' ? C2_SCRIPT : '',
-	d.id === 'client-original' ? C3_SCRIPT : '',
+	d.id === 'client-original' ? C3_SCRIPT + '\n' + THEME_SCRIPT : '',
 	d.id === 'client-original2' ? C3B_SCRIPT : '',
 ].filter(Boolean).join('\n');
 // Root-relative site links in a design's pages are moved under its base; shared files (/assets, /fonts, /media, /favicon) are not.

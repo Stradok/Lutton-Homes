@@ -47,3 +47,33 @@
 	});
 	dlg.addEventListener('close', function () { root.classList.remove('c3-lock'); });
 })();
+
+// Day and night: swap in the AI night photos (data-night) and label the toggle. The page already carries data-theme
+// from the head script (visitor's local time, or their saved choice); the toggle saves a choice.
+(function () {
+	var root = document.documentElement, btn = document.querySelector('[data-theme-toggle]');
+	function swap(night) {
+		[].forEach.call(document.querySelectorAll('img[data-night]'), function (img) {
+			if (img.dataset.daySrc === undefined) { img.dataset.daySrc = img.getAttribute('src'); img.dataset.daySrcset = img.getAttribute('srcset') || ''; }
+			var n = img.dataset.night, s = n.replace('-1600.webp', '-800.webp');
+			if (!night) { img.setAttribute('src', img.dataset.daySrc); if (img.dataset.daySrcset) img.setAttribute('srcset', img.dataset.daySrcset); return; }
+			if (img.dataset.daySrcset) { img.setAttribute('srcset', s + ' 800w, ' + n + ' 1600w'); img.setAttribute('src', n); } else img.setAttribute('src', /-800\.webp$/.test(img.dataset.daySrc) ? s : n);
+		});
+	}
+	function paint() {
+		var night = root.getAttribute('data-theme') === 'night';
+		swap(night);
+		if (btn) {
+			btn.setAttribute('aria-pressed', String(night));
+			btn.setAttribute('aria-label', night ? 'Switch to day mode' : 'Switch to night mode');
+			btn.querySelector('.c3-theme-label').textContent = night ? 'Day' : 'Night';
+		}
+	}
+	if (btn) btn.addEventListener('click', function () {
+		var next = root.getAttribute('data-theme') === 'night' ? 'day' : 'night';
+		root.setAttribute('data-theme', next);
+		try { localStorage.setItem('lh-theme', next); } catch (e) { /* the choice just will not be remembered */ }
+		paint();
+	});
+	paint();
+})();
