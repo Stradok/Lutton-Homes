@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Sample availability: a fixed pattern per home, three booked nights in every thirteen. The real calendar comes from the channel manager.
 	const taken = (slug, n) => slug !== '' && (n + [...slug].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 1009, 7)) % 13 < 3;
 	const freeRange = (slug, a, b) => { for (let n = day(a); n < day(b); n++) if (taken(slug, n)) return false; return true; };
+	// England and Wales bank holidays plus a few well-known dates, shown as a dot on the day.
+	const HOL = { '2026-10-31': 'Halloween', '2026-11-05': 'Bonfire Night', '2026-12-24': 'Christmas Eve', '2026-12-25': 'Christmas Day (bank holiday)', '2026-12-28': 'Boxing Day, substitute (bank holiday)', '2026-12-31': "New Year's Eve", '2027-01-01': "New Year's Day (bank holiday)", '2027-03-26': 'Good Friday (bank holiday)', '2027-03-29': 'Easter Monday (bank holiday)', '2027-05-03': 'Early May (bank holiday)', '2027-05-31': 'Spring (bank holiday)', '2027-08-30': 'Summer (bank holiday)', '2027-12-27': 'Christmas Day, substitute (bank holiday)', '2027-12-28': 'Boxing Day, substitute (bank holiday)' };
 	const nightsText = (n) => n + (n === 1 ? ' night' : ' nights');
 
 	const nav = (step, label, glyph, off) => '<button type="button" class="c3-nav" data-step="' + step + '" aria-label="' + label + '"' + (off ? ' disabled' : '') + '>' + glyph + '</button>';
@@ -71,8 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			const cell = (n, d) => {
 				const gone = n < today || taken(slug, n);
 				const ok = !gone && (a === null || b !== null || n <= a) || (a !== null && b === null && n > a && n <= limit && n >= today);
-				const cls = (a === n ? ' is-start' : '') + (b === n ? ' is-end' : '') + (a !== null && b !== null && n > a && n < b ? ' is-range' : '') + (gone ? ' is-taken' : '');
-				return '<button type="button" class="c3-day' + cls + '" data-d="' + iso(n) + '"' + (ok ? '' : ' disabled') + ' aria-label="' + lhFormatDate(iso(n)) + (n >= today && taken(slug, n) ? ', booked' : '') + '"' + (a === n || b === n ? ' aria-pressed="true"' : '') + '>' + d + '</button>';
+				const cls = (a === n ? ' is-start' : '') + (b === n ? ' is-end' : '') + (a !== null && b !== null && n > a && n < b ? ' is-range' : '') + (gone ? ' is-taken' : '') + (HOL[iso(n)] ? ' is-hol' : '');
+				return '<button type="button" class="c3-day' + cls + '" data-d="' + iso(n) + '"' + (ok ? '' : ' disabled') + ' aria-label="' + lhFormatDate(iso(n)) + (n >= today && taken(slug, n) ? ', booked' : '') + (HOL[iso(n)] ? ', ' + HOL[iso(n)] : '') + '"' + (HOL[iso(n)] ? ' title="' + HOL[iso(n)] + '"' : '') + (a === n || b === n ? ' aria-pressed="true"' : '') + '>' + d + '</button>';
 			};
 			const y = view.getUTCFullYear();
 			const m = view.getUTCMonth();
@@ -83,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const ny = m === 11 ? y + 1 : y;
 			cal.innerHTML = '<div class="c3-cal-head"><div><h3 class="c3-cal-title">Select dates</h3><p class="c3-hint">' + hint + '</p></div><div class="c3-cal-fields">' + field('in', 'CHECK-IN') + field('out', 'CHECKOUT') + '</div></div><div class="c3-months">'
 				+ monthHtml(y, m, cell, nav(-1, 'Previous month', '&#8249;', view.getTime() <= first), nav(1, 'Next month', '&#8250;', false))
-				+ monthHtml(ny, (m + 1) % 12, cell, '<span></span>', nav(1, 'Next month', '&#8250;', false)) + '</div><div class="c3-cal-foot"><p class="note">Sample availability.</p><div><button type="button" class="c3-clear" data-clear>Clear dates</button><button type="button" class="c3-close" data-close>Close</button></div></div>';
+				+ monthHtml(ny, (m + 1) % 12, cell, '<span></span>', nav(1, 'Next month', '&#8250;', false)) + '</div><div class="c3-cal-foot"><p class="note">Sample availability. <span class="c3-key">Bank holiday or festive date</span></p><div><button type="button" class="c3-clear" data-clear>Clear dates</button><button type="button" class="c3-close" data-close>' + (b !== null ? 'Confirm' : 'Close') + '</button></div></div>';
 		};
 		const open = (k) => { render(); cal.hidden = false; (cal.querySelector('.is-start') || cal.querySelector('.c3-day:not(:disabled)') || cal.querySelector('.c3-nav:not(:disabled)')).focus(); cal.dataset.from = k; };
 		const close = (k) => { cal.hidden = true; trig[k || cal.dataset.from || 'in'].focus(); };
@@ -99,7 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (!fin.value || fout.value || n <= day(fin.value)) { fin.value = btn.dataset.d; fout.value = ''; } else fout.value = btn.dataset.d;
 			changed();
 			render();
-			if (fout.value) close('out'); else again('[data-d="' + btn.dataset.d + '"]');
+			// With both dates chosen the picker stays open, so the guest can check the range, then press Confirm.
+			if (fout.value) cal.querySelector('.c3-close').focus(); else again('[data-d="' + btn.dataset.d + '"]');
 		});
 		form.addEventListener('keydown', (e) => {
 			if (e.key === 'Escape' && !cal.hidden) { e.stopPropagation(); close(); return; }

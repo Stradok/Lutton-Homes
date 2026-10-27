@@ -533,3 +533,46 @@
 [data-design="client-original"] .c3-loc-dist { color: var(--c3-grey); }
 @media (max-width: 700px) { [data-design="client-original"] .c3-loc { grid-template-columns: 1fr; } [data-design="client-original"] .c3-map { min-height: 11rem; } }
 @media (prefers-reduced-motion: reduce) { [data-design="client-original"] .m-pulse { animation: none; } }
+[data-design="client-original"] .c3-day { position: relative; }
+[data-design="client-original"] .c3-day.is-hol::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 5px; height: 5px; translate: -50% 0; border-radius: 50%; background: var(--c3-coral); }
+[data-design="client-original"] .c3-day:is(.is-start, .is-end).is-hol::after { background: #fff; }
+[data-design="client-original"] .c3-key::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 0.35rem 0 0.4rem; border-radius: 50%; background: var(--c3-coral); }
+[data-design="client-original"] .c3-close:disabled { opacity: 0.4; }
+
+/* Day and night scene: sun, dogs, cats and birds by day; moon, stars, owls and wolves by night. */
+[data-design="client-original"] .c3-n { display: none; }
+[data-design="client-original"][data-theme="night"] .c3-d { display: none; }
+[data-design="client-original"][data-theme="night"] .c3-n { display: block; }
+[data-design="client-original"] .c3-orb { position: absolute; top: 5px; left: 36%; width: 26px; height: 26px; }
+[data-design="client-original"] .c3-sun { animation: c3-spin 40s linear infinite; }
+@keyframes c3-spin { to { rotate: 360deg; } }
+[data-design="client-original"] .c3-moon { filter: drop-shadow(0 0 6px rgb(241 230 184 / 0.55)); }
+[data-design="client-original"] .c3-star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #F1E6B8; animation: c3-twinkle 3s ease-in-out infinite; }
+[data-design="client-original"] .c3-star.s1 { top: 8px; left: 31%; } [data-design="client-original"] .c3-star.s2 { top: 22px; left: 43%; animation-delay: -1s; }
+[data-design="client-original"] .c3-star.s3 { top: 10px; left: 62%; animation-delay: -2s; } [data-design="client-original"] .c3-star.s4 { top: 26px; left: 80%; animation-delay: -0.5s; }
+@keyframes c3-twinkle { 50% { opacity: 0.25; scale: 0.6; } }
+[data-design="client-original"] .c3-bird { position: absolute; left: 0; width: 18px; color: #6F8FA6; }
+[data-design="client-original"] .c3-bird-svg { display: block; width: 100%; transform-origin: 50% 80%; animation: c3-flap 0.45s ease-in-out infinite alternate; }
+[data-design="client-original"] .c3-bird.b1 { top: 8px; animation: c3-fly-by 24s linear infinite; animation-delay: -4s; }
+[data-design="client-original"] .c3-bird.b2 { top: 22px; width: 14px; animation: c3-fly-by 31s linear infinite; animation-delay: -17s; }
+[data-design="client-original"] .c3-bird.b3 { top: 14px; width: 12px; animation: c3-fly-by 38s linear infinite; animation-delay: -26s; }
+@keyframes c3-flap { to { scale: 1 0.4; } }
+[data-design="client-original"] .c3-owl { position: absolute; bottom: 17px; width: 15px; }
+[data-design="client-original"] .c3-owl.o1 { left: 9%; } [data-design="client-original"] .c3-owl.o2 { left: 71%; }
+[data-design="client-original"] .c3-owl-svg { display: block; width: 100%; animation: c3-tilt 6s ease-in-out infinite; }
+[data-design="client-original"] .c3-owl.o2 .c3-owl-svg { animation-delay: -3s; }
+[data-design="client-original"] .c3-owl-svg .eyes { transform-box: fill-box; transform-origin: center; animation: c3-blink 5s infinite; }
+@keyframes c3-tilt { 0%, 40%, 100% { rotate: 0deg; } 50%, 60% { rotate: -8deg; } 70%, 90% { rotate: 6deg; } }
+@keyframes c3-blink { 0%, 92%, 100% { scale: 1 1; } 96% { scale: 1 0.1; } }
+[data-design="client-original"] .c3-flyer2 { position: absolute; top: 12px; left: 0; width: 17px; animation: c3-fly-by 33s linear infinite; animation-delay: -12s; }
+[data-design="client-original"] .c3-owl-fly { animation: c3-flap 0.6s ease-in-out infinite alternate; transform-origin: 50% 80%; }
+[data-design="client-original"] .c3-wolf { color: #9FB0BA; }
+[data-design="client-original"] .c3-w3 { width: 42px; animation: c3-walk 40s linear infinite; animation-delay: -10s; }
+[data-design="client-original"] .c3-w4 { width: 38px; animation: c3-walk-back 52s linear infinite; animation-delay: -30s; }
+[data-design="client-original"] .c3-w4 .c3-pet { scale: -1 1; }
+@media (prefers-reduced-motion: reduce) {
+	[data-design="client-original"] :is(.c3-sun, .c3-star, .c3-bird, .c3-bird-svg, .c3-owl-svg, .c3-owl-svg .eyes, .c3-flyer2, .c3-w3, .c3-w4) { animation: none !important; }
+	[data-design="client-original"] .c3-bird.b1 { left: 20%; } [data-design="client-original"] .c3-bird.b2 { left: 55%; } [data-design="client-original"] .c3-bird.b3 { left: 88%; } [data-design="client-original"] .c3-flyer2 { left: 40%; }
+	[data-design="client-original"] .c3-w3 { left: 25%; } [data-design="client-original"] .c3-w4 { left: 60%; }
+}
+@media (max-width: 760px) { [data-design="client-original"] :is(.c3-w4, .c3-bird.b2, .c3-bird.b3, .c3-flyer2, .c3-owl.o2, .c3-star.s3, .c3-star.s4) { display: none !important; } [data-design="client-original"] .c3-orb { left: 52%; } }
