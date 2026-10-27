@@ -132,6 +132,11 @@ const designHead = (d) => [
 // Root-relative site links in a design's pages are moved under its base; shared files (/assets, /fonts, /media, /favicon) are not.
 const withBase = (html, base) => (base ? html.replace(/(\s(?:href|action)=")\/(?!assets\/|fonts\/|media\/|favicon|d\/)/g, `$1${base}/`) : html);
 const VARIANT_HEAD = '<link rel="stylesheet" href="/assets/variants.css">\n<script src="/assets/variants.js" defer></script>';
+// schema.org lodging data from the facts already on the page: no ratings, prices or amenity claims.
+const schemaFor = (h) => '<script type="application/ld+json">' + JSON.stringify({
+	'@context': 'https://schema.org', '@type': 'LodgingBusiness', name: `${h.name} by Luton Homes`, description: h.summary,
+	address: { '@type': 'PostalAddress', streetAddress: '34 Beaconsfield', addressLocality: 'Luton', postalCode: 'LU2 0RW', addressCountry: 'GB' },
+}).replace(/</g, '\\u003c') + '</script>';
 const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, extraHead: PREVIEW_HEAD };
 const pages = [
 	{
@@ -156,6 +161,7 @@ const pages = [
 			gallery: galleryFor(h), lightbox: lightbox(h), tourTiles: tourTiles(h), showAll: showAll(h), tourDialog: tourDialog(h),
 			galleryCaption: h.images?.length ? '<p class="gallery-caption">Sample image</p>' : '',
 			amenities: listItems(h.amenities), rules: listItems(h.rules), otherHomes: otherHomes(h),
+			extraHead: PREVIEW_HEAD + schemaFor(h),
 		},
 	})),
 	{ file: 'book.html', out: 'book/index.html', title: 'Book your stay | Luton Homes', description: 'Book a Luton Homes stay in three steps. This design preview makes no booking.', vars: {} },
