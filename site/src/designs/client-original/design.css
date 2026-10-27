@@ -259,7 +259,6 @@
 [data-design="client-original"][data-theme="night"] :is(.c3-tour-close, .c3-show-all) { background: var(--c3-wash); color: var(--c3-ink); border-color: var(--c3-line); }
 [data-design="client-original"][data-theme="night"] .c3-hero { background: linear-gradient(180deg, #1A1A1A, var(--c3-bg)); }
 [data-design="client-original"][data-theme="night"] .gate-sign--sky, [data-design="client-original"][data-theme="night"] .gate-sign--paper, [data-design="client-original"][data-theme="night"] .gate-sign--ink { background: linear-gradient(160deg, #262626, #181818); color: var(--c3-ink); }
-[data-design="client-original"][data-theme="night"] :is(.gallery, .c3-rooms, .c3-tour-imgs, .home-cards, .other-home-list) img:not([data-night]) { filter: brightness(0.6) contrast(1.08) saturate(0.9) sepia(0.16); }
 [data-design="client-original"] :is(.gallery, .c3-rooms, .c3-tour-imgs, .home-cards) img { transition: filter 600ms ease; }
 [data-design="client-original"] .c3-theme { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 0.9rem; border: 1px solid var(--c3-line); border-radius: 999px; background: var(--c3-bg); color: var(--c3-ink); font: 700 0.9rem var(--lh-font-body); cursor: pointer; }
 [data-design="client-original"] .c3-theme-icon { width: 18px; height: 18px; border-radius: 50%; background: #F5A524; box-shadow: 0 0 0 3px rgba(245, 165, 36, 0.25); }
