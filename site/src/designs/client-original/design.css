@@ -243,8 +243,6 @@
 	[data-design="client-original"] .c3-go { grid-column: 1 / -1; width: 100%; height: 52px; border-radius: 12px; color: #fff; font: 700 1rem var(--lh-font-body); }
 	[data-design="client-original"] .c3-go::after { content: "Check availability"; }
 	[data-design="client-original"] .c3-go span { display: none; }
-	[data-design="client-original"] .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 2fr 1fr; height: 22rem; }
-	[data-design="client-original"] .gallery .gate-sign:first-child { grid-column: 1 / -1; grid-row: 1; }
 	[data-design="client-original"] .facts { grid-template-columns: 1fr; gap: 0.75rem; }
 }
 @media (prefers-reduced-motion: reduce) {
