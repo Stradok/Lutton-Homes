@@ -39,13 +39,7 @@
 [data-design="client-original"] .c3-veil {
 	position: absolute;
 	inset: -10%;
-	background:
-		radial-gradient(38% 30% at 18% 30%, #FFFFFF 0 40%, transparent 70%),
-		radial-gradient(34% 28% at 62% 22%, #FFFFFF 0 38%, transparent 72%),
-		radial-gradient(40% 32% at 82% 64%, #FFFFFF 0 40%, transparent 72%),
-		radial-gradient(36% 30% at 34% 74%, #FFFFFF 0 36%, transparent 70%),
-		radial-gradient(30% 26% at 50% 50%, #F8FAFB 0 40%, transparent 75%),
-		linear-gradient(180deg, #E6EDF0, #DCE6EA);
+	background: url('/media/c2-clouds.webp') center / cover, #EEF3F4;
 	will-change: transform, opacity;
 }
 [data-design="client-original"] .c3-veil--top { clip-path: polygon(0 0, 100% 0, 100% 24.5%, 0 65.5%); }
