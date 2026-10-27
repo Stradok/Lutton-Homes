@@ -14,10 +14,10 @@
 <h1>Somewhere calm to land</h1>
 <p class="lead">Five short-stay homes near Luton Airport, booked direct.</p>
 <form id="search-form" class="c3-search" action="/homes/" method="get" novalidate>
-<div class="c3-seg c3-seg--where"><span class="c3-seg-label">Where</span><span class="c3-seg-value">Near Luton Airport</span></div>
+<div class="c3-seg c3-seg--where" data-where><span class="c3-seg-label" id="where-l">Where</span><button type="button" class="c3-pick" aria-expanded="false" aria-haspopup="true" aria-labelledby="where-l where-v"><span id="where-v">All properties</span></button><div class="c3-pop c3-wpop" hidden><a href="/homes/" data-all data-label="All properties">All properties<small>Every home near Luton Airport</small></a>{{{whereList}}}</div></div>
 <div class="c3-seg"><label for="search-in">Check in</label><input id="search-in" name="in" type="date" aria-describedby="search-in-error"></div>
 <div class="c3-seg"><label for="search-out">Check out</label><input id="search-out" name="out" type="date" aria-describedby="search-out-error"></div>
-<div class="c3-seg"><label for="search-guests">Who</label><input id="search-guests" name="guests" type="number" min="1" value="2" aria-describedby="search-guests-error"></div>
+<div class="c3-seg c3-seg--guests" data-guests data-max="6"><span class="c3-seg-label" id="guests-l">Guests</span><button type="button" class="c3-pick" aria-expanded="false" aria-haspopup="dialog" aria-labelledby="guests-l guests-v"><span id="guests-v">2 guests</span></button><input id="search-guests" name="guests" type="hidden" value="2" aria-describedby="search-guests-error"></div>
 <button type="submit" class="c3-go" aria-label="Check availability"><span aria-hidden="true"></span></button>
 <p id="search-in-error" class="error" data-err="in" role="alert"></p>
 <p id="search-out-error" class="error" data-err="out" role="alert"></p>
@@ -32,6 +32,19 @@
 <h2>Homes near Luton Airport</h2>
 <p class="intro">Each home keeps its own name. Photos and details are on the way.</p>
 <ul class="home-cards">{{{homeCards}}}</ul>
+</div>
+</section>
+
+<section id="reviews" class="page-section">
+<div class="wrap">
+<h2>What guests say</h2>
+<p class="intro">Sample reviews to show the layout. Real reviews arrive after real stays, and each guest is sent a link to write theirs.</p>
+<ul class="c3-reviews">
+<li><p class="c3-stars" aria-label="5 out of 5 (sample)">&#9733;&#9733;&#9733;&#9733;&#9733;</p><p>"Sample review text. A guest's own words about their stay will appear here."</p><p class="c3-by">Guest name, month (sample)</p></li>
+<li><p class="c3-stars" aria-label="5 out of 5 (sample)">&#9733;&#9733;&#9733;&#9733;&#9733;</p><p>"Sample review text. Reviews are also posted to Google Maps from the same link."</p><p class="c3-by">Guest name, month (sample)</p></li>
+<li><p class="c3-stars" aria-label="3 out of 5 (sample)">&#9733;&#9733;&#9733;&#9734;&#9734;</p><p>"Sample review text. Every star level is shown as the guest wrote it."</p><p class="c3-by">Guest name, month (sample)</p></li>
+</ul>
+<a class="button button--quiet" href="/review/">See how a guest leaves a review</a>
 </div>
 </section>
 

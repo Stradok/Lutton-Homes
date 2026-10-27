@@ -1,0 +1,26 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="page-band">
+<div class="wrap">
+<h1>Owner sign in</h1>
+<p class="lead">For the Luton Homes team.</p>
+</div>
+</section>
+<section class="page-section">
+<div class="wrap x-admin">
+<form id="login-form" class="x-card x-form" action="/admin/login/" method="get" novalidate>
+<div class="field"><label for="lg-user">Username</label><input id="lg-user" name="user" type="text" autocomplete="username" required></div>
+<div class="field"><label for="lg-pass">Password</label><input id="lg-pass" name="pass" type="password" autocomplete="current-password" required></div>
+<p id="lg-error" class="error" role="alert"></p>
+<button type="submit" class="button button--primary">Sign in<span class="arrow" aria-hidden="true"></span></button>
+<p class="note">Design preview sign-in. The live version uses a private account for each owner.</p>
+</form>
+</div>
+</section>
+</main>
+{{> footer}}
+<script src="/assets/admin.js" defer></script>
+</body>
+</html>

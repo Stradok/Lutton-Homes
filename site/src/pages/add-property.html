@@ -1,0 +1,40 @@
+{{> head}}
+<script>try{if(sessionStorage.getItem('lh-admin')!=='1')location.replace('{{base}}/admin/login/')}catch(e){location.replace('{{base}}/admin/login/')}</script>
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="page-band">
+<div class="wrap">
+<h1>Add a property</h1>
+<p class="lead">List a home, a restaurant or anything else, with a photo for each room.</p>
+</div>
+</section>
+<section class="page-section">
+<div class="wrap x-admin">
+<p class="notice" role="note">Design preview. Nothing is uploaded or saved. Photos stay in your browser until you close the page.</p>
+<form id="prop-form" class="x-card x-form x-wide" action="/admin/add/" method="get" onsubmit="return false">
+<div class="field"><label for="p-name">Name</label><input id="p-name" type="text" placeholder="For example, EasyStay"></div>
+<div class="field"><label for="p-cat">Listed as</label><select id="p-cat"><option value="homes">Homes</option><option value="restaurants">Restaurants</option><option value="misc">Misc</option><option value="custom">Other (type your own)</option></select></div>
+<div class="field" id="p-custom-wrap" hidden><label for="p-custom">Your own category</label><input id="p-custom" type="text"></div>
+<div class="field"><label for="p-addr">Address</label><input id="p-addr" type="text"></div>
+<fieldset class="x-counts" id="p-counts"><legend>What does it have?</legend>
+<div class="field"><label for="n-bedroom">Bedrooms</label><input id="n-bedroom" data-room="Bedroom" type="number" min="0" max="12" value="1"></div>
+<div class="field"><label for="n-kitchen">Kitchens</label><input id="n-kitchen" data-room="Kitchen" type="number" min="0" max="6" value="1"></div>
+<div class="field"><label for="n-bathroom">Bathrooms</label><input id="n-bathroom" data-room="Bathroom" type="number" min="0" max="12" value="1"></div>
+<div class="field"><label for="n-living">Living rooms</label><input id="n-living" data-room="Living room" type="number" min="0" max="6" value="1"></div>
+<div class="field"><label for="n-outdoor">Outdoor spaces</label><input id="n-outdoor" data-room="Outdoor space" type="number" min="0" max="6" value="0"></div>
+</fieldset>
+<fieldset class="x-photos"><legend>Photos</legend>
+<p class="note">One row per room. The night photo is optional: without one, the day photo is used in night mode.</p>
+<div id="p-rooms"></div>
+</fieldset>
+<div class="actions"><button type="button" id="p-save" class="button button--primary">Save property (preview)<span class="arrow" aria-hidden="true"></span></button><a class="link" href="/admin/">Back to the dashboard</a></div>
+<p id="p-done" class="notice" role="status" hidden></p>
+</form>
+</div>
+</section>
+</main>
+{{> footer}}
+<script src="/assets/admin.js" defer></script>
+</body>
+</html>

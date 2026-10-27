@@ -1,4 +1,5 @@
 {{> head}}
+<script>try{if(sessionStorage.getItem('lh-admin')!=='1')location.replace('{{base}}/admin/login/')}catch(e){location.replace('{{base}}/admin/login/')}</script>
 {{> preview-strip}}
 {{> header}}
 <main id="content">
@@ -6,19 +7,12 @@
 <div class="wrap">
 <h1>Owner dashboard</h1>
 <p class="lead">One place for arrivals, the calendar and manual bookings.</p>
+<div class="actions"><a class="button button--primary" href="/admin/add/">Add a property<span class="arrow" aria-hidden="true"></span></a><button type="button" id="x-signout" class="button button--quiet" data-to="{{base}}/admin/login/">Sign out</button></div>
 </div>
 </section>
 <section class="page-section">
 <div class="wrap x-admin">
-<p class="notice" role="note">Design preview with made-up sample data. There is no sign-in, nothing is saved and no buttons here do anything yet.</p>
-
-<section aria-labelledby="x-login">
-<h2 id="x-login">Owner sign in (sample)</h2>
-<div class="x-card">
-<p>Each owner gets their own login with a two-step code. The real sign-in comes with the admin build.</p>
-<a class="button button--primary" href="#dashboard">Continue to the dashboard<span class="arrow" aria-hidden="true"></span></a>
-</div>
-</section>
+<p class="notice" role="note">Design preview with made-up sample data. Nothing is saved and most buttons here do not do anything yet.</p>
 
 <section id="dashboard" aria-labelledby="x-today">
 <h2 id="x-today">Today (sample)</h2>
@@ -54,6 +48,19 @@
 <div class="actions"><button type="button" class="button button--quiet" aria-disabled="true">Export to CSV (preview)</button></div>
 </section>
 
+<section aria-labelledby="x-review">
+<h2 id="x-review">Guest review link</h2>
+<p class="note">Make a link for a guest who has just checked out. They pick 1, 3 or 5 stars, a review is written for them, and it goes to Google Maps and to the website.</p>
+<div class="x-card x-form">
+<div class="field"><label for="rl-home">Home</label><select id="rl-home">{{{adminHomeValues}}}</select></div>
+<div class="field"><label for="rl-ref">Booking reference (optional)</label><input id="rl-ref" type="text" placeholder="LH-0001"></div>
+<div class="field"><label for="rl-link">Link to send</label><input id="rl-link" type="text" readonly></div>
+<div class="actions"><button type="button" id="rl-copy" class="button button--primary">Copy link</button><a id="rl-wa" class="button button--quiet" href="https://wa.me/" target="_blank" rel="noopener">Send on WhatsApp</a></div>
+<p id="rl-ok" class="note" role="status"></p>
+<a id="rl-base" href="/review/" hidden>base</a>
+</div>
+</section>
+
 <section aria-labelledby="x-manual">
 <h2 id="x-manual">Add a booking by hand (sample)</h2>
 <form class="x-card x-form" action="/admin/" method="get" onsubmit="return false">
@@ -68,5 +75,6 @@
 </section>
 </main>
 {{> footer}}
+<script src="/assets/admin.js" defer></script>
 </body>
 </html>

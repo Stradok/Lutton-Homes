@@ -101,7 +101,7 @@ for (const page of pages) {
 	if (size > (/homes\/[^/]+\/index\.html$/.test(name) ? 40 * KB : BUDGET.html)) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
 }
 
-const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss, 'assets/cal.js': 12 * KB, 'assets/quote.js': KB, 'assets/extras.css': 4 * KB };
+const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss, 'assets/cal.js': 12 * KB, 'assets/quote.js': KB, 'assets/extras.css': 7 * KB, 'assets/ui.js': 8 * KB, 'assets/admin.js': 5 * KB, 'assets/review.js': 2 * KB };
 for (const [file, budget] of Object.entries(assets)) {
 	const text = read(file);
 	if (Buffer.byteLength(text) > budget) fail(`${file}: ${Buffer.byteLength(text)} bytes, budget ${budget}`);

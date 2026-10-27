@@ -54,6 +54,9 @@ const adminDays = Array.from({ length: 14 }, (_, j) => new Date(Date.now() + j *
 const adminHead = adminDays.map((d) => `<th scope="col">${d.getDate()}</th>`).join('');
 const adminGrid = homes.map((h, i) => `<tr><th scope="row">${esc(h.name)}</th>${adminDays.map((_, j) => { const c = ['', 'D', 'B', 'A'][Math.floor((j + i * 3) / 3) % 4]; return `<td${c ? ` class="x-${c.toLowerCase()}"` : ''}>${c}</td>`; }).join('')}</tr>`).join('');
 const adminHomes = homes.map((h) => `<option>${esc(h.name)}</option>`).join('');
+const adminHomeValues = homes.map((h) => `<option value="${h.slug}">${esc(h.name)}</option>`).join('');
+const navHomes = '<a href="/homes/">All homes</a>' + homes.map((h) => `<a href="/homes/${h.slug}/">${esc(h.name)}<small>${esc(h.beds)}</small></a>`).join('');
+const whereList = '<p class="c3-pop-h">Homes</p>' + homes.map((h) => `<a href="/homes/${h.slug}/" data-label="${esc(h.name)}">${esc(h.name)}<small>${esc(h.beds)}, ${esc(h.distance)}</small></a>`).join('');
 const XCSS = '<link rel="stylesheet" href="/assets/extras.css">';
 const homeCard = (h, inList) => `<li class="reveal" data-tags="|${h.tags.map(esc).join('|')}|"><a class="home-card" href="/homes/${h.slug}/"${inList ? ` data-carry data-rate="${h.rate}"` : ''}>`
 	+ gateSign(h, h.tone, { named: true, src: h.images?.[0], alt: h.alts?.[0], sizes: '(min-width: 768px) 36rem, 100vw' })
@@ -143,7 +146,7 @@ const schemaFor = (h) => '<script type="application/ld+json">' + JSON.stringify(
 	'@context': 'https://schema.org', '@type': 'LodgingBusiness', name: `${h.name} by Luton Homes`, description: h.summary,
 	address: { '@type': 'PostalAddress', streetAddress: '34 Beaconsfield', addressLocality: 'Luton', postalCode: 'LU2 0RW', addressCountry: 'GB' },
 }).replace(/</g, '\\u003c') + '</script>';
-const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, extraHead: PREVIEW_HEAD };
+const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
@@ -177,7 +180,10 @@ const pages = [
 	{ file: 'local-area.html', out: 'local-area/index.html', title: 'Getting here | Luton Homes', description: 'Where Luton Homes is, and how far each home is from Luton Airport.', vars: { distances } },
 	{ file: 'terms.html', out: 'terms/index.html', title: 'Terms and booking conditions | Luton Homes', description: 'Draft terms for booking a Luton Homes stay direct.', vars: {} },
 	{ file: 'manage.html', out: 'manage/index.html', title: 'Manage your booking | Luton Homes', description: 'Preview of how a guest views, changes or cancels a booking. Nothing is changed.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
-	{ file: 'admin.html', out: 'admin/index.html', title: 'Owner dashboard (preview) | Luton Homes', description: 'Preview of the owner dashboard with made-up sample data.', vars: { adminHead, adminGrid, adminHomes, extraHead: PREVIEW_HEAD + XCSS } },
+	{ file: 'admin.html', out: 'admin/index.html', title: 'Owner dashboard (preview) | Luton Homes', description: 'Preview of the owner dashboard with made-up sample data.', vars: { adminHead, adminGrid, adminHomes, adminHomeValues, extraHead: PREVIEW_HEAD + XCSS } },
+	{ file: 'login.html', out: 'admin/login/index.html', title: 'Owner sign in | Luton Homes', description: 'Owner sign in for the Luton Homes design preview.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
+	{ file: 'add-property.html', out: 'admin/add/index.html', title: 'Add a property (preview) | Luton Homes', description: 'Preview of how an owner lists a home, restaurant or other property with room photos.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
+	{ file: 'review.html', out: 'review/index.html', title: 'Leave a review | Luton Homes', description: 'Preview of the guest review page: pick 1, 3 or 5 stars and a review is written for you.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
 	{ file: 'cancellation.html', out: 'cancellation/index.html', title: 'Cancellation policy | Luton Homes', description: 'Draft cancellation policy placeholder for Luton Homes.', vars: {} },
 	{ file: 'privacy.html', out: 'privacy/index.html', title: 'Privacy policy | Luton Homes', description: 'Draft privacy policy for Luton Homes.', vars: {} },
 	{ file: 'cookies.html', out: 'cookies/index.html', title: 'Cookie policy | Luton Homes', description: 'What the Luton Homes site stores in your browser.', vars: {} },
@@ -194,7 +200,7 @@ cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
 cpSync(at('src/extras.css'), join(dist, 'assets/extras.css'));
-for (const f of ['quote.js', 'cal.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
+for (const f of ['quote.js', 'cal.js', 'ui.js', 'review.js', 'admin.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
 for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
 let built = 0;
 for (const d of DESIGNS) {
