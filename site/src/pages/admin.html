@@ -17,16 +17,17 @@
 <section id="dashboard" aria-labelledby="x-today">
 <h2 id="x-today">Today (sample)</h2>
 <ul class="x-stats">
-<li><strong>2</strong><span>Arrivals today</span></li>
-<li><strong>1</strong><span>Departures today</span></li>
-<li><strong>3 of 5</strong><span>Homes occupied tonight</span></li>
-<li><strong>Direct</strong><span>Bookings that skip the Booking.com commission appear here</span></li>
+<li><button type="button" class="x-stat" aria-expanded="false" aria-controls="x-s1"><strong>2</strong><span>Arrivals today</span><i class="x-plus" aria-hidden="true"></i></button><div id="x-s1" class="x-detail" hidden><ul><li>LH-0001, EasyStay, Guest A, check in from 3pm (sample)</li><li>LH-0004, EasyStay Studio, Guest D, awaiting payment (sample)</li></ul></div></li>
+<li><button type="button" class="x-stat" aria-expanded="false" aria-controls="x-s2"><strong>1</strong><span>Departures today</span><i class="x-plus" aria-hidden="true"></i></button><div id="x-s2" class="x-detail" hidden><ul><li>LH-0002, Luton Lodge, Guest B, check out by 10am (sample)</li></ul></div></li>
+<li><button type="button" class="x-stat" aria-expanded="false" aria-controls="x-s3"><strong>3 of 5</strong><span>Homes occupied tonight</span><i class="x-plus" aria-hidden="true"></i></button><div id="x-s3" class="x-detail" hidden><ul><li>EasyStay (sample)</li><li>Luton Lodge (sample)</li><li>The Garden Nest (sample)</li></ul></div></li>
+<li><button type="button" class="x-stat" aria-expanded="false" aria-controls="x-s4"><strong>Direct</strong><span>Bookings that skip the Booking.com commission appear here</span><i class="x-plus" aria-hidden="true"></i></button><div id="x-s4" class="x-detail" hidden><ul><li>LH-0001, EasyStay, paid in full (sample)</li><li>LH-0004, EasyStay Studio, deposit due (sample)</li></ul></div></li>
 </ul>
 </section>
 
 <section aria-labelledby="x-cal">
 <h2 id="x-cal">Calendar, next 14 days (sample)</h2>
 <p class="note">One calendar for every channel. D is a direct booking, B is Booking.com, A is Airbnb.</p>
+<p id="x-cellinfo" class="x-cellinfo" role="status">Select a booking in the calendar to see its details.</p>
 <div class="x-scroll"><table class="x-grid">
 <caption class="x-cap">Bookings by home for the next 14 days</caption>
 <thead><tr><th scope="col">Home</th>{{{adminHead}}}</tr></thead>

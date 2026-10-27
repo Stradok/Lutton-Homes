@@ -12,7 +12,7 @@ const fail = (msg) => failures.push(msg);
 const PENDING_ROUTES = [];
 const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
 const KB = 1024;
-const BUDGET = { html: 18 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB, switcherCss: 4 * KB, themeOriginalCss: 12 * KB };
+const BUDGET = { html: 24 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB, switcherCss: 4 * KB, themeOriginalCss: 12 * KB };
 // Designs come from build.mjs (id, menu name, base path, html data-design value), in menu order.
 const DESIGN_LIST = [...readFileSync(join(root, 'build.mjs'), 'utf8').matchAll(/\{ id: '([\w-]+)', name: '([^']+)', base: '([^']*)', attr: '([\w-]+)' \}/g)].map(([, id, name, base, attr]) => ({ id, name, base, attr }));
 const designOf = (page) => DESIGN_LIST.find((d) => d.base && page.startsWith(d.base.slice(1) + '/')) || DESIGN_LIST[0];

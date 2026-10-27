@@ -831,3 +831,4 @@ main { margin-top: -5rem; }
 }
 [data-design="dawn"] .error-brand, [data-design="orbit"] .error-brand { color: var(--lh-sky); }
 
+.other-home-pic { display: none; }

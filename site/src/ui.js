@@ -80,6 +80,10 @@
 		dd.addEventListener('keydown', function (e) { if (e.key === 'Escape') { dd.classList.remove('is-open'); b.setAttribute('aria-expanded', 'false'); b.focus(); } });
 	});
 
+	// Property pages: every WhatsApp link opens a message that names the home and the page the guest was on.
+	var ask = document.querySelector('[data-ask]');
+	if (ask) document.querySelectorAll('a[href*="wa.me"]').forEach(function (a) { a.href = a.getAttribute('href').split('?')[0] + '?text=' + encodeURIComponent(ask.dataset.ask + '\n' + location.href); });
+
 	// Card rail: a few cards wrap into a grid; past RAIL_AFTER they become one scrolling row with arrows.
 	document.querySelectorAll('.home-cards').forEach(function (ul) {
 		if (ul.children.length <= RAIL_AFTER) return;

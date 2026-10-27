@@ -53,7 +53,7 @@
 <button type="submit" class="button button--primary button--block">Check availability<span class="arrow" aria-hidden="true"></span></button>
 <p class="note">Preview only. No booking is made.</p>
 </form>
-<a class="link" href="{{wa}}?text={{ask}}">Ask about {{name}} on WhatsApp</a>
+<a class="link" href="{{wa}}?text={{ask}}" data-ask="Hello Luton Homes, I would like to ask about {{name}}. I was looking at this page:">Ask about {{name}} on WhatsApp</a>
 </aside>
 
 <div class="home-main">
@@ -79,8 +79,23 @@
 </section>
 <section id="location">
 <h2>Location</h2>
-<p>Our address is 34 Beaconsfield, Luton LU2 0RW.</p>
-<a class="link" href="{{maps}}">Get directions</a>
+<div class="c3-loc">
+<svg class="c3-map" viewBox="0 0 420 240" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Illustration of the streets around the home, not a real map">
+<rect class="m-bg" width="420" height="240"/>
+<path class="m-park" d="M250 150 q30-30 70-10 t60 20 v70 h-150z"/>
+<path class="m-water" d="M-10 190 q80-30 150-5 t160 25 l-10 40 h-300z"/>
+<g class="m-road" fill="none" stroke-linecap="round"><path d="M-10 70 L430 40" stroke-width="12"/><path d="M120 -10 L170 250" stroke-width="10"/><path d="M-10 140 L430 120" stroke-width="7"/><path d="M290 -10 L250 250" stroke-width="7"/><path d="M200 100 L300 20" stroke-width="5"/></g>
+<path class="m-route" d="M140 100 C190 70 250 48 296 34" fill="none" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"/>
+<g class="m-air" transform="translate(284 20)"><circle cx="14" cy="14" r="14"/><path d="M14 5l2 7 7 3-7 2-2 7-2-7-7-2 7-3z" fill="#fff"/></g>
+<g class="m-pin" transform="translate(140 100)"><circle class="m-pulse" r="14"/><path d="M0 0c-9-12-12-17-12-23a12 12 0 0 1 24 0c0 6-3 11-12 23z" transform="translate(0 4)"/><circle cy="-17" r="4.5" fill="#fff"/></g>
+</svg>
+<div class="c3-loc-body">
+<p class="c3-loc-addr"><strong>34 Beaconsfield</strong>Luton LU2 0RW</p>
+<p class="c3-loc-dist">{{distance}} <span class="sample">(sample)</span></p>
+<div class="actions"><a class="button button--primary" href="{{maps}}">Get directions<span class="arrow" aria-hidden="true"></span></a><a class="button button--quiet" href="{{wa}}">Ask on WhatsApp</a></div>
+<p class="note">The picture is an illustration, not a real map.</p>
+</div>
+</div>
 </section>
 </div>
 </div>

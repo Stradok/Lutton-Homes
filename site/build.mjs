@@ -52,7 +52,14 @@ const distances = homes.map((h) => `<li><a class="link" href="/homes/${h.slug}/"
 // Owner dashboard preview: a made-up 14-day calendar, a run of three days per channel (D direct, B Booking.com, A Airbnb).
 const adminDays = Array.from({ length: 14 }, (_, j) => new Date(Date.now() + j * 864e5));
 const adminHead = adminDays.map((d) => `<th scope="col">${d.getDate()}</th>`).join('');
-const adminGrid = homes.map((h, i) => `<tr><th scope="row">${esc(h.name)}</th>${adminDays.map((_, j) => { const c = ['', 'D', 'B', 'A'][Math.floor((j + i * 3) / 3) % 4]; return `<td${c ? ` class="x-${c.toLowerCase()}"` : ''}>${c}</td>`; }).join('')}</tr>`).join('');
+const dayName = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+const adminGrid = homes.map((h, i) => `<tr><th scope="row">${esc(h.name)}</th>${adminDays.map((_, j) => {
+	const k = Math.floor((j + i * 3) / 3) % 4, c = ['', 'D', 'B', 'A'][k];
+	if (!c) return '<td></td>';
+	const from = j - ((j + i * 3) % 3), to = Math.min(from + 2, adminDays.length - 1);
+	const ch = { D: 'Direct booking', B: 'Booking.com', A: 'Airbnb' }[c];
+	return `<td class="x-${c.toLowerCase()}"><button type="button" class="x-cell" data-info="${esc(h.name)}, ${dayName(adminDays[from])} to ${dayName(adminDays[to])}: ${ch} (sample)">${c}</button></td>`;
+}).join('')}</tr>`).join('');
 const adminHomes = homes.map((h) => `<option>${esc(h.name)}</option>`).join('');
 const adminHomeValues = homes.map((h) => `<option value="${h.slug}">${esc(h.name)}</option>`).join('');
 const navHomes = '<a href="/homes/">All homes</a>' + homes.map((h) => `<a href="/homes/${h.slug}/">${esc(h.name)}<small>${esc(h.beds)}</small></a>`).join('');
@@ -68,7 +75,8 @@ const boardRow = (h) => `<li><a class="board-row" href="/homes/${h.slug}/"><span
 // Cinematic design: one dark window per home for the lights-on hold.
 const windowTile = (h) => `<li><a class="cin-window" href="/homes/${h.slug}/"><span class="cin-window-mark" aria-hidden="true">${esc(h.monogram)}</span><span class="cin-window-name">${esc(h.name)}</span></a></li>`;
 const listItems = (items) => items.map((x) => `<li>${esc(x)}</li>`).join('');
-const otherHomes = (h) => homes.filter((o) => o.slug !== h.slug).map((o) => `<li><a class="other-home" href="/homes/${o.slug}/" data-carry><span class="other-home-name">${esc(o.name)}</span><span class="rate">${rateHtml(o)}</span></a></li>`).join('');
+const otherPic = (o) => (o.images?.[0] ? `<span class="other-home-pic"><img src="${esc(o.images[0].replace('-1600.webp', '-800.webp'))}" alt="Photo of ${esc(o.name)}" width="800" height="533" loading="lazy" decoding="async"></span>` : '');
+const otherHomes = (h) => homes.filter((o) => o.slug !== h.slug).map((o) => `<li><a class="other-home" href="/homes/${o.slug}/" data-carry>${otherPic(o)}<span class="other-home-name">${esc(o.name)}</span><span class="rate">${rateHtml(o)}</span></a></li>`).join('');
 const galleryFor = (h) => {
 	const start = TONES.indexOf(h.tone);
 	const sizes = (k) => (k === 0 ? '(min-width: 1140px) 1104px, 100vw' : '(min-width: 1140px) 540px, 50vw');

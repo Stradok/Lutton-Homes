@@ -20,6 +20,9 @@
 		st.setAttribute('aria-label', n + ' out of 5');
 		document.getElementById('rv-ptext').textContent = '"' + text.value + '"';
 		document.getElementById('rv-pby').textContent = 'A guest of ' + name + ' (sample)';
+		// Copy the text and open Google; the guest pastes it and presses Google's Post button (a page cannot fill in another site's box).
+		try { navigator.clipboard.writeText(text.value); } catch (e) { text.select(); document.execCommand('copy'); }
+		window.open(document.getElementById('rv-google').href, '_blank', 'noopener');
 		done.hidden = false; done.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 	});
 })();

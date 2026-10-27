@@ -19,6 +19,13 @@
 		location.href = out.dataset.to;
 	});
 
+	// Expandable stat cards and calendar cells.
+	document.querySelectorAll('.x-stat').forEach(function (b) {
+		b.addEventListener('click', function () { var o = b.getAttribute('aria-expanded') !== 'true'; b.setAttribute('aria-expanded', String(o)); $(b.getAttribute('aria-controls')).hidden = !o; });
+	});
+	var info = $('x-cellinfo');
+	document.querySelectorAll('.x-cell').forEach(function (c) { c.addEventListener('click', function () { info.textContent = c.dataset.info; }); });
+
 	// Review link: a link for one stay that opens the 1, 3 or 5 star page for that home.
 	var rl = $('rl-home');
 	if (rl) {
