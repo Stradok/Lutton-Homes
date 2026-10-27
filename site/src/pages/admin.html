@@ -1,0 +1,72 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="page-band">
+<div class="wrap">
+<h1>Owner dashboard</h1>
+<p class="lead">One place for arrivals, the calendar and manual bookings.</p>
+</div>
+</section>
+<section class="page-section">
+<div class="wrap x-admin">
+<p class="notice" role="note">Design preview with made-up sample data. There is no sign-in, nothing is saved and no buttons here do anything yet.</p>
+
+<section aria-labelledby="x-login">
+<h2 id="x-login">Owner sign in (sample)</h2>
+<div class="x-card">
+<p>Each owner gets their own login with a two-step code. The real sign-in comes with the admin build.</p>
+<a class="button button--primary" href="#dashboard">Continue to the dashboard<span class="arrow" aria-hidden="true"></span></a>
+</div>
+</section>
+
+<section id="dashboard" aria-labelledby="x-today">
+<h2 id="x-today">Today (sample)</h2>
+<ul class="x-stats">
+<li><strong>2</strong><span>Arrivals today</span></li>
+<li><strong>1</strong><span>Departures today</span></li>
+<li><strong>3 of 5</strong><span>Homes occupied tonight</span></li>
+<li><strong>Direct</strong><span>Bookings that skip the Booking.com commission appear here</span></li>
+</ul>
+</section>
+
+<section aria-labelledby="x-cal">
+<h2 id="x-cal">Calendar, next 14 days (sample)</h2>
+<p class="note">One calendar for every channel. D is a direct booking, B is Booking.com, A is Airbnb.</p>
+<div class="x-scroll"><table class="x-grid">
+<caption class="x-cap">Bookings by home for the next 14 days</caption>
+<thead><tr><th scope="col">Home</th>{{{adminHead}}}</tr></thead>
+<tbody>{{{adminGrid}}}</tbody>
+</table></div>
+</section>
+
+<section aria-labelledby="x-list">
+<h2 id="x-list">Bookings (sample)</h2>
+<div class="x-scroll"><table class="x-table">
+<thead><tr><th scope="col">Reference</th><th scope="col">Home</th><th scope="col">Guest</th><th scope="col">Dates</th><th scope="col">Channel</th><th scope="col">Status</th></tr></thead>
+<tbody>
+<tr><td>LH-0001</td><td>EasyStay</td><td>Guest A</td><td>12 to 15 Nov</td><td>Direct</td><td>Confirmed</td></tr>
+<tr><td>LH-0002</td><td>Luton Lodge</td><td>Guest B</td><td>13 to 16 Nov</td><td>Booking.com</td><td>Confirmed</td></tr>
+<tr><td>LH-0003</td><td>The Garden Nest</td><td>Guest C</td><td>14 to 18 Nov</td><td>Airbnb</td><td>Confirmed</td></tr>
+<tr><td>LH-0004</td><td>EasyStay Studio</td><td>Guest D</td><td>15 to 17 Nov</td><td>Direct</td><td>Awaiting payment</td></tr>
+</tbody>
+</table></div>
+<div class="actions"><button type="button" class="button button--quiet" aria-disabled="true">Export to CSV (preview)</button></div>
+</section>
+
+<section aria-labelledby="x-manual">
+<h2 id="x-manual">Add a booking by hand (sample)</h2>
+<form class="x-card x-form" action="/admin/" method="get" onsubmit="return false">
+<div class="field"><label for="x-home">Home</label><select id="x-home">{{{adminHomes}}}</select></div>
+<div class="field"><label for="x-in">Check in</label><input id="x-in" type="date"></div>
+<div class="field"><label for="x-out">Check out</label><input id="x-out" type="date"></div>
+<div class="field"><label for="x-name">Guest name</label><input id="x-name" type="text"></div>
+<button type="button" class="button button--primary" aria-disabled="true">Create and send payment link (preview)</button>
+</form>
+</section>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>

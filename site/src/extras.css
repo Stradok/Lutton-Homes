@@ -1,0 +1,28 @@
+/* New booking components shared by every design: payment options, manage-booking popover, owner dashboard. Colours come from each design's --lh tokens. */
+.pay-options { display: grid; gap: 0.6rem; margin: 0 0 1.5rem; padding: 0; border: 0; }
+.pay-options legend { margin-bottom: 0.6rem; padding: 0; font-weight: 700; }
+.pay-option { display: flex; align-items: center; gap: 0.8rem; min-height: 44px; padding: 0.8rem 1rem; border: 1px solid var(--lh-line, #ddd); border-radius: 12px; cursor: pointer; }
+.pay-option:has(input:checked) { border-color: currentColor; box-shadow: 0 0 0 1px currentColor; }
+.pay-option input { width: 1.2rem; height: 1.2rem; flex: none; accent-color: var(--lh-amber, #222); }
+.pay-option span { display: grid; gap: 0.15rem; }
+.pay-option small { color: var(--lh-slate, #666); }
+.x-pop { max-width: min(28rem, 92vw); margin: auto; padding: 1.5rem; border: 1px solid var(--lh-line, #ddd); border-radius: 16px; background: var(--lh-white, #fff); color: var(--lh-ink, #222); box-shadow: 0 16px 48px rgb(0 0 0 / 0.25); }
+.x-pop::backdrop { background: rgb(0 0 0 / 0.45); }
+.x-admin { display: grid; gap: 2.5rem; }
+.x-card { display: grid; gap: 1rem; justify-items: start; padding: 1.25rem; border: 1px solid var(--lh-line, #ddd); border-radius: 16px; }
+.x-card p { margin: 0; }
+.x-form { max-width: 32rem; justify-items: stretch; }
+.x-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.x-stats li { display: grid; gap: 0.3rem; padding: 1.1rem; border: 1px solid var(--lh-line, #ddd); border-radius: 16px; }
+.x-stats strong { font-size: 1.7rem; line-height: 1.1; }
+.x-stats span { color: var(--lh-slate, #666); }
+.x-scroll { overflow-x: auto; }
+.x-grid, .x-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.x-grid th, .x-grid td, .x-table th, .x-table td { padding: 0.55rem 0.6rem; border: 1px solid var(--lh-line, #ddd); text-align: center; white-space: nowrap; }
+.x-table th, .x-table td { text-align: start; }
+.x-grid th[scope="row"] { text-align: start; }
+.x-grid td { min-width: 2.4rem; font-weight: 700; }
+.x-d { background: color-mix(in srgb, var(--lh-amber, #e31c5f) 22%, transparent); }
+.x-b { background: color-mix(in srgb, #1d6fb8 22%, transparent); }
+.x-a { background: color-mix(in srgb, #6a6a6a 22%, transparent); }
+.x-cap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

@@ -101,7 +101,7 @@ for (const page of pages) {
 	if (size > (/homes\/[^/]+\/index\.html$/.test(name) ? 40 * KB : BUDGET.html)) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
 }
 
-const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss };
+const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss, 'assets/cal.js': 10 * KB, 'assets/quote.js': KB, 'assets/extras.css': 4 * KB };
 for (const [file, budget] of Object.entries(assets)) {
 	const text = read(file);
 	if (Buffer.byteLength(text) > budget) fail(`${file}: ${Buffer.byteLength(text)} bytes, budget ${budget}`);
@@ -228,6 +228,10 @@ const h = mod.exports;
 const eq = (actual, expected, label) => {
 	if (JSON.stringify(actual) !== JSON.stringify(expected)) fail(`app.js ${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
 };
+const quote = {};
+new Function('module', read('assets/quote.js') + '\nmodule.exports = { lhQuote };')(quote);
+eq(quote.exports.lhQuote(100, 3), { stay: 300, cleaning: 35, discount: 0, total: 335 }, 'quote short stay');
+eq(quote.exports.lhQuote(100, 7), { stay: 700, cleaning: 35, discount: 70, total: 665 }, 'quote week discount');
 const TODAY = '2026-10-25';
 eq(h.lhIsDate('2026-11-12'), true, 'valid date');
 eq(h.lhIsDate('2026-02-30'), false, 'impossible date');

@@ -49,6 +49,12 @@ const gateSign = (h, tone, { named = false, src = '', eager = false, alt = '', s
 };
 // On /homes/ the card title is h2 (the page has one h1); on the home page the cards sit under an h2 and stay h3.
 const distances = homes.map((h) => `<li><a class="link" href="/homes/${h.slug}/">${esc(h.name)}</a>: ${esc(h.distance)} <span class="sample">(sample)</span></li>`).join('');
+// Owner dashboard preview: a made-up 14-day calendar, a run of three days per channel (D direct, B Booking.com, A Airbnb).
+const adminDays = Array.from({ length: 14 }, (_, j) => new Date(Date.now() + j * 864e5));
+const adminHead = adminDays.map((d) => `<th scope="col">${d.getDate()}</th>`).join('');
+const adminGrid = homes.map((h, i) => `<tr><th scope="row">${esc(h.name)}</th>${adminDays.map((_, j) => { const c = ['', 'D', 'B', 'A'][Math.floor((j + i * 3) / 3) % 4]; return `<td${c ? ` class="x-${c.toLowerCase()}"` : ''}>${c}</td>`; }).join('')}</tr>`).join('');
+const adminHomes = homes.map((h) => `<option>${esc(h.name)}</option>`).join('');
+const XCSS = '<link rel="stylesheet" href="/assets/extras.css">';
 const homeCard = (h, inList) => `<li class="reveal" data-tags="|${h.tags.map(esc).join('|')}|"><a class="home-card" href="/homes/${h.slug}/"${inList ? ` data-carry data-rate="${h.rate}"` : ''}>`
 	+ gateSign(h, h.tone, { named: true, src: h.images?.[0], alt: h.alts?.[0], sizes: '(min-width: 768px) 36rem, 100vw' })
 	+ `<div class="home-card-body"><${inList ? 'h2' : 'h3'}>${esc(h.name)}</${inList ? 'h2' : 'h3'}><p class="by-line">by Luton Homes</p><p class="facts-line">${esc(h.beds)}, ${esc(h.distance)}</p><p class="rate">${rateHtml(h)}</p>`
@@ -164,12 +170,14 @@ const pages = [
 			extraHead: PREVIEW_HEAD + schemaFor(h),
 		},
 	})),
-	{ file: 'book.html', out: 'book/index.html', title: 'Book your stay | Luton Homes', description: 'Book a Luton Homes stay in three steps. This design preview makes no booking.', vars: {} },
+	{ file: 'book.html', out: 'book/index.html', title: 'Book your stay | Luton Homes', description: 'Book a Luton Homes stay in three steps. This design preview makes no booking.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
 	{ file: 'book-confirmed.html', out: 'book/confirmed/index.html', title: 'Booking confirmed (preview) | Luton Homes', description: 'Preview confirmation for a Luton Homes stay. No booking is made.', vars: {} },
 	{ file: 'about.html', out: 'about/index.html', title: 'About | Luton Homes', description: 'Luton Homes runs five short-stay homes near Luton Airport, with one team behind them.', vars: {} },
 	{ file: 'contact.html', out: 'contact/index.html', title: 'Contact | Luton Homes', description: 'Message Luton Homes on WhatsApp or visit us at 34 Beaconsfield, Luton LU2 0RW.', vars: {} },
 	{ file: 'local-area.html', out: 'local-area/index.html', title: 'Getting here | Luton Homes', description: 'Where Luton Homes is, and how far each home is from Luton Airport.', vars: { distances } },
 	{ file: 'terms.html', out: 'terms/index.html', title: 'Terms and booking conditions | Luton Homes', description: 'Draft terms for booking a Luton Homes stay direct.', vars: {} },
+	{ file: 'manage.html', out: 'manage/index.html', title: 'Manage your booking | Luton Homes', description: 'Preview of how a guest views, changes or cancels a booking. Nothing is changed.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
+	{ file: 'admin.html', out: 'admin/index.html', title: 'Owner dashboard (preview) | Luton Homes', description: 'Preview of the owner dashboard with made-up sample data.', vars: { adminHead, adminGrid, adminHomes, extraHead: PREVIEW_HEAD + XCSS } },
 	{ file: 'cancellation.html', out: 'cancellation/index.html', title: 'Cancellation policy | Luton Homes', description: 'Draft cancellation policy placeholder for Luton Homes.', vars: {} },
 	{ file: 'privacy.html', out: 'privacy/index.html', title: 'Privacy policy | Luton Homes', description: 'Draft privacy policy for Luton Homes.', vars: {} },
 	{ file: 'cookies.html', out: 'cookies/index.html', title: 'Cookie policy | Luton Homes', description: 'What the Luton Homes site stores in your browser.', vars: {} },
@@ -185,6 +193,8 @@ cpSync(at('src/styles.css'), join(dist, 'assets/styles.css'));
 cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
+cpSync(at('src/extras.css'), join(dist, 'assets/extras.css'));
+for (const f of ['quote.js', 'cal.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
 for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
 let built = 0;
 for (const d of DESIGNS) {

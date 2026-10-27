@@ -13,7 +13,7 @@
 			const run = () => {
 				const shown = items.filter((li) => {
 					li.hidden = tag !== 'all' && !li.dataset.tags.includes('|' + tag + '|');
-					return !li.hidden;
+					return !li.hidden && !('busy' in li.dataset);
 				});
 				list.classList.toggle('is-filtered', tag !== 'all');
 				chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));

@@ -249,4 +249,4 @@
 @media (prefers-reduced-motion: reduce) {
 	[data-design="client-original2"] .c3-intro { display: none !important; }
 }
-[data-design="client-original2"] .footer-name { color: var(--c3-ink); }
+[data-design="client-original2"] .footer-name { color: var(--c3-ink) !important; }

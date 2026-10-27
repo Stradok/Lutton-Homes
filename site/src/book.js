@@ -27,8 +27,11 @@
 		row(dl, 'Home', s.name);
 		row(dl, 'Dates', lhFormatDate(s.in) + ' to ' + lhFormatDate(s.out));
 		row(dl, 'Guests', s.guests + (s.guests === 1 ? ' guest' : ' guests'));
+		const q = lhQuote(s.rate, s.nights);
 		row(dl, 'Sample rate', '£' + s.rate + ' a night x ' + nightsText(s.nights));
-		row(dl, 'Sample total', '£' + s.total);
+		row(dl, 'Cleaning fee (sample)', '£' + q.cleaning);
+		if (q.discount) row(dl, 'Stay of 7 nights or more, 10% off (sample)', '-£' + q.discount);
+		row(dl, 'Sample total', '£' + q.total);
 		return dl;
 	};
 

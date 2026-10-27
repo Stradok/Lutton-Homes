@@ -57,8 +57,20 @@
 
 <section class="step" aria-labelledby="step-3-title">
 <h2 id="step-3-title" tabindex="-1">Pay</h2>
+<fieldset class="pay-options">
+<legend>How much to pay now (sample)</legend>
+<label class="pay-option"><input type="radio" name="when" value="full" checked><span><strong>Pay in full</strong><small>The whole total is paid when you book.</small></span></label>
+<label class="pay-option"><input type="radio" name="when" value="deposit"><span><strong>Pay a deposit</strong><small>The rest is paid before you arrive. Amount to be confirmed.</small></span></label>
+</fieldset>
+<fieldset class="pay-options">
+<legend>Pay with (sample)</legend>
+<label class="pay-option"><input type="radio" name="method" value="card" checked><span><strong>Debit or credit card</strong></span></label>
+<label class="pay-option"><input type="radio" name="method" value="apple"><span><strong>Apple Pay</strong></span></label>
+<label class="pay-option"><input type="radio" name="method" value="google"><span><strong>Google Pay</strong></span></label>
+</fieldset>
 <div class="pay-box">
-<p>Secure card payment will appear here once a payment provider is connected.</p>
+<p>You pay on your payment provider's secure page. Card details are never typed into this site.</p>
+<p class="note">Design preview: no payment is taken and there are no card fields here. The provider is to be confirmed.</p>
 </div>
 <input type="hidden" id="f-home" name="home">
 <input type="hidden" id="f-in" name="in">
@@ -75,6 +87,7 @@
 </main>
 {{> footer}}
 {{{homesJson}}}
+<script src="/assets/quote.js" defer></script>
 <script src="/assets/book.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,51 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="page-band">
+<div class="wrap">
+<h1>Manage your booking</h1>
+<p class="lead">See your stay, change the dates or cancel.</p>
+</div>
+</section>
+<section class="page-section">
+<div class="wrap book-wrap">
+<p class="notice" role="note">This is a design preview. Nothing is looked up, changed or cancelled.</p>
+<form class="book-form" action="/manage/" method="get" novalidate>
+<div class="field">
+<label for="m-ref">Booking reference</label>
+<input id="m-ref" type="text" value="LH-SAMPLE" autocomplete="off">
+</div>
+<div class="field">
+<label for="m-email">Email address</label>
+<input id="m-email" type="email" autocomplete="email" placeholder="name@example.com">
+</div>
+<button type="submit" class="button button--primary">Find my booking<span class="arrow" aria-hidden="true"></span></button>
+</form>
+<h2>Your booking (sample)</h2>
+<div class="summary-box">
+<dl class="summary-list">
+<div><dt>Status</dt><dd>Confirmed (sample)</dd></div>
+<div><dt>Home</dt><dd>EasyStay</dd></div>
+<div><dt>Dates</dt><dd>12 Nov 2026 to 15 Nov 2026</dd></div>
+<div><dt>Guests</dt><dd>2 guests</dd></div>
+<div><dt>Reference</dt><dd>LH-SAMPLE</dd></div>
+</dl>
+</div>
+<div class="actions">
+<a class="button button--primary" href="/homes/easystay/">Change dates<span class="arrow" aria-hidden="true"></span></a>
+<button type="button" class="button button--quiet" popovertarget="cancel-pop">Cancel booking</button>
+<a class="link" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+<div id="cancel-pop" popover class="x-pop">
+<h2>Cancel this booking?</h2>
+<p>What you get back depends on the cancellation policy, which is still to be confirmed. <a class="link" href="/cancellation/">Read the draft policy</a></p>
+<p class="note">Design preview: nothing is cancelled.</p>
+<button type="button" class="button button--quiet" popovertarget="cancel-pop" popovertargetaction="hide">Keep my booking</button>
+</div>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>
