@@ -33,7 +33,7 @@ const read = (f) => readFileSync(join(dist, f), 'utf8');
 const variantsCss = read('assets/variants.css');
 const themeCss = read('assets/theme-original.css');
 const switcherCss = read('assets/switcher.css');
-const pages = files.filter((f) => f.endsWith('.html'));
+const pages = files.filter((f) => f.endsWith('.html') && !f.startsWith('requirements/')); // the checklist is a standalone tool page
 const idsIn = (f) => new Set([...read(f).matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 
 for (const page of pages) {

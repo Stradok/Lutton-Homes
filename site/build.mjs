@@ -82,7 +82,7 @@ const DESIGNS = [
 	{ id: 'orbit', name: 'Orbit', base: '/d/orbit', attr: 'orbit' },
 	{ id: 'custom-1', name: 'Custom 1', base: '/d/custom-1', attr: 'custom-1' },
 	{ id: 'custom-2', name: 'Custom 2', base: '/d/custom-2', attr: 'custom-2' },
-	{ id: 'custom-3', name: 'Custom 3', base: '/d/custom-3', attr: 'custom-3' },
+	{ id: 'client-original', name: 'Client Original', base: '/d/client-original', attr: 'client-original' },
 	{ id: 'cinematic', name: 'Cinematic', base: '/d/cinematic', attr: 'cinematic' },
 ];
 // The switcher lists every design as a plain link to the same page in that design, so it works without JavaScript.
@@ -102,8 +102,8 @@ const DAWN_SCRIPT = '<script>(function(){var d=document.documentElement,seen=nul
 const C1_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-c1-seen")}catch(e){}if(!seen&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&/^\\/d\\/custom-1\\/?$/.test(location.pathname))d.classList.add("c1-pending")})();</script>';
 // Custom 2 plays its own cloud-and-plane intro on the home page once per browser session.
 const C2_SCRIPT = '<script>(function(){var d=document.documentElement,seen=null;try{seen=sessionStorage.getItem("lh-c2-seen")}catch(e){}if(!seen&&!matchMedia("(prefers-reduced-motion: reduce)").matches&&/^\\/d\\/custom-2\\/?$/.test(location.pathname))d.classList.add("c2-pending")})();</script>';
-// Custom 3 plays the same plane-and-clouds intro as Custom 1 before its white landing page.
-const C3_SCRIPT = C1_SCRIPT.replace(/c1|custom-1/g, (m) => (m === 'c1' ? 'c3' : 'custom-3'));
+// Client Original plays the same plane-and-clouds intro as Custom 1 before its white landing page.
+const C3_SCRIPT = C1_SCRIPT.replace(/c1|custom-1/g, (m) => (m === 'c1' ? 'c3' : 'client-original'));
 const designHead = (d) => [
 	d.id === 'original' ? '<link rel="stylesheet" href="/assets/theme-original.css">' : '',
 	existsSync(at('src/designs', d.id, 'design.css')) ? `<link rel="stylesheet" href="/assets/design-${d.id}.css">` : '',
@@ -111,7 +111,7 @@ const designHead = (d) => [
 	d.attr === 'dawn' ? DAWN_SCRIPT : '',
 	d.id === 'custom-1' ? C1_SCRIPT : '',
 	d.id === 'custom-2' ? C2_SCRIPT : '',
-	d.id === 'custom-3' ? C3_SCRIPT : '',
+	d.id === 'client-original' ? C3_SCRIPT : '',
 ].filter(Boolean).join('\n');
 // Root-relative site links in a design's pages are moved under its base; shared files (/assets, /fonts, /media, /favicon) are not.
 const withBase = (html, base) => (base ? html.replace(/(\s(?:href|action)=")\/(?!assets\/|fonts\/|media\/|favicon|d\/)/g, `$1${base}/`) : html);
