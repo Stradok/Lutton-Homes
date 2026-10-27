@@ -11,7 +11,7 @@
 	var poster = hero.querySelector('.cin-poster');
 	var ring = hero.querySelector('.cin-ring');
 	var VIDEO_URL = '/media/cinematic/hero-scrub.mp4';
-	var VIDEO_BYTES = 7358842;
+	var VIDEO_BYTES = 5021638;
 	var POSTER_URL = '/media/cinematic/hero-poster.webp';
 	var clamp = function (v, lo, hi) { return Math.min(hi, Math.max(lo, v)); };
 	var smoothstep = function (p, e0, e1) { var t = clamp((p - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); };
