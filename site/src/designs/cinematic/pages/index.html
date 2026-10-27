@@ -1,0 +1,127 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<div class="cin-env" aria-hidden="true"></div>
+<main id="content" tabindex="-1">
+<section class="cin-hero" aria-label="Luton Homes, from orbit to your door">
+<div class="cin-stage">
+<div class="cin-poster" aria-hidden="true"></div>
+<video class="cin-video" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+<div class="cin-scrim" aria-hidden="true"></div>
+<svg class="cin-ring" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)"/></svg>
+
+<div class="band band--1" data-band="0,0.22">
+<p class="cin-chip cin-static-only"><span>LTN</span> 51.9&deg; N, 0.4&deg; W</p>
+<h1 class="cin-h1" data-split>Somewhere calm to land</h1>
+<p class="cin-sub">Five short-stay homes near Luton Airport, booked direct.</p>
+<a class="button button--primary cin-static-only" href="#plan">Check availability<span class="arrow" aria-hidden="true"></span></a>
+</div>
+<div class="band band--2" data-band="0.27,0.49" data-entrance="scatter">
+<p class="cin-line" data-split>Five properties. One team.</p>
+</div>
+<div class="band band--3" data-band="0.53,0.74" data-entrance="depth">
+<p class="cin-chip"><span>LTN</span> 51.9&deg; N, 0.4&deg; W</p>
+<p class="cin-line" data-split>Near Luton Airport.</p>
+</div>
+<div class="band band--4" data-band="0.82,1" data-entrance="settle">
+<p class="cin-line cin-line--settle" data-split>Book direct with Luton Homes.</p>
+<p class="cin-sub cin-settle-sub">Pick your dates and we will show you the homes.</p>
+<div class="cin-actions">
+<a class="button button--primary" href="#plan">Check availability<span class="arrow" aria-hidden="true"></span></a>
+<a class="cin-ghost" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+</div>
+</div>
+</section>
+
+<section id="plan" class="cin-section cin-plan">
+<div class="wrap cin-plan-grid">
+<div>
+<h2>Plan your stay</h2>
+<p class="intro">Tell us when you arrive and when you leave. Each home has its own page with its rules and sample rate.</p>
+</div>
+<form id="search-form" class="search-card" action="/homes/" method="get" novalidate>
+<div class="search-card-head">
+<h3 class="search-card-title">Your dates</h3>
+<span class="search-card-code" aria-hidden="true">LTN</span>
+</div>
+<div class="search-card-body">
+<div class="field">
+<label for="search-in">Check in</label>
+<input id="search-in" name="in" type="date" aria-describedby="search-in-error">
+<p id="search-in-error" class="error" data-err="in" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-out">Check out</label>
+<input id="search-out" name="out" type="date" aria-describedby="search-out-error">
+<p id="search-out-error" class="error" data-err="out" role="alert"></p>
+</div>
+<div class="field">
+<label for="search-guests">Guests</label>
+<input id="search-guests" name="guests" type="number" min="1" value="2" aria-describedby="search-guests-error">
+<p id="search-guests-error" class="error" data-err="guests" role="alert"></p>
+</div>
+<button type="submit" class="button button--primary button--block">Check availability<span class="arrow" aria-hidden="true"></span></button>
+<p class="note">Availability and prices are samples in this preview.</p>
+</div>
+</form>
+</div>
+</section>
+
+<section id="lights" class="cin-section cin-lights">
+<div class="wrap">
+<h2>Five homes, one team</h2>
+<p class="intro">Each home keeps its own name. Hold the button to turn the lights on.</p>
+<ul class="cin-windows" data-windows>{{{windowTiles}}}</ul>
+<button type="button" class="cin-hold" data-hold aria-describedby="lights-hint"><svg class="cin-hold-ring" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="126" style="stroke-dashoffset:var(--hp,126)"/></svg><span>Hold for lights on</span></button>
+<p id="lights-hint" class="cin-hint">Press and hold, or press Enter and keep it held. The homes are listed below either way.</p>
+</div>
+</section>
+
+<section id="homes" class="cin-section">
+<div class="wrap">
+<h2>Our homes</h2>
+<p class="intro">Photos and details are on the way.</p>
+<ul class="home-cards">{{{homeCards}}}</ul>
+</div>
+</section>
+
+<section id="why-direct" class="cin-section cin-arrive">
+<div class="cin-arrive-img" aria-hidden="true"></div>
+<div class="wrap">
+<h2>Why book with us directly</h2>
+<ul class="why-rows">
+<li class="why-row reveal"><h3>Talk to a person.</h3><p>Message us on WhatsApp and the team that looks after the homes answers.</p></li>
+<li class="why-row reveal"><h3>Clear check-in details.</h3><p>We send check-in instructions before you arrive.</p></li>
+<li class="why-row reveal"><h3>Pay securely online.</h3><p>Secure online payment once booking opens.</p></li>
+</ul>
+</div>
+</section>
+
+<section id="how-booking" class="cin-section">
+<div class="wrap">
+<h2>How booking works</h2>
+<ol class="cin-steps">
+<li class="reveal"><h3>Pick your dates</h3><p>Tell us when you arrive and when you leave.</p></li>
+<li class="reveal"><h3>Choose a home</h3><p>Each home has its own page with its rules and sample rate.</p></li>
+<li class="reveal"><h3>Pay securely</h3><p>Online payment is not connected in this preview.</p></li>
+</ol>
+</div>
+</section>
+
+<section id="find-us" class="cin-section cin-find">
+<div class="wrap">
+<h2>Find us</h2>
+<address>34 Beaconsfield, Luton LU2 0RW</address>
+<p>Luton Airport is nearby.</p>
+<div class="actions">
+<a class="link" href="{{maps}}">Get directions</a>
+<a class="link" href="{{wa}}">Message us on WhatsApp</a>
+</div>
+<p class="cin-credit">Earth at night: NASA Earth Observatory. Interior: AI-generated sample image.</p>
+</div>
+</section>
+</main>
+{{> footer}}
+</body>
+</html>

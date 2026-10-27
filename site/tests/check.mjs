@@ -108,7 +108,11 @@ for (const [file, budget] of Object.entries(assets)) {
 
 for (const file of files.filter((f) => f.startsWith('media/'))) {
 	const size = statSync(join(dist, file)).size;
-	const budget = file === 'media/earth-night-se-england.webp' ? 100 * KB : BUDGET.media;
+	// The Cinematic scrub video is the one large file (the 10k-websites target is 4 to 8 MB for a short 1080p clip);
+	// its poster and stills get a still-image budget.
+	const budget = file === 'media/cinematic/hero-scrub.mp4' ? 8 * 1024 * KB
+		: file.startsWith('media/cinematic/') ? 120 * KB
+		: file === 'media/earth-night-se-england.webp' ? 100 * KB : BUDGET.media;
 	if (size > budget) fail(`${file}: ${size} bytes, budget ${budget}`);
 }
 
@@ -210,7 +214,10 @@ for (const [, value] of cssBare.matchAll(/(?<![\w-])animation(?:-name)?\s*:\s*([
 // Unit checks: evaluate app.js with no document; the module.exports guard supplies the helpers.
 const src = readFileSync(join(root, 'src/app.js'), 'utf8');
 for (const file of files.filter((f) => /\.(js|html)$/.test(f))) {
-	if (/addEventListener\(\s*['"]scroll['"]/.test(read(file))) fail(`${file}: scroll event listener is not allowed`);
+	// The one exception: the Cinematic scrub hero needs scroll progress, so it registers a single passive
+	// listener that only sets a target and wakes a rAF loop (the 10k-websites scrub standard).
+	const scrollOk = file === 'assets/design-cinematic.js' && /addEventListener\('scroll', onScroll, \{ passive: true \}\)/.test(read(file));
+	if (/addEventListener\(\s*['"]scroll['"]/.test(read(file)) && !scrollOk) fail(`${file}: scroll event listener is not allowed`);
 }
 const mod = { exports: {} };
 new Function('document', 'module', src)(undefined, mod);

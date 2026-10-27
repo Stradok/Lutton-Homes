@@ -1,0 +1,182 @@
+/* Cinematic design: "from orbit to your door". A scroll-scrubbed journey from Europe at night into Luton,
+   then lights on and inside a home. The page lives in the footage's world: a deep night-navy canvas,
+   city-light amber as the one accent (the brand's own amber, which is also the colour of the lights in the
+   footage, so the amber-on-dark default is the subject's material here, not a reach), no serif.
+   Scoped to [data-design="cinematic"]. */
+[data-design="cinematic"] {
+	--cin-canvas: #0B1222;
+	--cin-panel: #121C33;
+	--cin-panel-2: #1A2745;
+	--cin-text: #EEF1F6;
+	--cin-text-2: #AEB9CD;
+	--cin-line: rgba(238, 241, 246, 0.14);
+	--cin-accent: var(--lh-amber);
+	--cin-accent-muted: rgba(242, 176, 30, 0.22);
+	--ease-cine: cubic-bezier(.22, .61, .36, 1);
+	--tshadow: 0 1px 2px rgba(5, 8, 16, .95), 0 3px 12px rgba(5, 8, 16, .78), 0 10px 44px rgba(5, 8, 16, .8);
+	color-scheme: dark;
+}
+html[data-design="cinematic"], [data-design="cinematic"] body { overflow-x: hidden; overflow-x: clip; }
+[data-design="cinematic"] body { background: var(--cin-canvas); color: var(--cin-text); }
+[data-design="cinematic"] main { margin-top: 0; }
+[data-design="cinematic"] h1, [data-design="cinematic"] h2, [data-design="cinematic"] h3 { color: var(--cin-text); }
+[data-design="cinematic"] p, [data-design="cinematic"] .intro, [data-design="cinematic"] .by-line { color: var(--cin-text-2); }
+[data-design="cinematic"] .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[data-design="cinematic"] :focus-visible { outline: 3px solid var(--cin-accent); outline-offset: 3px; box-shadow: none; }
+[data-design="cinematic"] a:not(.button) { color: var(--cin-text); }
+
+/* One fixed environment layer behind everything: faint city lights drifting very slowly. */
+[data-design="cinematic"] .cin-env {
+	position: fixed;
+	inset: -10%;
+	z-index: -1;
+	pointer-events: none;
+	background:
+		radial-gradient(1px 1px at 12% 22%, rgba(242, 176, 30, .5), transparent 60%),
+		radial-gradient(1px 1px at 68% 14%, rgba(242, 176, 30, .35), transparent 60%),
+		radial-gradient(1.5px 1.5px at 84% 62%, rgba(242, 176, 30, .4), transparent 60%),
+		radial-gradient(1px 1px at 32% 78%, rgba(238, 241, 246, .3), transparent 60%),
+		radial-gradient(60% 40% at 80% 0%, rgba(26, 39, 69, .9), transparent 70%),
+		var(--cin-canvas);
+	animation: cin-drift 90s linear -20s infinite alternate;
+}
+@keyframes cin-drift { to { transform: translate3d(-3%, 2%, 0); } }
+
+/* Header: dark glass over the footage. */
+[data-design="cinematic"] .site-header { background: rgba(11, 18, 34, .55); box-shadow: 0 0 0 1px var(--cin-line); }
+[data-design="cinematic"] .site-header::after { background: var(--cin-panel); }
+[data-design="cinematic"] .wordmark, [data-design="cinematic"] .site-header:not(.is-open) .site-nav a { color: var(--cin-text); }
+[data-design="cinematic"] .menu-lines, [data-design="cinematic"] .menu-lines::before, [data-design="cinematic"] .menu-lines::after { background: var(--cin-text); }
+[data-design="cinematic"] .site-header.is-open { background: var(--cin-canvas); }
+[data-design="cinematic"] .site-header.is-open .menu-lines { background: transparent; }
+
+/* ---------- The scrub hero: a tall pinned region with a sticky full-viewport stage ---------- */
+[data-design="cinematic"] .cin-hero { position: relative; height: 520vh; margin-top: -5rem; }
+[data-design="cinematic"] .cin-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--cin-canvas); }
+[data-design="cinematic"] .cin-poster,
+[data-design="cinematic"] .cin-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: center / cover no-repeat; }
+[data-design="cinematic"] .cin-video { opacity: 0; transform: translateZ(0); will-change: transform; transition: opacity 600ms var(--ease-cine); }
+[data-design="cinematic"] .video-ready .cin-video { opacity: 1; }
+[data-design="cinematic"] .video-failed .cin-video { display: none; }
+[data-design="cinematic"] .cin-scrim { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 45%, rgba(5, 8, 16, 0) 35%, rgba(5, 8, 16, .62) 100%); }
+[data-design="cinematic"] .cin-ring { position: absolute; right: 1.5rem; bottom: 1.5rem; width: 2.5rem; height: 2.5rem; color: var(--cin-accent); transform: rotate(-90deg); transition: opacity 600ms var(--ease-cine); }
+[data-design="cinematic"] .cin-ring circle { transition: stroke-dashoffset 120ms linear; }
+[data-design="cinematic"] .video-ready .cin-ring, [data-design="cinematic"] .video-failed .cin-ring { opacity: 0; }
+
+/* Caption bands live in the footage's calm regions; each dims the footage behind it while it is on. */
+[data-design="cinematic"] .band { position: absolute; z-index: 1; max-width: min(46rem, 88vw); text-shadow: var(--tshadow); visibility: hidden; }
+[data-design="cinematic"] .band .button { text-shadow: none; }
+[data-design="cinematic"] .band::before { content: ""; position: absolute; inset: -40% -30%; z-index: -1; pointer-events: none; opacity: calc(.25 + .75 * var(--k, 1)); background: radial-gradient(ellipse 74% 62% at 50% 50%, rgba(5, 8, 16, .66) 0%, rgba(5, 8, 16, .44) 46%, rgba(5, 8, 16, 0) 76%); }
+[data-design="cinematic"] .band--1 { left: var(--lh-edge); top: 30%; visibility: visible; }
+[data-design="cinematic"] .band--2 { left: var(--lh-edge); bottom: 18%; }
+[data-design="cinematic"] .band--3 { right: var(--lh-edge); top: 24%; text-align: right; }
+[data-design="cinematic"] .band--3::before { background: radial-gradient(ellipse 74% 62% at 60% 50%, rgba(5, 8, 16, .7) 0%, rgba(5, 8, 16, .46) 46%, rgba(5, 8, 16, 0) 76%); }
+[data-design="cinematic"] .band--4 { left: var(--lh-edge); top: 22%; }
+[data-design="cinematic"] .band--4::before { background: radial-gradient(ellipse 80% 70% at 40% 50%, rgba(5, 8, 16, .74) 0%, rgba(5, 8, 16, .5) 46%, rgba(5, 8, 16, 0) 78%); }
+[data-design="cinematic"] .cin-h1 { margin: 0 0 1rem; font-size: clamp(2.4rem, 6.2vw, 5.2rem); line-height: 1.02; color: #FFFFFF; }
+[data-design="cinematic"] .cin-line { margin: 0; font: 700 clamp(1.8rem, 4.4vw, 3.6rem) / 1.06 var(--lh-font-head); font-stretch: 112%; color: #FFFFFF; }
+[data-design="cinematic"] .cin-sub { margin: 0; font-size: var(--lh-text-md); color: #E4E9F2; max-width: 34ch; }
+[data-design="cinematic"] .cin-chip { display: inline-flex; gap: 0.5rem; align-items: center; margin: 0 0 1rem; padding: 0.35rem 0.75rem; border: 1px solid rgba(238, 241, 246, .3); border-radius: 999px; background: rgba(8, 12, 22, .55); backdrop-filter: blur(10px); color: #E4E9F2; font: 600 0.85rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-shadow: 0 1px 3px rgba(5, 8, 16, .85); }
+[data-design="cinematic"] .cin-chip span { color: var(--cin-accent); }
+[data-design="cinematic"] .cin-static-only { display: none; }
+[data-design="cinematic"] .cin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-top: 1.5rem; }
+[data-design="cinematic"] .cin-ghost { display: inline-flex; align-items: center; min-height: 44px; color: #FFFFFF; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+
+/* Split text: words and characters, driven by each band's --k (0 to 1). Transform and opacity only. */
+[data-design="cinematic"] .sx .w { display: inline-block; white-space: nowrap; }
+[data-design="cinematic"] .sx .c { display: inline-block; }
+/* Band 1: word-by-word rise on load. */
+[data-design="cinematic"] .band--1 .w { --kc: clamp(0, (var(--k, 0) - var(--wi, 0) * .45) * 2.4, 1); opacity: var(--kc); transform: translateY(calc((1 - var(--kc)) * 18px)); }
+[data-design="cinematic"] .band--1 .cin-sub { opacity: clamp(0, (var(--k, 0) - .55) * 3, 1); }
+/* Band 2: scatter, the city lights gathering. */
+[data-design="cinematic"] .band--2 .c { --kc: clamp(0, (var(--k, 0) - var(--th, 0)) * 2.6, 1); opacity: var(--kc); transform: translate(calc((1 - var(--kc)) * var(--jx, 0px)), calc((1 - var(--kc)) * var(--jy, 0px))) rotate(calc((1 - var(--kc)) * var(--jr, 0deg))); }
+/* Band 3: approach from depth, the camera pushing in. */
+[data-design="cinematic"] .band--3 .cin-line { --kc: clamp(0, var(--k, 0) * 1.6, 1); opacity: var(--kc); transform: scale(calc(.82 + .18 * var(--kc))); transform-origin: 100% 50%; }
+[data-design="cinematic"] .band--3 .cin-chip { opacity: clamp(0, var(--k, 0) * 2, 1); }
+/* Band 4: staged settle, the arrival at rest. */
+[data-design="cinematic"] .band--4 .w { --kc: clamp(0, (var(--k, 0) - var(--wi, 0) * .4) * 2.6, 1); opacity: var(--kc); transform: translateY(calc((1 - var(--kc)) * 22px)); }
+[data-design="cinematic"] .band--4 .cin-settle-sub { margin-top: 1rem; opacity: clamp(0, (var(--k, 0) - .66) * 4, 1); }
+[data-design="cinematic"] .band--4 .cin-actions { opacity: clamp(0, (var(--k, 0) - .78) * 5, 1); }
+
+/* ---------- The static hero: phones, portrait tablets, coarse portrait, short landscape phones, reduced motion.
+   The five queries match the JS GATES exactly. ---------- */
+@media (max-width: 720px), (orientation: portrait) and (max-width: 1024px), (orientation: portrait) and (pointer: coarse), (orientation: landscape) and (pointer: coarse) and (max-height: 560px), (prefers-reduced-motion: reduce) {
+	[data-design="cinematic"] .cin-hero { height: auto; }
+	[data-design="cinematic"] .cin-stage { position: relative; height: auto; min-height: 100svh; display: flex; align-items: flex-end; padding: 7rem var(--lh-edge) 3rem; background: var(--cin-canvas) url('/media/cinematic/hero-static.webp') center / cover no-repeat; }
+	[data-design="cinematic"] .cin-video, [data-design="cinematic"] .cin-poster, [data-design="cinematic"] .cin-ring { display: none; }
+	[data-design="cinematic"] .band { display: none; }
+	[data-design="cinematic"] .band--1 { position: relative; display: block; left: auto; top: auto; --k: 1; visibility: visible; opacity: 1; }
+	[data-design="cinematic"] .band--1 .w, [data-design="cinematic"] .band--1 .cin-sub { opacity: 1; transform: none; }
+	[data-design="cinematic"] .cin-static-only { display: inline-flex; }
+	[data-design="cinematic"] .band--1 .button { margin-top: 1.5rem; }
+}
+
+/* ---------- Below the hero: a real website in the same night world ---------- */
+[data-design="cinematic"] .cin-section { position: relative; padding-block: clamp(4rem, 9vw, 7rem); }
+[data-design="cinematic"] .cin-section h2 { font-size: clamp(1.8rem, 3.6vw, 2.8rem); }
+
+/* Plan: copy left, the boarding-pass card right. */
+[data-design="cinematic"] .cin-plan-grid { display: grid; gap: 2rem; align-items: center; }
+@media (min-width: 900px) { [data-design="cinematic"] .cin-plan-grid { grid-template-columns: 1fr 26rem; } }
+[data-design="cinematic"] .search-card { color: var(--lh-ink); border-radius: 20px; box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .7), 0 0 0 1px var(--cin-accent-muted); animation: none; }
+[data-design="cinematic"] .search-card p, [data-design="cinematic"] .search-card .note { color: var(--lh-slate); }
+[data-design="cinematic"] .search-card h3 { color: var(--lh-ink); }
+[data-design="cinematic"] .search-card-head::before, [data-design="cinematic"] .search-card-head::after { background: var(--cin-canvas); }
+
+/* Lights on: five dark windows, one per home, lit by the hold. */
+[data-design="cinematic"] .cin-windows { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; margin: 2rem 0; padding: 0; list-style: none; }
+[data-design="cinematic"] .cin-window { position: relative; display: grid; align-content: end; gap: .25rem; min-height: 11rem; padding: 1rem; border-radius: 14px; background: var(--cin-panel); border: 1px solid var(--cin-line); text-decoration: none; overflow: hidden; transition: background-color 500ms var(--ease-cine), border-color 500ms var(--ease-cine); }
+[data-design="cinematic"] .cin-window::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 70% at 50% 35%, rgba(255, 214, 140, .95), rgba(242, 176, 30, .35) 55%, transparent 80%); opacity: 0; transition: opacity 700ms var(--ease-cine); }
+[data-design="cinematic"] .cin-window-mark { position: relative; font: 700 1.6rem var(--lh-font-head); font-stretch: 112%; color: var(--cin-text-2); transition: color 500ms var(--ease-cine); }
+[data-design="cinematic"] .cin-window-name { position: relative; font-weight: 700; color: var(--cin-text); }
+[data-design="cinematic"] li.is-lit .cin-window { border-color: rgba(242, 176, 30, .6); background: #2A2416; }
+[data-design="cinematic"] li.is-lit .cin-window::before { opacity: .55; }
+[data-design="cinematic"] li.is-lit .cin-window-mark { color: #FFFFFF; }
+[data-design="cinematic"] .cin-hold { display: inline-flex; align-items: center; gap: .75rem; min-height: 56px; padding: 0 1.5rem 0 .75rem; border: 1px solid var(--cin-accent); border-radius: 999px; background: transparent; color: var(--cin-text); font: 700 1rem var(--lh-font-body); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
+[data-design="cinematic"] .cin-hold-ring { width: 2.2rem; height: 2.2rem; color: var(--cin-accent); transform: rotate(-90deg); }
+[data-design="cinematic"] .cin-hold.is-done { background: var(--cin-accent); color: var(--lh-ink); }
+[data-design="cinematic"] .cin-hold.is-done .cin-hold-ring { color: var(--lh-ink); }
+[data-design="cinematic"] .cin-hint { margin-top: .75rem; font-size: .9rem; }
+
+/* Homes: dark cards. */
+[data-design="cinematic"] .home-card { background: var(--cin-panel); border-radius: 16px; box-shadow: 0 0 0 1px var(--cin-line); color: var(--cin-text); }
+[data-design="cinematic"] .home-card:hover, [data-design="cinematic"] .home-card:focus-visible { box-shadow: 0 0 0 1px var(--cin-accent), 0 24px 60px -24px rgba(0, 0, 0, .8); }
+[data-design="cinematic"] .home-card-body h2, [data-design="cinematic"] .home-card-body h3 { color: var(--cin-text); }
+[data-design="cinematic"] .home-card .rate { color: var(--cin-text); }
+[data-design="cinematic"] .sample { color: var(--cin-text-2); }
+[data-design="cinematic"] .gate-sign--sky, [data-design="cinematic"] .gate-sign--paper, [data-design="cinematic"] .gate-sign--ink { background: linear-gradient(160deg, var(--cin-panel-2), var(--cin-canvas)); }
+[data-design="cinematic"] .gate-sign-mark { color: var(--cin-accent); }
+
+/* Why direct: the ending frame (the room at rest) as the section's backdrop. */
+[data-design="cinematic"] .cin-arrive { overflow: hidden; }
+[data-design="cinematic"] .cin-arrive-img { position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(11, 18, 34, .96) 0%, rgba(11, 18, 34, .85) 45%, rgba(11, 18, 34, .45) 100%), url('/media/cinematic/hero-ending.webp') center / cover no-repeat; }
+[data-design="cinematic"] .why-row { border-color: var(--cin-line); }
+[data-design="cinematic"] .why-row p { color: #D3DAE6; }
+
+/* How booking works: three stops joined by an amber route. */
+[data-design="cinematic"] .cin-steps { display: grid; gap: 2rem; margin: 2rem 0 0; padding: 0; list-style: none; counter-reset: s; }
+[data-design="cinematic"] .cin-steps li { counter-increment: s; padding-top: 1.25rem; border-top: 2px solid var(--cin-accent-muted); }
+[data-design="cinematic"] .cin-steps li::before { content: counter(s, decimal-leading-zero); display: block; margin-bottom: .5rem; color: var(--cin-accent); font: 600 .85rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+@media (min-width: 900px) { [data-design="cinematic"] .cin-steps { grid-template-columns: repeat(3, 1fr); } }
+
+[data-design="cinematic"] .cin-find address { font: 700 clamp(1.3rem, 3vw, 2rem) var(--lh-font-head); font-stretch: 112%; font-style: normal; color: var(--cin-text); }
+[data-design="cinematic"] .cin-credit { margin-top: 2rem; font-size: .85rem; }
+
+/* Entrances: reveal once with a short stagger; delays retired once in. */
+[data-design="cinematic"] .reveal { transition: opacity 600ms var(--ease-cine), transform 600ms var(--ease-cine); }
+
+/* Inner pages: night title band, light panels for forms. */
+[data-design="cinematic"] .page-band { background: linear-gradient(180deg, var(--cin-panel-2), var(--cin-canvas)); }
+[data-design="cinematic"] .page-band :is(.intro, .lead, .by-line) { color: var(--cin-text-2); }
+[data-design="cinematic"] :is(.booking-panel, .book-form, .notice, .summary-box, .pay-box, .stay-summary, .estimate-box, .other-home, .lightbox-figure) { color: var(--lh-ink); }
+[data-design="cinematic"] :is(.booking-panel, .book-form, .notice, .summary-box, .pay-box, .stay-summary, .estimate-box, .other-home) :is(p, h2, h3, dt, dd, label, span) { color: var(--lh-ink); }
+[data-design="cinematic"] .chip { background: var(--cin-panel); color: var(--cin-text); border-color: var(--cin-line); }
+[data-design="cinematic"] .chip[aria-pressed="true"] { background: var(--cin-accent); color: var(--lh-ink); border-color: var(--cin-accent); }
+[data-design="cinematic"] .list li, [data-design="cinematic"] dd, [data-design="cinematic"] dt, [data-design="cinematic"] label { color: var(--cin-text); }
+[data-design="cinematic"] .site-footer { background: #070C17; }
+
+/* Paused tabs and reduced motion. */
+[data-design="cinematic"] body.paused *, [data-design="cinematic"] body.paused *::before, [data-design="cinematic"] body.paused *::after { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+	[data-design="cinematic"] *, [data-design="cinematic"] *::before, [data-design="cinematic"] *::after { animation: none !important; transition: none !important; transition-delay: 0s !important; }
+}

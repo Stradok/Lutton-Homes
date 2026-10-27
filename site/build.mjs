@@ -52,6 +52,8 @@ const homeCard = (h, inList) => `<li class="reveal" data-tags="|${h.tags.map(esc
 	+ '</div></a></li>';
 // Departures design: the five homes as rows on an arrivals board.
 const boardRow = (h) => `<li><a class="board-row" href="/homes/${h.slug}/"><span class="board-home" data-flap>${esc(h.name)}</span><span class="board-gate">${esc(h.monogram)}</span><span class="board-info">${esc(h.beds)}</span><span class="board-rate">From £${h.rate} <span class="sample">(sample)</span></span></a></li>`;
+// Cinematic design: one dark window per home for the lights-on hold.
+const windowTile = (h) => `<li><a class="cin-window" href="/homes/${h.slug}/"><span class="cin-window-mark" aria-hidden="true">${esc(h.monogram)}</span><span class="cin-window-name">${esc(h.name)}</span></a></li>`;
 const listItems = (items) => items.map((x) => `<li>${esc(x)}</li>`).join('');
 const otherHomes = (h) => homes.filter((o) => o.slug !== h.slug).map((o) => `<li><a class="other-home" href="/homes/${o.slug}/" data-carry><span class="other-home-name">${esc(o.name)}</span><span class="rate">${rateHtml(o)}</span></a></li>`).join('');
 const galleryFor = (h) => {
@@ -80,6 +82,7 @@ const DESIGNS = [
 	{ id: 'orbit', name: 'Orbit', base: '/d/orbit', attr: 'orbit' },
 	{ id: 'custom-1', name: 'Custom 1', base: '/d/custom-1', attr: 'custom-1' },
 	{ id: 'custom-2', name: 'Custom 2', base: '/d/custom-2', attr: 'custom-2' },
+	{ id: 'cinematic', name: 'Cinematic', base: '/d/cinematic', attr: 'cinematic' },
 ];
 // The switcher lists every design as a plain link to the same page in that design, so it works without JavaScript.
 const switcherFor = (design, path) => '<div class="design-switcher" role="group" aria-label="Design preview switcher" data-switcher>'
@@ -115,7 +118,7 @@ const pages = [
 		file: 'index.html', out: 'index.html',
 		title: 'Luton Homes: homes near Luton Airport, booked direct',
 		description: CANONICAL,
-		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), boardRows: homes.map(boardRow).join(''), extraHead: PREVIEW ? PREVIEW_HEAD + '\n' + VARIANT_HEAD : '' },
+		vars: { homeCards: homes.map((h) => homeCard(h, false)).join(''), boardRows: homes.map(boardRow).join(''), windowTiles: homes.map(windowTile).join(''), extraHead: PREVIEW ? PREVIEW_HEAD + '\n' + VARIANT_HEAD : '' },
 	},
 	{
 		file: 'homes.html', out: 'homes/index.html',
