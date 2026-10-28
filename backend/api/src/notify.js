@@ -23,7 +23,7 @@ export function createNotifier({ mailer = 'log', ownerEmail = '', homes = [] } =
 	// Email trouble must never lose or fail a booking, so errors are logged and swallowed.
 	const safe = (msg) => Promise.resolve().then(() => m.send(msg)).catch((err) => console.error('mail failed', err.message));
 	return async function notify(event, booking) {
-		const h = homes.find((x) => x.slug === booking.home) || { name: booking.home };
+		const h = (typeof homes === 'function' ? await homes() : homes).find((x) => x.slug === booking.home) || { name: booking.home };
 		const t = TEMPLATES[event](booking, h);
 		const jobs = [];
 		if (booking.email && t.guest) jobs.push(safe({ to: booking.email, subject: t.guest[0], text: t.guest[1] }));

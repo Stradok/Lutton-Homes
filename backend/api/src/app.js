@@ -1,15 +1,18 @@
 // Builds the request handler. Kept separate from server.js so tests can call it without opening a port.
 import { adminRoutes } from './routes/admin.js';
 import { publicRoutes } from './routes/public.js';
+import { listHomes } from './homes.js';
 import { getProvider } from './payments.js';
 import { createNotifier } from './notify.js';
 import { HttpError, applyCors, rateLimiter, send } from './http.js';
 
 // payments and notify are injectable so tests (and a future provider) can stand in; by default they come from the settings.
-export function createApp({ config, store, payments = getProvider(config.paymentProvider), notify = createNotifier({ mailer: config.mailProvider, ownerEmail: config.ownerEmail, homes: config.homes }) }) {
+export function createApp({ config, store, payments = getProvider(config.paymentProvider), notify }) {
 	const limit = rateLimiter(10, 60_000);
 	const loginLimit = rateLimiter(5, 60_000);
-	const deps = { config, store, payments, notify };
+	const getHomes = () => listHomes(store, config.seedHomes ?? config.homes);
+	notify ??= createNotifier({ mailer: config.mailProvider, ownerEmail: config.ownerEmail, homes: getHomes });
+	const deps = { config, store, payments, notify, getHomes };
 	const routes = [...publicRoutes({ ...deps, limit }), ...adminRoutes({ ...deps, loginLimit })];
 
 	return async function handle(req, res) {

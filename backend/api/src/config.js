@@ -11,6 +11,10 @@ export function loadConfig(env = process.env) {
 	const { homes } = JSON.parse(readFileSync(env.HOMES_FILE || here('../../../site/data/homes.json'), 'utf8'));
 	return {
 		port: Number(env.PORT) || 8787,
+		seedHomes: homes, // the website's own properties, used until an owner changes them
+		uploadsDir: env.UPLOADS_DIR || here('../data/uploads'),
+		apiUrl: (env.API_PUBLIC_URL || '').replace(/\/$/, ''), // this API's public address, put in front of uploaded photo links
+		deployHook: env.DEPLOY_HOOK_URL || '', // a POST to this address rebuilds the static website (a Vercel deploy hook)
 		dataFile: env.DATA_FILE || here('../data/store.json'),
 		adminToken: env.ADMIN_TOKEN || '',
 		owners: parseOwners(env.OWNERS), // owner sign-in accounts, "name:hash,name:hash"

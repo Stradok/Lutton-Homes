@@ -10,3 +10,4 @@ site/dist/
 Docs/imagineart-*
 backend/api/data/*.json
 backend/api/.env
+backend/api/data/uploads/

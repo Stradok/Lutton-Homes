@@ -5,6 +5,9 @@ import { HttpError, clientIp, readJson, safeEqual, send } from '../http.js';
 import { isIsoDate, dayNumber } from '../shapes.js';
 import { quote } from '../pricing.js';
 import { readRaw } from '../http.js';
+import { readImage } from '../uploads.js';
+import { cleanReview, publicView, readReviewToken } from '../reviews.js';
+import { randomUUID } from 'node:crypto';
 
 const MAX_NIGHTS = 30;
 const MAX_AHEAD_DAYS = 400;
@@ -12,9 +15,9 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function publicRoutes({ config, store, limit, payments, notify }) {
-	const home = (slug) => {
-		const h = config.homes.find((x) => x.slug === slug);
+export function publicRoutes({ config, store, limit, payments, notify, getHomes }) {
+	const home = async (slug) => {
+		const h = (await getHomes()).find((x) => x.slug === slug);
 		if (!h) throw new HttpError(404, 'Unknown home');
 		return h;
 	};
@@ -24,7 +27,7 @@ export function publicRoutes({ config, store, limit, payments, notify }) {
 
 		// Booked and free nights for one home, merged from direct bookings and the Airbnb and Booking.com feeds.
 		['GET', /^\/api\/availability\/([a-z0-9-]+)$/, async (req, res, [slug], url) => {
-			home(slug);
+			await home(slug);
 			const from = isIsoDate(url.searchParams.get('from')) ? url.searchParams.get('from') : today();
 			const days = Math.min(Math.max(parseInt(url.searchParams.get('days'), 10) || 120, 1), 400);
 			const blocks = await store.list();
@@ -32,11 +35,44 @@ export function publicRoutes({ config, store, limit, payments, notify }) {
 			send(res, 200, { home: slug, from, days: map, ranges: bookedRanges(blocks, slug).map(({ from: f, to }) => ({ from: f, to })) });
 		}],
 
+		// The properties, as the website shows them.
+		['GET', /^\/api\/homes$/, async (req, res) => send(res, 200, await getHomes())],
+		['GET', /^\/api\/homes\/([a-z0-9-]+)$/, async (req, res, [slug]) => send(res, 200, await home(slug))],
+
+		// Uploaded photos. The file name is a random id and the type is checked again on the way out.
+		['GET', /^\/api\/media\/([a-z0-9.]+)$/, async (req, res, [name]) => {
+			const { bytes, mime } = await readImage(config.uploadsDir, name);
+			res.writeHead(200, { 'content-type': mime, 'cache-control': 'public, max-age=31536000, immutable', 'x-content-type-options': 'nosniff', 'cross-origin-resource-policy': 'cross-origin' });
+			res.end(bytes);
+		}],
+
+		// Published reviews only.
+		['GET', /^\/api\/reviews$/, async (req, res, m, url) => {
+			const homeSlug = url.searchParams.get('home');
+			const all = (await store.meta('reviews')) ?? [];
+			send(res, 200, all.filter((r) => r.status === 'published' && (!homeSlug || r.home === homeSlug)).map(publicView));
+		}],
+
+		// A guest's review. It needs a link an owner made (one use), and waits for an owner to publish it.
+		['POST', /^\/api\/reviews$/, async (req, res) => {
+			if (!limit(clientIp(req, config.trustProxy))) throw new HttpError(429, 'Too many requests, try again in a minute');
+			const b = await readJson(req);
+			const link = readReviewToken(b.token, config.sessionSecret);
+			if (!link) throw new HttpError(403, 'This review link is not valid');
+			await home(link.home);
+			const review = { id: randomUUID(), home: link.home, ref: link.ref, tokenId: link.id, ...cleanReview(b), status: 'pending', createdAt: new Date().toISOString() };
+			await store.mutate('reviews', (cur = []) => {
+				if (cur.some((r) => r.tokenId === link.id)) throw new HttpError(409, 'This review link was already used');
+				return [...cur, review];
+			});
+			send(res, 201, { id: review.id, status: review.status });
+		}],
+
 		// A guest booking direct. Rejects dates that overlap an existing stay on any channel.
 		['POST', /^\/api\/bookings$/, async (req, res) => {
 			if (!limit(clientIp(req, config.trustProxy))) throw new HttpError(429, 'Too many requests, try again in a minute');
 			const b = await readJson(req);
-			const h = home(b.home);
+			const h = await home(b.home);
 			if (!isIsoDate(b.from) || !isIsoDate(b.to) || b.to <= b.from || b.from < today()) throw new HttpError(400, 'Choose valid dates');
 			const nights = dayNumber(b.to) - dayNumber(b.from);
 			// One request must not be able to block a home for a year: cap the stay and how far ahead it starts.
@@ -100,7 +136,7 @@ export function publicRoutes({ config, store, limit, payments, notify }) {
 		// Calendar feed for Airbnb and Booking.com to import, so a direct booking blocks the same nights there.
 		// ?for=airbnb leaves out Airbnb's own stays (it already has them); the token keeps the address private.
 		['GET', /^\/api\/ical\/([a-z0-9-]+)\.ics$/, async (req, res, [slug], url) => {
-			const h = home(slug);
+			const h = await home(slug);
 			if (!config.icalToken || !safeEqual(url.searchParams.get('token') || '', config.icalToken)) throw new HttpError(401, 'Not allowed');
 			const target = url.searchParams.get('for');
 			const blocks = (await store.list()).filter((x) => x.home === slug && x.channel !== target);
