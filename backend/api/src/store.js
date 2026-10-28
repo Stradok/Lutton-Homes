@@ -118,10 +118,11 @@ export function createStore(filePath) {
 			return incoming.length;
 		}),
 
-		// Atomic change to one collection kept in meta: fn gets the current value and returns the new one. If fn throws, nothing is written.
+		// Atomic change to one collection kept in meta: fn gets the current value (and the bookings, read in the same step) and returns
+		// the new value. If fn throws, nothing is written.
 		mutate: (key, fn) => serial(async () => {
 			const data = await read();
-			data.meta[key] = fn(data.meta[key]);
+			data.meta[key] = fn(data.meta[key], data.blocks);
 			await write(data);
 			return data.meta[key];
 		}),

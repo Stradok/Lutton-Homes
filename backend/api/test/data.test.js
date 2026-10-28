@@ -95,3 +95,10 @@ test('publish needs a deploy hook', async () => {
 	assert.equal((await fetch(`${t.base}/api/admin/publish`, { method: 'POST', headers: t.auth })).status, 503);
 	t.close();
 });
+
+test('an unknown colour tone falls back to sky', async () => {
+	const t = await boot();
+	const r = await (await fetch(`${t.base}/api/admin/homes`, { method: 'POST', headers: t.auth, body: JSON.stringify({ name: 'Tone Test', rate: 10, sleeps: 1, tone: '"><script>' }) })).json();
+	assert.equal(r.tone, 'sky');
+	t.close();
+});

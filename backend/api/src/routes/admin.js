@@ -82,8 +82,9 @@ export function adminRoutes({ config, store, notify, loginLimit, getHomes }) {
 		})],
 		['DELETE', /^\/api\/admin\/homes\/([a-z0-9-]+)$/, guard(async (req, res, [slug]) => {
 			const today = new Date().toISOString().slice(0, 10);
-			if ((await store.list()).some((b) => b.home === slug && b.to >= today && holds(b))) throw new HttpError(409, 'This property has current or future bookings. Cancel them first.');
-			await changeHomes(store, config.seedHomes ?? config.homes, (cur) => {
+			// The bookings check and the removal happen in one store step, so a booking cannot slip in between.
+			await changeHomes(store, config.seedHomes ?? config.homes, (cur, blocks) => {
+				if (blocks.some((b) => b.home === slug && b.to >= today && holds(b))) throw new HttpError(409, 'This property has current or future bookings. Cancel them first.');
 				if (!cur.some((h) => h.slug === slug)) throw new HttpError(404, 'No such property');
 				return { homes: cur.filter((h) => h.slug !== slug), result: true };
 			});

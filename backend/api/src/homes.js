@@ -3,6 +3,7 @@
 import { HttpError } from './http.js';
 
 export const CATEGORIES = ['homes', 'restaurants', 'misc'];
+const TONES = ['sky', 'paper', 'ink']; // the colour families the pages know
 const ROOM_TYPES = ['Bedroom', 'Kitchen', 'Bathroom', 'Living room', 'Outdoor space'];
 const slugOf = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
 const text = (v, max) => String(v ?? '').trim().slice(0, max);
@@ -38,7 +39,7 @@ export function cleanHome(input, existing = {}) {
 	return {
 		slug, name, category,
 		monogram: text(m.monogram, 3) || name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase(),
-		tone: m.tone || 'sky', tags: list(m.tags, 8, 40), sample: false,
+		tone: TONES.includes(m.tone) ? m.tone : 'sky', tags: list(m.tags, 8, 40), sample: false,
 		sleeps, rate, beds: text(m.beds, 60), distance: text(m.distance, 100), address: text(m.address, 200),
 		summary: text(m.summary, 300), amenities: list(m.amenities, 30, 60), rules: list(m.rules, 20, 100),
 		images: rooms ? rooms.images : existing.images || [], alts: rooms ? rooms.alts : existing.alts || [],
@@ -51,6 +52,6 @@ export const listHomes = async (store, seed) => (await store.meta('homes')) ?? s
 // Edit the list atomically. The first change copies the website's homes into the store so nothing is lost.
 export async function changeHomes(store, seed, fn) {
 	let result;
-	await store.mutate('homes', (cur) => { const next = fn(cur ?? seed); result = next.result; return next.homes; });
+	await store.mutate('homes', (cur, blocks) => { const next = fn(cur ?? seed, blocks); result = next.result; return next.homes; });
 	return result;
 }
