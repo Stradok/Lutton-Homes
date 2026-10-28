@@ -1,5 +1,7 @@
 # Luton Homes API
 
+Plain-language explanation, limits and owner to-do list: `Docs/calendar-sync.md`.
+
 Availability, calendar sync, direct bookings and reports. Node 22, no dependencies.
 
 ```
