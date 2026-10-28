@@ -39,12 +39,18 @@
 	if (rl) {
 		var link = $('rl-link'), base = new URL($('rl-base').getAttribute('href'), location.href);
 		var make = function () {
-			var u = new URL(base); u.searchParams.set('home', rl.value);
+			var u = new URL(base); u.searchParams.set('home', rl.value); if (base.searchParams.get('t')) u.searchParams.set('t', base.searchParams.get('t'));
 			if ($('rl-ref').value.trim()) u.searchParams.set('ref', $('rl-ref').value.trim());
 			link.value = u.href;
 			$('rl-wa').href = 'https://wa.me/?text=' + encodeURIComponent('Thank you for staying with Luton Homes. Tell us how it went in one tap: ' + u.href);
 		};
-		rl.addEventListener('input', make); $('rl-ref').addEventListener('input', make); make();
+		var tok = function () { try { return sessionStorage.getItem('lh-admin-token'); } catch (x) { return null; } };
+		var withToken = function () {
+			if (!api || !tok()) return;
+			fetch(api + '/api/admin/review-links', { method: 'POST', headers: { authorization: 'Bearer ' + tok(), 'content-type': 'application/json' }, body: JSON.stringify({ home: rl.value, ref: $('rl-ref').value.trim() }) })
+				.then(function (r) { return r.json(); }).then(function (j) { if (j.token) { base.searchParams.set('t', j.token); make(); } });
+		};
+		rl.addEventListener('input', function () { make(); withToken(); }); $('rl-ref').addEventListener('change', withToken); make(); withToken();
 		$('rl-copy').addEventListener('click', function () {
 			link.select();
 			var ok = function () { $('rl-ok').textContent = 'Link copied.'; };
@@ -71,14 +77,40 @@
 					var id = 'ph-' + inp.id + '-' + i, row = document.createElement('div'); row.className = 'x-room';
 					row.innerHTML = '<p class="x-room-name"></p><div class="field"><label for="' + id + '-d">Day photo</label><input id="' + id + '-d" type="file" accept="image/*"><div class="x-thumb"></div></div>'
 						+ '<div class="field"><label for="' + id + '-n">Night photo (optional)</label><input id="' + id + '-n" type="file" accept="image/*"><div class="x-thumb"></div></div>';
-					row.firstChild.textContent = inp.dataset.room + (n > 1 ? ' ' + i : '');
+					row.dataset.room = inp.dataset.room; row.firstChild.textContent = inp.dataset.room + (n > 1 ? ' ' + i : '');
 					row.querySelectorAll('input').forEach(function (fi) { fi.addEventListener('change', function () { thumb(fi, fi.nextElementSibling); }); });
 					rooms.append(row);
 				}
 			});
 		};
 		$('p-counts').addEventListener('input', draw); draw();
+		var token = function () { try { return sessionStorage.getItem('lh-admin-token'); } catch (x) { return null; } };
+		var call = function (path, opts) {
+			opts = opts || {}; opts.headers = Object.assign({ authorization: 'Bearer ' + token() }, opts.headers);
+			return fetch(api + path, opts).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || 'The server answered ' + r.status); return j; }); });
+		};
+		var live = api && token();
+		if (live) { $('p-mode').textContent = 'Saved to the live server. Press Publish on the dashboard to show it on the website.'; $('p-savetxt').textContent = 'Save property'; }
+		var up = function (input) { var f = input.files[0]; return f ? call('/api/admin/uploads', { method: 'POST', body: f }).then(function (j) { return j.url; }) : Promise.resolve(''); };
+		var save = function () {
+			var d = $('p-done'), list = [].slice.call(rooms.children), cat = $('p-cat');
+			d.hidden = false; d.textContent = 'Uploading photos...';
+			var work = list.reduce(function (p, row) {
+				return p.then(function (all) {
+					var f = row.querySelectorAll('input');
+					return up(f[0]).then(function (day) { return up(f[1]).then(function (night) { if (day) all.push({ type: row.dataset.room, photos: [{ day: day, night: night || undefined, alt: row.dataset.room }] }); return all; }); });
+				});
+			}, Promise.resolve([]));
+			return work.then(function (r) {
+				var beds = +$('n-bedroom').value || 0;
+				return call('/api/admin/homes', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+					name: $('p-name').value, category: cat.value === 'custom' ? $('p-custom').value : cat.value, address: $('p-addr').value, rate: +$('p-rate').value, sleeps: +$('p-sleeps').value,
+					summary: $('p-summary').value, beds: beds + (beds === 1 ? ' bedroom' : ' bedrooms'), amenities: $('p-amen').value.split(','), rooms: r }) });
+			}).then(function (h) { d.textContent = h.name + ' was saved. Press Publish on the dashboard to show it on the website.'; })
+				.catch(function (e) { d.textContent = 'Not saved: ' + e.message; });
+		};
 		$('p-save').addEventListener('click', function () {
+			if (live) return save();
 			var c = cat.value === 'custom' ? $('p-custom').value.trim() || 'Other' : cat.options[cat.selectedIndex].text, d = $('p-done');
 			d.hidden = false;
 			d.textContent = ($('p-name').value.trim() || 'This property') + ' would be listed under ' + c + ' with ' + rooms.children.length + ' room photo slots. Preview only: nothing was saved.';

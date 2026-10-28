@@ -6,7 +6,13 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('.', import.meta.url));
 const at = (...p) => join(root, ...p);
 const dist = at('dist');
-const { homes } = JSON.parse(readFileSync(at('data/homes.json'), 'utf8'));
+// Address of the API (backend/api). When set, the properties come from it, so what the owners add shows up on the next build.
+// If it cannot be reached the build falls back to data/homes.json rather than failing.
+const API_URL = (process.env.API_URL || '').replace(/\/$/, '');
+const fileHomes = () => JSON.parse(readFileSync(at('data/homes.json'), 'utf8')).homes;
+const homes = API_URL
+	? await fetch(API_URL + '/api/homes').then((r) => (r.ok ? r.json() : Promise.reject(new Error('answered ' + r.status)))).catch((e) => { console.warn(`Could not load homes from ${API_URL} (${e.message}); using data/homes.json`); return fileHomes(); })
+	: fileHomes();
 const TONES = ['sky', 'paper', 'ink'];
 // Design preview: the preview strip, the design switcher and the variant files. Set to false for launch.
 const PREVIEW = true;
@@ -154,8 +160,7 @@ const schemaFor = (h) => '<script type="application/ld+json">' + JSON.stringify(
 	'@context': 'https://schema.org', '@type': 'LodgingBusiness', name: `${h.name} by Luton Homes`, description: h.summary,
 	address: { '@type': 'PostalAddress', streetAddress: '34 Beaconsfield', addressLocality: 'Luton', postalCode: 'LU2 0RW', addressCountry: 'GB' },
 }).replace(/</g, '\\u003c') + '</script>';
-// Address of the availability API (backend/api). Empty keeps the sample calendar. Set API_URL when building, for example API_URL=https://api.example.com node build.mjs
-const API_URL = (process.env.API_URL || '').replace(/\/$/, '');
+// Empty API_URL keeps the sample calendar. Set it when building, for example API_URL=https://api.example.com node build.mjs
 const shared = { apiUrl: API_URL, year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
 const pages = [
 	{

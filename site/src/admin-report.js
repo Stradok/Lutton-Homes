@@ -81,7 +81,7 @@
 
 	$('rp-load').addEventListener('click', function () {
 		try { sessionStorage.setItem('lh-admin-token', token.value); } catch (e) { /* not remembered */ }
-		call('/api/admin/report?' + query()).then(function (r) { return r.json(); }).then(function (r) { render(r); say('Live figures from the API.'); loadSync(); loadBookings(); })
+		call('/api/admin/report?' + query()).then(function (r) { return r.json(); }).then(function (r) { render(r); say('Live figures from the API.'); loadSync(); loadBookings(); loadReviews(); $('rp-publish').hidden = false; })
 			.catch(function (e) { say(e.message || 'Could not reach the API.', true); });
 	});
 	$('rp-csv').addEventListener('click', function () {
@@ -124,6 +124,28 @@
 			})));
 		}).catch(function () { /* the report message already explains */ });
 	}
+
+	// Guest reviews: each waits here until an owner publishes it.
+	function loadReviews() {
+		call('/api/admin/reviews').then(function (r) { return r.json(); }).then(function (all) {
+			var box = $('rp-reviews'), wait = all.filter(function (r) { return r.status === 'pending'; });
+			box.textContent = '';
+			if (!wait.length) return box.append(el('p', 'note', 'No reviews are waiting.'));
+			box.append(table(['Stars', 'Review', 'Home', ''], wait.map(function (r) {
+				var td = el('td');
+				['publish', 'hide'].forEach(function (what) {
+					var b = el('button', 'button button--quiet', what === 'publish' ? 'Publish' : 'Hide'); b.type = 'button';
+					b.addEventListener('click', function () { call('/api/admin/reviews/' + r.id + '/' + what, { method: 'POST' }).then(loadReviews).catch(function (e) { say(e.message, true); }); });
+					td.append(b);
+				});
+				return [r.stars + ' of 5', r.text, r.home, td];
+			})));
+		}).catch(function () { /* the report message already explains */ });
+	}
+	$('rp-publish').addEventListener('click', function () {
+		say('Rebuilding the website...');
+		call('/api/admin/publish', { method: 'POST' }).then(function () { say('The website is rebuilding. Changes show in a minute or two.'); }).catch(function (e) { say(e.message, true); });
+	});
 
 	render(SAMPLE);
 	if (api.value && token.value) $('rp-load').click(); // signed in through the server: load the live figures straight away

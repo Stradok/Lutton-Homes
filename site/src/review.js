@@ -14,6 +14,7 @@
 		if (e.target.name !== 'stars') return;
 		s = e.target.value; text.value = TEXT[s]; post.disabled = false; done.hidden = true;
 	});
+	var api = (document.querySelector('meta[name="lh-api"]') || {}).content;
 	post.addEventListener('click', function () {
 		var n = +s, st = document.getElementById('rv-pstars');
 		st.textContent = '★'.repeat(n) + '☆'.repeat(5 - n);
@@ -24,5 +25,9 @@
 		try { navigator.clipboard.writeText(text.value); } catch (e) { text.select(); document.execCommand('copy'); }
 		window.open(document.getElementById('rv-google').href, '_blank', 'noopener');
 		done.hidden = false; done.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+		// With an API address the review is also sent to the website, where an owner publishes it.
+		if (api) fetch(api.replace(/\/$/, '') + '/api/reviews', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ token: q.get('t'), stars: n, text: text.value }) })
+			.then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error); }); })
+			.catch(function (e) { done.append(' Your review was not saved on our website: ' + e.message); });
 	});
 })();
