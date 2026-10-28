@@ -21,9 +21,9 @@ function assertValid(b) {
 	if (!STATUSES.includes(b.status)) throw fail('INVALID', `unknown status: ${b.status}`);
 }
 
-// Cancelled blocks do not hold nights, so only confirmed ones are checked against the calendar.
+// Cancelled blocks do not hold nights, so only confirmed and pending ones are checked against the calendar.
 function assertNoOverlap(blocks, candidate) {
-	if (candidate.status !== 'confirmed') return;
+	if (candidate.status === 'cancelled') return;
 	const clash = activeBlocks(blocks, candidate.home).some((b) => b.id !== candidate.id && overlaps(b, candidate));
 	if (clash) throw fail('OVERLAP', `overlaps an existing booking on ${candidate.home}`);
 }

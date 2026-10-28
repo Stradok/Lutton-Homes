@@ -2,6 +2,7 @@
 // website's own data file, so there is one list of properties for the site and the API.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { parseOwners } from './auth.js';
 
 const here = (p) => fileURLToPath(new URL(p, import.meta.url));
 const envKey = (slug) => slug.toUpperCase().replace(/[^A-Z0-9]/g, '_');
@@ -12,6 +13,13 @@ export function loadConfig(env = process.env) {
 		port: Number(env.PORT) || 8787,
 		dataFile: env.DATA_FILE || here('../data/store.json'),
 		adminToken: env.ADMIN_TOKEN || '',
+		owners: parseOwners(env.OWNERS), // owner sign-in accounts, "name:hash,name:hash"
+		sessionSecret: env.SESSION_SECRET || '',
+		holdMinutes: Number(env.HOLD_MINUTES) || 30, // how long an unpaid request holds its nights
+		siteUrl: env.SITE_URL || '',
+		paymentProvider: env.PAYMENT_PROVIDER || 'manual',
+		mailProvider: env.MAIL_PROVIDER || 'log',
+		ownerEmail: env.OWNER_EMAIL || '',
 		icalToken: env.ICAL_TOKEN || '',
 		allowedOrigins: (env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean),
 		trustProxy: env.TRUST_PROXY === '1',

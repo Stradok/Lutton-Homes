@@ -26,6 +26,8 @@ async function boot() {
 	return { base, store, config, close: () => { server.close(); rmSync(dir, { recursive: true, force: true }); } };
 }
 const admin = { authorization: 'Bearer secret-admin' };
+// A website booking starts pending; reports and the Airbnb feed only count it once the owner (or a payment) confirms it.
+const confirmDirect = async (t) => { const b = (await t.store.list()).find((x) => x.channel === 'direct'); await t.store.update(b.id, { status: 'confirmed' }); };
 
 test('an Airbnb booking found by the sync blocks those nights on the public calendar', async () => {
 	const t = await boot();
@@ -52,7 +54,7 @@ test('a failed feed keeps the last good blocks and records the failure', async (
 
 test('a direct booking is stored, priced and then blocks the dates for the next guest', async () => {
 	const t = await boot();
-	const body = JSON.stringify({ home: 'easystay', from: day(20), to: day(22), guests: 2, name: 'Guest A' });
+	const body = JSON.stringify({ home: 'easystay', from: day(20), to: day(22), guests: 2, name: 'Guest A', email: 'a@test.dev' });
 	const ok = await fetch(`${t.base}/api/bookings`, { method: 'POST', body });
 	assert.equal(ok.status, 201);
 	assert.equal((await ok.json()).total, 95 * 2 + 35);
@@ -73,7 +75,8 @@ test('direct booking rejects bad input', async () => {
 test('the report counts bookings by where they came from, and needs the admin token', async () => {
 	const t = await boot();
 	await syncAll({ store: t.store, homes: t.config.homes, fetchImpl: async () => new Response(feed(day(10), day(13))) });
-	await fetch(`${t.base}/api/bookings`, { method: 'POST', body: JSON.stringify({ home: 'easystay', from: day(20), to: day(22), guests: 1, name: 'G' }) });
+	await fetch(`${t.base}/api/bookings`, { method: 'POST', body: JSON.stringify({ home: 'easystay', from: day(20), to: day(22), guests: 1, name: 'G', email: 'g@test.dev' }) });
+	await confirmDirect(t);
 	assert.equal((await fetch(`${t.base}/api/admin/report`)).status, 401);
 	assert.equal((await fetch(`${t.base}/api/admin/report`, { headers: { authorization: 'Bearer wrong' } })).status, 401);
 	const r = await (await fetch(`${t.base}/api/admin/report`, { headers: admin })).json();
@@ -88,7 +91,8 @@ test('the report counts bookings by where they came from, and needs the admin to
 test('the calendar feed for Airbnb and Booking.com needs its token and leaves out the importer\'s own stays', async () => {
 	const t = await boot();
 	await syncAll({ store: t.store, homes: t.config.homes, fetchImpl: async () => new Response(feed(day(10), day(13))) });
-	await fetch(`${t.base}/api/bookings`, { method: 'POST', body: JSON.stringify({ home: 'easystay', from: day(20), to: day(22), guests: 1, name: 'Secret Name' }) });
+	await fetch(`${t.base}/api/bookings`, { method: 'POST', body: JSON.stringify({ home: 'easystay', from: day(20), to: day(22), guests: 1, name: 'Secret Name', email: 'secret@test.dev' }) });
+	await confirmDirect(t);
 	assert.equal((await fetch(`${t.base}/api/ical/easystay.ics`)).status, 401);
 	const text = await (await fetch(`${t.base}/api/ical/easystay.ics?token=secret-ical&for=airbnb`)).text();
 	assert.equal((text.match(/BEGIN:VEVENT/g) || []).length, 1, 'only the direct stay is exported to Airbnb');

@@ -3,5 +3,5 @@
 	"private": true,
 	"type": "module",
 	"description": "Availability, calendar sync (Airbnb and Booking.com iCal), direct bookings and reports for Luton Homes. No dependencies. Node 22.",
-	"scripts": { "start": "node src/server.js", "test": "node --test test/*.test.js" }
+	"scripts": { "start": "node src/server.js", "test": "node --test test/*.test.js", "hash-password": "node scripts/hash-password.js" }
 }

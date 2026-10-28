@@ -11,15 +11,20 @@ export function send(res, status, body, headers = {}) {
 	res.end(isText ? body : JSON.stringify(body));
 }
 
-export async function readJson(req, limit = 20_000) {
+// The raw bytes matter for webhooks: a provider signs the exact body it sent.
+export async function readRaw(req, limit = 20_000) {
 	const chunks = []; let size = 0;
 	for await (const c of req) {
 		size += c.length;
 		if (size > limit) throw new HttpError(413, 'Request is too large');
 		chunks.push(c);
 	}
+	return Buffer.concat(chunks);
+}
+
+export async function readJson(req, limit) {
 	let body;
-	try { body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); } catch { throw new HttpError(400, 'Body must be JSON'); }
+	try { body = JSON.parse((await readRaw(req, limit)).toString('utf8') || '{}'); } catch { throw new HttpError(400, 'Body must be JSON'); }
 	if (body === null || typeof body !== 'object' || Array.isArray(body)) throw new HttpError(400, 'Body must be a JSON object');
 	return body;
 }

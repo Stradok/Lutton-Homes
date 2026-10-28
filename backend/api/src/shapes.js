@@ -3,11 +3,12 @@
 // Block: one stay (or one blocked range) on one home.
 //   { id: string, home: string (home slug), from: 'YYYY-MM-DD' (check-in night),
 //     to: 'YYYY-MM-DD' (check-out day, exclusive), channel: Channel, status: Status,
-//     guest?: string, total?: number (GBP, direct bookings only), createdAt: string (ISO 8601) }
+//     guest?: string, email?: string, holdUntil?: string (ISO 8601, pending only), payment?: string (provider reference), total?: number (GBP, direct bookings only), createdAt: string (ISO 8601) }
 // A block covers the nights from `from` up to but not including `to`. A guest can check in on the day another checks out.
 
 export const CHANNELS = ['direct', 'airbnb', 'booking', 'manual'];
-export const STATUSES = ['confirmed', 'cancelled'];
+// pending = a direct booking waiting for payment or owner approval; it holds its nights only until holdUntil.
+export const STATUSES = ['pending', 'confirmed', 'cancelled'];
 export const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 // Days since 1970-01-01 for an ISO date (UTC, so no daylight-saving drift), and back.

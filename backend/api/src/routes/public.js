@@ -4,12 +4,15 @@ import { buildIcal } from '../ical.js';
 import { HttpError, clientIp, readJson, safeEqual, send } from '../http.js';
 import { isIsoDate, dayNumber } from '../shapes.js';
 import { quote } from '../pricing.js';
+import { readRaw } from '../http.js';
 
 const MAX_NIGHTS = 30;
 const MAX_AHEAD_DAYS = 400;
 const today = () => new Date().toISOString().slice(0, 10);
 
-export function publicRoutes({ config, store, limit }) {
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function publicRoutes({ config, store, limit, payments, notify }) {
 	const home = (slug) => {
 		const h = config.homes.find((x) => x.slug === slug);
 		if (!h) throw new HttpError(404, 'Unknown home');
@@ -43,14 +46,48 @@ export function publicRoutes({ config, store, limit }) {
 			if (!Number.isInteger(guests) || guests < 1 || guests > h.sleeps) throw new HttpError(400, `Guests must be 1 to ${h.sleeps}`);
 			const guest = String(b.name || '').trim().slice(0, 80);
 			if (!guest) throw new HttpError(400, 'Name is required');
+			const email = String(b.email || '').trim().slice(0, 120);
+			if (!EMAIL.test(email)) throw new HttpError(400, 'A valid email is required');
 			if (!isRangeFree(await store.list(), h.slug, b.from, b.to)) throw new HttpError(409, 'Those dates are no longer available', 'OVERLAP');
+			let block;
 			try {
-				const block = await store.add({ home: h.slug, from: b.from, to: b.to, channel: 'direct', status: 'confirmed', guest, guests, total: quote(h.rate, nights).total });
-				send(res, 201, { id: block.id, total: block.total, nights });
+				// Pending, not confirmed: the nights are held for HOLD_MINUTES while the guest pays or the owner approves.
+				const holdUntil = new Date(Date.now() + (config.holdMinutes || 30) * 60_000).toISOString();
+				block = await store.add({ home: h.slug, from: b.from, to: b.to, channel: 'direct', status: 'pending', holdUntil, guest, email, guests, total: quote(h.rate, nights).total });
 			} catch (err) {
 				if (err.code === 'OVERLAP') throw new HttpError(409, 'Those dates are no longer available', 'OVERLAP');
 				throw err;
 			}
+			let checkout = null;
+			try {
+				const back = config.siteUrl || req.headers.origin || '';
+				checkout = await payments.createCheckout({ booking: block, home: h, successUrl: `${back}/book/confirmed/?ref=${block.id}`, cancelUrl: `${back}/book/?home=${h.slug}` });
+				if (checkout?.ref) block = await store.update(block.id, { payment: checkout.ref });
+			} catch (err) {
+				await store.update(block.id, { status: 'cancelled' }); // do not hold nights for a payment page that never opened
+				console.error('checkout failed', err.message);
+				throw new HttpError(502, 'Payment could not be started, please try again');
+			}
+			await notify('requested', block);
+			send(res, 201, { id: block.id, total: block.total, nights, status: block.status, holdUntil: block.holdUntil, checkoutUrl: checkout?.url || null });
+		}],
+
+		// The payment provider calls this when a guest pays. The provider's own code checks the signature.
+		['POST', /^\/api\/payments\/webhook\/([a-z0-9-]+)$/, async (req, res, [name]) => {
+			if (name !== config.paymentProvider) throw new HttpError(404, 'Unknown payment provider');
+			const event = await payments.parseWebhook({ headers: req.headers, raw: await readRaw(req, 200_000) });
+			if (!event) return send(res, 200, { ok: true });
+			const block = (await store.list()).find((x) => x.id === event.bookingId);
+			if (!block || block.status !== 'pending') return send(res, 200, { ok: true }); // unknown, or already settled
+			try {
+				const next = await store.update(block.id, event.paid ? { status: 'confirmed', holdUntil: undefined } : { status: 'cancelled' });
+				await notify(event.paid ? 'confirmed' : 'cancelled', next);
+			} catch (err) {
+				// Paid after the hold ran out and someone else took the nights: the owner has to refund or rebook.
+				if (err.code === 'OVERLAP') throw new HttpError(409, 'Paid, but the dates were taken. Refund needed.', 'OVERLAP');
+				throw err;
+			}
+			send(res, 200, { ok: true });
 		}],
 
 		// Calendar feed for Airbnb and Booking.com to import, so a direct booking blocks the same nights there.

@@ -14,8 +14,11 @@ export function blockNights(block) {
 	return nights;
 }
 
-export function activeBlocks(blocks, home) {
-	return blocks.filter((b) => b.home === home && b.status === 'confirmed');
+// Confirmed stays hold their nights; a pending one holds them only until its hold runs out.
+export const holds = (b, now = Date.now()) => b.status === 'confirmed' || (b.status === 'pending' && Date.parse(b.holdUntil) > now);
+
+export function activeBlocks(blocks, home, now = Date.now()) {
+	return blocks.filter((b) => b.home === home && holds(b, now));
 }
 
 // Same-day turnover (a.to === b.from) is not an overlap: the night belongs to the next guest.
