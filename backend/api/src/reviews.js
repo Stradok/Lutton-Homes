@@ -3,7 +3,8 @@
 import { createHmac, randomBytes } from 'node:crypto';
 import { HttpError, safeEqual } from './http.js';
 
-const sign = (body, secret) => createHmac('sha256', secret).update(body).digest('base64url');
+// The 'review:' prefix keeps these signatures apart from owner sessions, which use the same secret.
+const sign = (body, secret) => createHmac('sha256', secret).update('review:' + body).digest('base64url');
 
 // The link token says which home (and optional booking reference) it is for, and carries a random id so it works once.
 export function makeReviewToken({ home, ref = '' }, secret) {

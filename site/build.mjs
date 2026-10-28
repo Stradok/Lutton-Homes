@@ -9,9 +9,15 @@ const dist = at('dist');
 // Address of the API (backend/api). When set, the properties come from it, so what the owners add shows up on the next build.
 // If it cannot be reached the build falls back to data/homes.json rather than failing.
 const API_URL = (process.env.API_URL || '').replace(/\/$/, '');
+// A bad answer (an error page, a record missing a field the pages need) must not break the whole build.
+const checkHomes = (list) => {
+	const ok = Array.isArray(list) && list.length && list.every((h) => h && typeof h.slug === 'string' && typeof h.name === 'string' && typeof h.rate === 'number' && ['tags', 'amenities', 'rules', 'images', 'alts'].every((k) => Array.isArray(h[k])));
+	if (!ok) throw new Error('the list is incomplete');
+	return list;
+};
 const fileHomes = () => JSON.parse(readFileSync(at('data/homes.json'), 'utf8')).homes;
 const homes = API_URL
-	? await fetch(API_URL + '/api/homes').then((r) => (r.ok ? r.json() : Promise.reject(new Error('answered ' + r.status)))).catch((e) => { console.warn(`Could not load homes from ${API_URL} (${e.message}); using data/homes.json`); return fileHomes(); })
+	? await fetch(API_URL + '/api/homes', { signal: AbortSignal.timeout(15_000) }).then((r) => (r.ok ? r.json() : Promise.reject(new Error('answered ' + r.status)))).then(checkHomes).catch((e) => { console.warn(`Could not load homes from ${API_URL} (${e.message}); using data/homes.json`); return fileHomes(); })
 	: fileHomes();
 const TONES = ['sky', 'paper', 'ink'];
 // Design preview: the preview strip, the design switcher and the variant files. Set to false for launch.
@@ -45,7 +51,7 @@ const rateHtml = (h) => `From £${h.rate} a night <span class="sample">(sample)<
 const nightOf = (src) => { const n = src.replace('-1600.webp', '-night-1600.webp'); return n !== src && existsSync(at('public', n)) ? n : ''; };
 const nightAttr = (src) => (nightOf(src) ? ` data-night="${esc(nightOf(src))}"` : '');
 const gateSign = (h, tone, { named = false, src = '', eager = false, alt = '', sizes = '', open = false } = {}) => {
-	const cls = `gate-sign gate-sign--${tone}`;
+	const cls = `gate-sign gate-sign--${esc(tone)}`;
 	const vt = named ? ` style="view-transition-name: home-${h.slug}"` : '';
 	if (src) {
 		const img = `<img src="${esc(src)}" srcset="${esc(src.replace('-1600.webp', '-800.webp'))} 800w, ${esc(src)} 1600w" sizes="${sizes}" alt="${esc(alt)}"${nightAttr(src)} width="1600" height="1067" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;

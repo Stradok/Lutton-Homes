@@ -114,7 +114,7 @@ export function adminRoutes({ config, store, notify, loginLimit, getHomes }) {
 		// Rebuild the static website so it picks up property and review changes (needs DEPLOY_HOOK_URL).
 		['POST', /^\/api\/admin\/publish$/, guard(async (req, res) => {
 			if (!config.deployHook) throw new HttpError(503, 'Publishing is not connected. Set DEPLOY_HOOK_URL.');
-			const r = await fetch(config.deployHook, { method: 'POST' }).catch(() => null);
+			const r = await fetch(config.deployHook, { method: 'POST', signal: AbortSignal.timeout(10_000) }).catch(() => null);
 			if (!r?.ok) throw new HttpError(502, 'The website rebuild could not be started');
 			send(res, 200, { ok: true });
 		})],
