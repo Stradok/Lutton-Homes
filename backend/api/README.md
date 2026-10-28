@@ -35,3 +35,38 @@ Public: `GET /api/availability/:home`, `POST /api/bookings`, `GET /api/ical/:hom
 Owner (Bearer `ADMIN_TOKEN`): `GET /api/admin/report?from=&to=&format=csv`, `GET|POST /api/admin/bookings`, `POST /api/admin/bookings/:id/cancel`, `POST /api/admin/sync`, `GET /api/admin/sync-status`.
 
 Not built yet: payment (provider undecided), guest emails, owner accounts beyond one token, a database for more than one server process.
+
+## Booking life cycle
+
+1. A guest books on the website. The API stores it as **pending**, holds its nights for `HOLD_MINUTES` (default 30) and sends the guest to the payment provider's page if there is one.
+2. The booking becomes **confirmed** when the provider's webhook says it was paid, or when an owner presses Confirm in the dashboard (the default, `PAYMENT_PROVIDER=manual`).
+3. A pending booking that is never paid simply stops holding its nights when the hold runs out. Only confirmed bookings go to Airbnb and Booking.com and into reports.
+
+## Owner accounts
+
+Owners sign in with a name and password; the server checks it and returns a 12 hour session. Sessions end when the owner's password changes or the owner is removed.
+
+```
+npm run hash-password -- 'a long password'     # prints scrypt$...
+OWNERS=owner1:scrypt$...,owner2:scrypt$...     # in .env
+SESSION_SECRET=<long random string>            # in .env
+```
+
+`ADMIN_TOKEN` is still accepted as a service token for scripts. Leave it empty if you do not need one.
+
+## Slots for outside services
+
+Nothing outside is connected yet. Each service has one small place to plug in, and nothing else in the API changes.
+
+| Slot | File | Default | To connect |
+|---|---|---|---|
+| Payments (Stripe, PayPal, Square) | `src/payments.js` | `manual`: owner confirms | Write a provider with `createCheckout` and `parseWebhook`, call `registerProvider`, set `PAYMENT_PROVIDER`, and point the provider's webhook at `POST /api/payments/webhook/<name>`. The provider must verify its own signature in `parseWebhook`. |
+| Email (SMTP, Postmark, Resend) | `src/notify.js` | `log`: nothing is emailed | Write `{ name, send({to, subject, text}) }`, call `registerMailer`, set `MAIL_PROVIDER` and `OWNER_EMAIL`. |
+| Airbnb and Booking.com | `.env` | none | Paste each listing's calendar export link as `FEED_AIRBNB_<HOME>` / `FEED_BOOKING_<HOME>`. See `Docs/calendar-sync.md`. |
+| Channel manager (instant sync) | `src/sync.js` | none | Add a source that returns blocks for a home and channel; call `store.replaceChannel`. |
+
+Register a provider before the server starts, for example from `src/server.js`.
+
+## Running it
+
+`docker build -f backend/api/Dockerfile -t luton-homes-api .` (from the repository root, so the site's `homes.json` is included) then run it with the `.env` values and a volume on `/data`. Put it behind HTTPS and set `TRUST_PROXY=1` if the proxy sets `X-Forwarded-For`. The JSON file store suits one server; move to a database by replacing `src/store.js`.

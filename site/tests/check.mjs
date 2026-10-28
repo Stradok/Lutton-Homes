@@ -12,7 +12,7 @@ const fail = (msg) => failures.push(msg);
 const PENDING_ROUTES = [];
 const ALLOWED_EXTERNAL = /^https:\/\/(wa\.me\/|www\.google\.com\/maps\/)/;
 const KB = 1024;
-const BUDGET = { html: 28 * KB, css: 38 * KB, js: 9 * KB, book: 4 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB, switcherCss: 4 * KB, themeOriginalCss: 12 * KB };
+const BUDGET = { html: 28 * KB, css: 38 * KB, js: 9 * KB, book: 6 * KB, homes: 4 * KB, media: 80 * KB, variantsCss: 14 * KB, variantsJs: 6 * KB, switcherJs: 3 * KB, switcherCss: 4 * KB, themeOriginalCss: 12 * KB };
 // Designs come from build.mjs (id, menu name, base path, html data-design value), in menu order.
 const DESIGN_LIST = [...readFileSync(join(root, 'build.mjs'), 'utf8').matchAll(/\{ id: '([\w-]+)', name: '([^']+)', base: '([^']*)', attr: '([\w-]+)' \}/g)].map(([, id, name, base, attr]) => ({ id, name, base, attr }));
 const designOf = (page) => DESIGN_LIST.find((d) => d.base && page.startsWith(d.base.slice(1) + '/')) || DESIGN_LIST[0];
@@ -101,7 +101,7 @@ for (const page of pages) {
 	if (size > (/homes\/[^/]+\/index\.html$/.test(name) ? 40 * KB : BUDGET.html)) fail(`${name}: ${size} bytes, budget ${BUDGET.html}`);
 }
 
-const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss, 'assets/cal.js': 14 * KB, 'assets/quote.js': KB, 'assets/extras.css': 9 * KB, 'assets/ui.js': 8 * KB, 'assets/admin.js': 5 * KB, 'assets/admin-report.js': 8 * KB, 'assets/review.js': 2 * KB };
+const assets = { 'assets/styles.css': BUDGET.css, 'assets/app.js': BUDGET.js, 'assets/book.js': BUDGET.book, 'assets/homes.js': BUDGET.homes, 'assets/variants.css': BUDGET.variantsCss, 'assets/variants.js': BUDGET.variantsJs, 'assets/switcher.js': BUDGET.switcherJs, 'assets/switcher.css': BUDGET.switcherCss, 'assets/theme-original.css': BUDGET.themeOriginalCss, 'assets/cal.js': 14 * KB, 'assets/quote.js': KB, 'assets/extras.css': 9 * KB, 'assets/ui.js': 8 * KB, 'assets/admin.js': 6 * KB, 'assets/admin-report.js': 10 * KB, 'assets/review.js': 2 * KB };
 for (const [file, budget] of Object.entries(assets)) {
 	const text = read(file);
 	if (Buffer.byteLength(text) > budget) fail(`${file}: ${Buffer.byteLength(text)} bytes, budget ${budget}`);

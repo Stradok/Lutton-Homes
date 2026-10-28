@@ -36,6 +36,12 @@
 	};
 
 	const s = stay();
+	// The confirmation page: with a reference from the server the stay is real and waiting for the owners to confirm.
+	if (params.get('ref') && $('confirm-summary') && document.querySelector('meta[name="lh-api"]')?.content) {
+		document.querySelector('h1').textContent = 'Booking request received';
+		document.querySelector('.lead').textContent = 'Reference: ' + params.get('ref');
+		document.querySelectorAll('.notice').forEach((n) => { n.hidden = true; });
+	}
 	if (s && $('confirm-summary')) $('confirm-summary').replaceChildren(summary(s));
 
 	const form = $('book-form');
@@ -85,11 +91,28 @@
 		if (to > current && !validStep(current)) return;
 		show(to);
 	});
+	// With an API address (lh-api meta) the booking is sent for real: the nights are held and the guest goes to the payment
+	// page, or to the confirmation page when the owners approve by hand. Without one this stays a preview.
+	const api = document.querySelector('meta[name="lh-api"]')?.content.replace(/\/$/, '');
+	if (api) document.querySelectorAll('.notice').forEach((n) => { n.hidden = true; });
 	// Enter moves forward. Only step 3 really submits.
 	form.addEventListener('submit', (e) => {
 		if (current < 2) {
 			e.preventDefault();
 			if (validStep(current)) show(current + 1);
+			return;
 		}
+		if (!api || !s) return;
+		e.preventDefault();
+		const err = $('book-error'), go = form.querySelector('[type="submit"]');
+		err.textContent = '';
+		go.disabled = true;
+		fetch(api + '/api/bookings', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ home: s.home, from: s.in, to: s.out, guests: s.guests, name: $('guest-name').value, email: $('guest-email').value }) })
+			.then((r) => r.json().then((j) => ({ ok: r.ok, j })))
+			.then(({ ok, j }) => {
+				if (!ok) throw new Error(j.error || 'The booking could not be made.');
+				location.href = j.checkoutUrl || form.action + '?' + new URLSearchParams({ home: s.home, in: s.in, out: s.out, guests: s.guests, ref: j.id });
+			})
+			.catch((x) => { err.textContent = x instanceof TypeError ? 'Could not reach the booking server. Try again.' : x.message; go.disabled = false; });
 	});
 })();

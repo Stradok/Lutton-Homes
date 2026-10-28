@@ -1,21 +1,29 @@
 // Owner preview scripts: sign in, sign out, the review-link maker and the add-property form.
-// The sign-in is a design-preview gate only: this is a static site, so it protects nothing. Real accounts come with the admin build.
+// With an API address (the lh-api meta tag) sign-in is checked by the server, which returns a 12 hour session token.
+// Without one it is a design-preview gate only: this is a static site, so it protects nothing.
 (function () {
 	var USER = 'admin', PASS = 'zamooq121', KEY = 'lh-admin';
 	function $(id) { return document.getElementById(id); }
 
 	var login = $('login-form');
+	var meta = document.querySelector('meta[name="lh-api"]'), api = meta && meta.content.replace(/\/$/, '');
+	function enter(token) {
+		try { sessionStorage.setItem(KEY, '1'); if (token) sessionStorage.setItem('lh-admin-token', token); } catch (x) { /* the dashboard cannot open without it */ }
+		location.href = new URL('../', location.href).pathname;
+	}
 	if (login) login.addEventListener('submit', function (e) {
 		e.preventDefault();
-		if (login.elements.user.value.trim() === USER && login.elements.pass.value === PASS) {
-			try { sessionStorage.setItem(KEY, '1'); } catch (x) { /* the dashboard cannot open without it */ }
-			location.href = new URL('../', location.href).pathname;
-		} else $('lg-error').textContent = 'That username or password is not right.';
+		var user = login.elements.user.value.trim(), pass = login.elements.pass.value, err = $('lg-error');
+		if (!api) return user === USER && pass === PASS ? enter() : (err.textContent = 'That username or password is not right.');
+		fetch(api + '/api/admin/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, password: pass }) })
+			.then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+			.then(function (r) { if (r.ok) enter(r.j.token); else err.textContent = r.j.error || 'Sign in failed.'; })
+			.catch(function () { err.textContent = 'Could not reach the server. Try again.'; });
 	});
 
 	var out = $('x-signout');
 	if (out) out.addEventListener('click', function () {
-		try { sessionStorage.removeItem(KEY); } catch (x) { /* nothing to clear */ }
+		try { sessionStorage.removeItem(KEY); sessionStorage.removeItem('lh-admin-token'); } catch (x) { /* nothing to clear */ }
 		location.href = out.dataset.to;
 	});
 

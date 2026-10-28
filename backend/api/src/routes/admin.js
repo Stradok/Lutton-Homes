@@ -14,7 +14,7 @@ export function adminRoutes({ config, store, notify, loginLimit }) {
 	// Either a signed-in owner's session or the service token (ADMIN_TOKEN) opens the owner routes.
 	const guard = (fn) => async (req, res, m, url) => {
 		const given = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-		if (!verifySession(given, config.sessionSecret)) {
+		if (!verifySession(given, config.sessionSecret, config.owners)) {
 			if (config.adminToken) requireAdmin(req, config.adminToken);
 			else throw new HttpError(config.sessionSecret ? 401 : 503, config.sessionSecret ? 'Not signed in' : 'Admin access is not configured on this server');
 		}
@@ -30,7 +30,7 @@ export function adminRoutes({ config, store, notify, loginLimit }) {
 			const { user, password } = await readJson(req);
 			const stored = Object.hasOwn(config.owners, user) ? config.owners[user] : DUMMY;
 			if (!verifyPassword(password, stored) || stored === DUMMY) throw new HttpError(401, 'That username or password is not right');
-			send(res, 200, { token: signSession(user, config.sessionSecret), user });
+			send(res, 200, { token: signSession(user, config.sessionSecret, stored), user });
 		}],
 		// Where bookings came from: this website, Airbnb, Booking.com, or entered by hand.
 		['GET', /^\/api\/admin\/report$/, guard(async (req, res, m, url) => {

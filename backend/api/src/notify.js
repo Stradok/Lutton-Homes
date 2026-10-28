@@ -1,6 +1,7 @@
 // Email slot. A mailer is { send: async ({ to, subject, text }) => void }. The default writes to the log, so nothing is
 // emailed until a real provider (SMTP, Postmark, SendGrid, Resend) is registered and MAIL_PROVIDER is set.
-const log = { name: 'log', send: async ({ to, subject }) => console.log(`[mail not sent: no provider] to=${to} subject="${subject}"`) };
+// Logs only the address's domain: a log file should not collect guests' email addresses.
+const log = { name: 'log', send: async ({ to, subject }) => console.log(`[mail not sent: no provider] to=***@${String(to).split('@').pop()} subject="${subject}"`) };
 
 const mailers = new Map([[log.name, log]]);
 export const registerMailer = (mailer) => mailers.set(mailer.name, mailer);

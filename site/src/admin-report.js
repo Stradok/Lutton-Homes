@@ -66,7 +66,7 @@
 		if (!base || !token.value) return Promise.reject(new Error('Enter the API address and the admin token first.'));
 		opts = opts || {}; opts.headers = { authorization: 'Bearer ' + token.value };
 		return fetch(base + path, opts).then(function (res) {
-			if (res.status === 401) throw new Error('The admin token was not accepted.');
+			if (res.status === 401) throw new Error('Your sign-in ended or was not accepted. Sign out and sign in again.');
 			if (!res.ok) throw new Error('The API answered ' + res.status + '.');
 			return res;
 		});
@@ -81,7 +81,7 @@
 
 	$('rp-load').addEventListener('click', function () {
 		try { sessionStorage.setItem('lh-admin-token', token.value); } catch (e) { /* not remembered */ }
-		call('/api/admin/report?' + query()).then(function (r) { return r.json(); }).then(function (r) { render(r); say('Live figures from the API.'); loadSync(); })
+		call('/api/admin/report?' + query()).then(function (r) { return r.json(); }).then(function (r) { render(r); say('Live figures from the API.'); loadSync(); loadBookings(); })
 			.catch(function (e) { say(e.message || 'Could not reach the API.', true); });
 	});
 	$('rp-csv').addEventListener('click', function () {
@@ -104,5 +104,27 @@
 		call('/api/admin/sync', { method: 'POST' }).then(function () { say('Calendars checked.'); loadSync(); }).catch(function (e) { say(e.message, true); });
 	});
 
+	// Website requests that are still waiting for payment or approval, each with Confirm and Cancel.
+	function loadBookings() {
+		call('/api/admin/bookings').then(function (r) { return r.json(); }).then(function (all) {
+			var box = $('rp-bookings'), now = Date.now();
+			var open = all.filter(function (b) { return b.channel === 'direct' && b.status === 'pending' && Date.parse(b.holdUntil) > now; });
+			box.textContent = '';
+			if (!open.length) return box.append(el('p', 'note', 'No requests are waiting.'));
+			box.append(table(['Guest', 'Home', 'Dates', 'Total', ''], open.map(function (b) {
+				var td = el('td'), act = function (what) {
+					var btn = el('button', 'button button--quiet', what === 'confirm' ? 'Confirm' : 'Cancel'); btn.type = 'button';
+					btn.addEventListener('click', function () {
+						call('/api/admin/bookings/' + encodeURIComponent(b.id) + '/' + what, { method: 'POST' }).then(loadBookings).catch(function (e) { say(e.message, true); });
+					});
+					return btn;
+				};
+				td.append(act('confirm'), act('cancel'));
+				return [b.guest + ' (' + b.email + ')', b.home, b.from + ' to ' + b.to, gbp(b.total), td];
+			})));
+		}).catch(function () { /* the report message already explains */ });
+	}
+
 	render(SAMPLE);
+	if (api.value && token.value) $('rp-load').click(); // signed in through the server: load the live figures straight away
 })();

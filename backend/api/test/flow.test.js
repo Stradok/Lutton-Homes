@@ -95,10 +95,12 @@ test('passwords and sessions', () => {
 	assert.ok(verifyPassword('correct horse', hash));
 	assert.ok(!verifyPassword('nope', hash));
 	assert.ok(!verifyPassword('x', 'garbage'));
-	const tok = signSession('admin', 'k', 1000, 5000);
-	assert.equal(verifySession(tok, 'k', 5500), 'admin');
-	assert.equal(verifySession(tok, 'k', 7000), null, 'expired');
-	assert.equal(verifySession(tok, 'other', 5500), null, 'wrong secret');
+	const owners = { admin: hash }, tok = signSession('admin', 'k', hash, 1000, 5000);
+	assert.equal(verifySession(tok, 'k', owners, 5500), 'admin');
+	assert.equal(verifySession(tok, 'k', owners, 7000), null, 'expired');
+	assert.equal(verifySession(tok, 'other', owners, 5500), null, 'wrong secret');
+	assert.equal(verifySession(tok, 'k', {}, 5500), null, 'owner removed');
+	assert.equal(verifySession(tok, 'k', { admin: hashPassword('new password') }, 5500), null, 'password changed');
 	assert.deepEqual(parseOwners(`a:scrypt$x$y, b:scrypt$p$q`), { a: 'scrypt$x$y', b: 'scrypt$p$q' });
 });
 
