@@ -34,7 +34,8 @@ export async function syncAll({ store, homes, fetchImpl = fetch, now = () => new
 			}
 		}
 	}
-	await resolveConflicts({ store, notify }); // new Airbnb or Booking.com stays may now clash with ours
+	// New Airbnb or Booking.com stays may now clash with ours. A failure here must not hide the sync results.
+	try { await resolveConflicts({ store, notify }); } catch (err) { console.error('conflict check failed', err); }
 	return results;
 }
 

@@ -30,7 +30,8 @@ export async function resolveConflicts({ store, notify = async () => {}, now = D
 		const web = c.stays.find((s) => s.channel === 'direct' && s.status === 'pending');
 		const other = c.stays.find((s) => s !== web);
 		if (!web || other.channel === 'direct' || other.status !== 'confirmed') continue;
-		const done = await store.update(web.id, { status: 'cancelled', note: 'Cancelled: the dates were booked elsewhere first' });
+		// Only if it is still an unpaid request: a payment may have confirmed or flagged it since the list was read.
+		const done = await store.update(web.id, { status: 'cancelled', note: 'Cancelled: the dates were booked elsewhere first' }, (b) => b.status === 'pending' && !b.paidConflict);
 		if (done) await notify('cancelled', done);
 	}
 	const fresh = [];

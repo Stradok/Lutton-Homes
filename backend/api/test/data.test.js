@@ -136,3 +136,15 @@ test('a double booking: an unpaid website request gives way; a confirmed one is 
 	assert.deepEqual(await (await fetch(`${t.base}/api/admin/conflicts`, { headers: t.auth })).json(), [], 'cancelling one side clears it');
 	t.close();
 });
+
+test('a booking that was paid or confirmed meanwhile is never auto-cancelled', async () => {
+	const t = await boot();
+	const homes = [{ slug: 'easystay', name: 'EasyStay', feeds: { airbnb: 'https://airbnb.test/c.ics', booking: '' } }];
+	const b = await (await fetch(`${t.base}/api/bookings`, { method: 'POST', body: JSON.stringify({ home: 'easystay', from: day(10), to: day(13), guests: 1, name: 'G', email: 'g@t.dev' }) })).json();
+	await t.store.update(b.id, { paidConflict: true });
+	await syncAll({ store: t.store, homes, fetchImpl: async () => new Response(feed(day(11), day(14))) });
+	assert.equal((await t.store.list()).find((x) => x.id === b.id).status, 'pending', 'left for the owner');
+	assert.equal((await (await fetch(`${t.base}/api/admin/conflicts`, { headers: t.auth })).json()).length, 1);
+	assert.equal(await t.store.update(b.id, { status: 'cancelled' }, (x) => x.status === 'confirmed'), null, 'the guard blocks the change');
+	t.close();
+});

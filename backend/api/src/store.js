@@ -85,10 +85,11 @@ export function createStore(filePath) {
 			return next;
 		}),
 
-		update: (id, patch) => serial(async () => {
+		// onlyIf (optional) is checked against the stored booking inside the same step; if it fails nothing changes and null is returned.
+		update: (id, patch, onlyIf) => serial(async () => {
 			const data = await read();
 			const i = data.blocks.findIndex((b) => b.id === id);
-			if (i < 0) return null;
+			if (i < 0 || (onlyIf && !onlyIf(data.blocks[i]))) return null;
 			const next = { ...data.blocks[i], ...patch, id };
 			assertValid(next);
 			assertNoOverlap(data.blocks, next);
