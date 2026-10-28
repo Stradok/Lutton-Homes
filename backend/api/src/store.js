@@ -5,6 +5,8 @@ import { dirname } from 'node:path';
 import { CHANNELS, STATUSES, dayNumber, isIsoDate } from './shapes.js';
 import { activeBlocks, holds, overlaps } from './availability.js';
 
+const PRUNE_AFTER_MS = 48 * 3600_000;
+
 // Callers branch on err.code ('OVERLAP' | 'INVALID') instead of parsing messages.
 function fail(code, message) {
 	const err = new Error(message);
@@ -73,8 +75,9 @@ export function createStore(filePath) {
 			const data = await read();
 			const next = withDefaults(block);
 			assertValid(next);
-			// Unpaid requests whose hold ran out are dead weight; drop them so the file does not grow with abandoned bookings.
-			data.blocks = data.blocks.filter((b) => b.status !== 'pending' || Date.parse(b.holdUntil) > Date.now() || b.paidConflict);
+			// Abandoned requests are dropped only 48 hours after their hold ran out, long after any checkout page or late payment
+			// could still refer to them, so the file does not grow forever.
+			data.blocks = data.blocks.filter((b) => b.status !== 'pending' || b.paidConflict || Date.parse(b.holdUntil) + PRUNE_AFTER_MS > Date.now());
 			if (data.blocks.some((b) => b.id === next.id)) throw fail('INVALID', `duplicate id: ${next.id}`);
 			assertNoOverlap(data.blocks, next);
 			data.blocks.push(next);
