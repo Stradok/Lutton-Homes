@@ -81,7 +81,7 @@
 
 	$('rp-load').addEventListener('click', function () {
 		try { sessionStorage.setItem('lh-admin-token', token.value); } catch (e) { /* not remembered */ }
-		call('/api/admin/report?' + query()).then(function (r) { return r.json(); }).then(function (r) { render(r); say('Live figures from the API.'); loadSync(); loadBookings(); loadReviews(); $('rp-publish').hidden = false; })
+		call('/api/admin/report?' + query()).then(function (r) { return r.json(); }).then(function (r) { render(r); say('Live figures from the API.'); loadSync(); loadBookings(); loadReviews(); loadClashes(); $('rp-publish').hidden = false; })
 			.catch(function (e) { say(e.message || 'Could not reach the API.', true); });
 	});
 	$('rp-csv').addEventListener('click', function () {
@@ -121,6 +121,25 @@
 				};
 				td.append(act('confirm'), act('cancel'));
 				return [b.guest + ' (' + b.email + ')', b.home, b.from + ' to ' + b.to, gbp(b.total), td];
+			})));
+		}).catch(function () { /* the report message already explains */ });
+	}
+
+	// Same nights held by two sources. A website stay can be cancelled here; an Airbnb or Booking.com stay only on their site.
+	function loadClashes() {
+		call('/api/admin/conflicts').then(function (r) { return r.json(); }).then(function (list) {
+			var box = $('rp-clash'); box.textContent = '';
+			if (!list.length) return box.append(el('p', 'note', 'No double bookings.'));
+			box.append(table(['Home', 'Overlap', 'Stays', 'What to do'], list.map(function (c) {
+				var td = el('td');
+				c.stays.forEach(function (s) {
+					if (s.channel === 'direct') {
+						var b = el('button', 'button button--quiet', 'Cancel the website booking'); b.type = 'button';
+						b.addEventListener('click', function () { call('/api/admin/bookings/' + encodeURIComponent(s.id) + '/cancel', { method: 'POST' }).then(loadClashes).catch(function (e) { say(e.message, true); }); });
+						td.append(b);
+					} else td.append(el('p', 'note', 'Cancel the ' + NAMES[s.channel] + ' stay on ' + NAMES[s.channel] + '.'));
+				});
+				return [c.home, c.from + ' to ' + c.to, c.stays.map(function (s) { return NAMES[s.channel] + (s.guest ? ' (' + s.guest + ')' : '') + ' ' + s.from + ' to ' + s.to; }).join('; '), td];
 			})));
 		}).catch(function () { /* the report message already explains */ });
 	}

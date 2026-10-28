@@ -33,3 +33,22 @@ Code: `backend/api/` (Node 22, no dependencies). Checklist items: CM-06, CM-07, 
 1. The "export calendar" link for each listing on Airbnb and on Booking.com (10 links for 5 homes, fewer if a home is on one site only; CM-03 says The Garden Nest is not on Booking.com yet).
 2. A decision: iCal now and accept the delay, or a channel manager (CM-01 and CM-07).
 3. Somewhere to run the API (any Node 22 host), and an admin token for the dashboard.
+
+## When two people book the same nights
+
+Our own website cannot double-book: bookings are checked and stored one at a time (20 simultaneous requests for the same dates give 1 booking and 19 refusals). The risk is a guest booking on Airbnb or Booking.com in the gap before our next check (every 15 minutes, `SYNC_MINUTES`) or before they refresh our calendar.
+
+After every calendar check the API looks for stays from different sources on the same nights (`backend/api/src/conflicts.js`):
+
+| Case | What happens |
+|---|---|
+| A website request not yet paid or approved clashes with a confirmed Airbnb or Booking.com stay | The website request is cancelled automatically and the guest is emailed. Nothing for the owners to do. If the guest had already started paying, the payment check tells the owner to refund. |
+| A confirmed website booking clashes with Airbnb or Booking.com, or Airbnb clashes with Booking.com | Only an owner can cancel those stays. It is listed under "Double bookings" on the dashboard and the owner is emailed once. Cancelling one side clears it at the next check. |
+
+It cannot prevent the double booking, only catch it within minutes. Only a channel manager that updates both sites immediately shrinks the gap further.
+
+## Getting Airbnb or Booking.com API access (not needed for this build)
+
+- **Airbnb:** there is no self-service key for hosts. Airbnb's API is for approved software partners (property management systems and channel managers) and access is by application.
+- **Booking.com:** its connectivity API is for certified connectivity partners; a partner application and a certification process come first.
+- **Realistic route:** subscribe to a channel manager or property management system that already has those partnerships (Lodgify, Hostaway, Guesty, Smoobu and similar). It gives near real-time sync and usually its own API or iCal feed, which this API can read. Check each provider's current price and terms.

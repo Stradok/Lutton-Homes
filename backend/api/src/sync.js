@@ -1,6 +1,7 @@
 // Pulls each home's Airbnb and Booking.com calendar feeds and stores them as blocks. A failed feed keeps the last good
 // blocks (so a short outage never frees up booked nights) and the failure is recorded for the admin page.
 import { parseIcal } from './ical.js';
+import { resolveConflicts } from './conflicts.js';
 
 const TIMEOUT_MS = 15000;
 const MAX_BYTES = 2_000_000;
@@ -15,7 +16,7 @@ async function fetchFeed(url, fetchImpl) {
 	return text;
 }
 
-export async function syncAll({ store, homes, fetchImpl = fetch, now = () => new Date().toISOString() }) {
+export async function syncAll({ store, homes, fetchImpl = fetch, now = () => new Date().toISOString(), notify }) {
 	const results = [];
 	for (const home of homes) {
 		for (const channel of ['airbnb', 'booking']) {
@@ -33,6 +34,7 @@ export async function syncAll({ store, homes, fetchImpl = fetch, now = () => new
 			}
 		}
 	}
+	await resolveConflicts({ store, notify }); // new Airbnb or Booking.com stays may now clash with ours
 	return results;
 }
 

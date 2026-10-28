@@ -118,7 +118,8 @@ export function adminRoutes({ config, store, notify, loginLimit, getHomes }) {
 			if (!r?.ok) throw new HttpError(502, 'The website rebuild could not be started');
 			send(res, 200, { ok: true });
 		})],
-		['POST', /^\/api\/admin\/sync$/, guard(async (req, res) => send(res, 200, await syncAll({ store, homes: config.homes })))],
+		['POST', /^\/api\/admin\/sync$/, guard(async (req, res) => send(res, 200, await syncAll({ store, homes: config.homes, notify })))],
+		['GET', /^\/api\/admin\/conflicts$/, guard(async (req, res) => send(res, 200, (await store.meta('conflicts')) ?? []))],
 		['GET', /^\/api\/admin\/sync-status$/, guard(async (req, res) => send(res, 200, await syncStatus({ store, homes: config.homes })))],
 	];
 }

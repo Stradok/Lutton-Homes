@@ -12,6 +12,7 @@ const stay = (b, h) => `${h.name}, ${b.from} to ${b.to}.${money(b.total)}`;
 // One message per event, for the guest and for the owners. Plain text only.
 const TEMPLATES = {
 	requested: (b, h) => ({ guest: [`We have your request for ${h.name}`, `Thanks ${b.guest}. We are holding ${stay(b, h)} until we confirm it. Reference ${b.id}.`], owner: [`New booking request: ${h.name}`, `${b.guest} (${b.email}) wants ${stay(b, h)}`] }),
+	conflict: (b, h) => ({ owner: [`Double booking: ${h.name}`, b.note] }),
 	paymentIssue: (b) => ({ owner: ['Payment needs attention', `Booking ${b.id}: ${b.note}`] }),
 	confirmed: (b, h) => ({ guest: [`Booking confirmed: ${h.name}`, `Hello ${b.guest}, your stay is confirmed. ${stay(b, h)} Reference ${b.id}.`], owner: [`Booking confirmed: ${h.name}`, `${b.guest}, ${stay(b, h)}`] }),
 	cancelled: (b, h) => ({ guest: [`Booking cancelled: ${h.name}`, `Hello ${b.guest}, your booking for ${stay(b, h)} was cancelled. Reference ${b.id}.`], owner: [`Booking cancelled: ${h.name}`, `${b.guest}, ${stay(b, h)}`] }),

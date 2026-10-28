@@ -102,3 +102,37 @@ test('an unknown colour tone falls back to sky', async () => {
 	assert.equal(r.tone, 'sky');
 	t.close();
 });
+
+// ---- double bookings ----
+import { syncAll } from '../src/sync.js';
+const basic = (d) => d.replaceAll('-', '');
+const feed = (from, to) => `BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nUID:z@airbnb\r\nDTSTART;VALUE=DATE:${basic(from)}\r\nDTEND;VALUE=DATE:${basic(to)}\r\nSUMMARY:Reserved\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n`;
+
+test('a double booking: an unpaid website request gives way; a confirmed one is flagged once, then clears', async () => {
+	const t = await boot();
+	const events = [];
+	const homes = [{ slug: 'easystay', name: 'EasyStay', feeds: { airbnb: 'https://airbnb.test/c.ics', booking: '' } }];
+	const sync = (from, to) => syncAll({ store: t.store, homes, fetchImpl: async () => new Response(feed(from, to)), notify: async (e, b) => events.push([e, b.id]) });
+	const book = (a, b) => fetch(`${t.base}/api/bookings`, { method: 'POST', body: JSON.stringify({ home: 'easystay', from: day(a), to: day(b), guests: 1, name: 'G', email: 'g@t.dev' }) }).then((r) => r.json());
+	// Unpaid request first, then Airbnb reports the same nights: the request is cancelled automatically.
+	const web = await book(10, 13);
+	await sync(day(11), day(14));
+	assert.equal((await t.store.list()).find((b) => b.id === web.id).status, 'cancelled');
+	assert.deepEqual(events, [['cancelled', web.id]]);
+	assert.deepEqual(await (await fetch(`${t.base}/api/admin/conflicts`, { headers: t.auth })).json(), []);
+	// A confirmed website booking cannot be cancelled by us: it is flagged to the owner, once.
+	const ok = await book(30, 33);
+	await t.store.update(ok.id, { status: 'confirmed', holdUntil: undefined });
+	events.length = 0;
+	await sync(day(31), day(34));
+	await sync(day(31), day(34));
+	const open = await (await fetch(`${t.base}/api/admin/conflicts`, { headers: t.auth })).json();
+	assert.equal(open.length, 1);
+	assert.deepEqual(open[0].stays.map((s) => s.channel).sort(), ['airbnb', 'direct']);
+	assert.deepEqual(events.map((e) => e[0]), ['conflict'], 'the owner is told once, not on every check');
+	assert.equal((await fetch(`${t.base}/api/admin/conflicts`)).status, 401);
+	await fetch(`${t.base}/api/admin/bookings/${ok.id}/cancel`, { method: 'POST', headers: t.auth });
+	await sync(day(31), day(34));
+	assert.deepEqual(await (await fetch(`${t.base}/api/admin/conflicts`, { headers: t.auth })).json(), [], 'cancelling one side clears it');
+	t.close();
+});
