@@ -135,3 +135,10 @@ test('a fresh install creates its data folder', async () => {
 	assert.equal((await store.list()).length, 1);
 	rmSync(dir, { recursive: true, force: true });
 });
+
+test('the rate limiter uses the address our proxy added, not one the client made up', async () => {
+	const { clientIp } = await import('../src/http.js');
+	const req = { headers: { 'x-forwarded-for': '6.6.6.6, 203.0.113.9' }, socket: { remoteAddress: '10.0.0.1' } };
+	assert.equal(clientIp(req, true), '203.0.113.9');
+	assert.equal(clientIp(req, false), '10.0.0.1', 'ignored unless TRUST_PROXY is set');
+});

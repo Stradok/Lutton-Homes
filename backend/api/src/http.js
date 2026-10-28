@@ -24,10 +24,10 @@ export async function readJson(req, limit = 20_000) {
 	return body;
 }
 
-// Behind a proxy every visitor shares the proxy's address, so the real one is the first X-Forwarded-For entry. Only trusted when TRUST_PROXY is set,
-// because otherwise anyone could send that header to dodge the limit.
+// Behind a proxy every visitor shares the proxy's address, so the real one comes from X-Forwarded-For. Only trusted when TRUST_PROXY is set.
+// The LAST entry is the one our own proxy appended; earlier entries are whatever the client sent, so they can be faked.
 export function clientIp(req, trustProxy) {
-	const fwd = trustProxy && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+	const fwd = trustProxy && String(req.headers['x-forwarded-for'] || '').split(',').pop().trim();
 	return fwd || req.socket.remoteAddress || 'unknown';
 }
 
