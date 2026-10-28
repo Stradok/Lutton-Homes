@@ -7,7 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
 	const iso = (n) => new Date(n * 864e5).toISOString().slice(0, 10);
 	const today = day(lhTodayIso());
 	// Sample availability: a fixed pattern per home, three booked nights in every thirteen. The real calendar comes from the channel manager.
-	const taken = (slug, n) => slug !== '' && (n + [...slug].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 1009, 7)) % 13 < 3;
+	const sampleTaken = (slug, n) => slug !== '' && (n + [...slug].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 1009, 7)) % 13 < 3;
+	// Live availability: when <meta name="lh-api"> holds the API address, booked nights come from the server (direct bookings plus the
+	// Airbnb and Booking.com calendars). Until the answer arrives, or if it never does, the sample pattern above is used.
+	const API = (document.querySelector('meta[name="lh-api"]') || {}).content || '';
+	const live = Object.create(null);
+	const loadLive = (slug, done) => {
+		if (!API || !slug || slug in live) return;
+		live[slug] = null;
+		fetch(API + '/api/availability/' + slug + '?days=400').then((r) => (r.ok ? r.json() : Promise.reject())).then((j) => {
+			live[slug] = new Set(Object.entries(j.days).filter(([, v]) => v === 'booked').map(([d]) => day(d)));
+			done();
+		}).catch(() => { /* keep the sample pattern */ });
+	};
+	// With an API set, a home whose answer has not arrived (or failed) shows as free and the server has the final say; never invented nights.
+	const taken = (slug, n) => (live[slug] ? live[slug].has(n) : !API && sampleTaken(slug, n));
 	const freeRange = (slug, a, b) => { for (let n = day(a); n < day(b); n++) if (taken(slug, n)) return false; return true; };
 	// England and Wales bank holidays plus a few well-known dates, shown as a dot on the day.
 	const HOL = { '2026-10-31': 'Halloween', '2026-11-05': 'Bonfire Night', '2026-12-24': 'Christmas Eve', '2026-12-25': 'Christmas Day (bank holiday)', '2026-12-28': 'Boxing Day, substitute (bank holiday)', '2026-12-31': "New Year's Eve", '2027-01-01': "New Year's Day (bank holiday)", '2027-03-26': 'Good Friday (bank holiday)', '2027-03-29': 'Easter Monday (bank holiday)', '2027-05-03': 'Early May (bank holiday)', '2027-05-31': 'Spring (bank holiday)', '2027-08-30': 'Summer (bank holiday)', '2027-12-27': 'Christmas Day, substitute (bank holiday)', '2027-12-28': 'Boxing Day, substitute (bank holiday)' };
@@ -27,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const fout = form.elements.out;
 		if (!fin || !fout || fin.type !== 'date') return;
 		const slug = form.elements.home?.value || '';
+		loadLive(slug, () => { if (!cal.hidden) render(); });
 		const cal = document.createElement('div');
 		cal.className = 'c3-cal';
 		cal.hidden = true;
@@ -85,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const ny = m === 11 ? y + 1 : y;
 			cal.innerHTML = '<div class="c3-cal-head"><div><h3 class="c3-cal-title">Select dates</h3><p class="c3-hint">' + hint + '</p></div><div class="c3-cal-fields">' + field('in', 'CHECK-IN') + field('out', 'CHECKOUT') + '</div></div><div class="c3-months">'
 				+ monthHtml(y, m, cell, nav(-1, 'Previous month', '&#8249;', view.getTime() <= first), nav(1, 'Next month', '&#8250;', false))
-				+ monthHtml(ny, (m + 1) % 12, cell, '<span></span>', nav(1, 'Next month', '&#8250;', false)) + '</div><div class="c3-cal-foot"><p class="note">Sample availability. <span class="c3-key">Bank holiday or festive date</span></p><div><button type="button" class="c3-clear" data-clear>Clear dates</button><button type="button" class="c3-close" data-close>' + (b !== null ? 'Confirm' : 'Close') + '</button></div></div>';
+				+ monthHtml(ny, (m + 1) % 12, cell, '<span></span>', nav(1, 'Next month', '&#8250;', false)) + '</div><div class="c3-cal-foot"><p class="note">' + (API ? '' : 'Sample availability. ') + '<span class="c3-key">Bank holiday or festive date</span></p><div><button type="button" class="c3-clear" data-clear>Clear dates</button><button type="button" class="c3-close" data-close>' + (b !== null ? 'Confirm' : 'Close') + '</button></div></div>';
 		};
 		const open = (k) => { render(); cal.hidden = false; (cal.querySelector('.is-start') || cal.querySelector('.c3-day:not(:disabled)') || cal.querySelector('.c3-nav:not(:disabled)')).focus(); cal.dataset.from = k; };
 		const close = (k) => { cal.hidden = true; trig[k || cal.dataset.from || 'in'].focus(); };
@@ -163,15 +178,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	const list = $('home-list');
 	const q = new URLSearchParams(location.search);
 	if (list && lhIsDate(q.get('in')) && lhIsDate(q.get('out')) && q.get('out') > q.get('in')) {
-		let free = 0;
-		for (const li of list.children) {
-			const slug = new URL(li.querySelector('a').href).pathname.split('/').filter(Boolean).pop();
-			if (freeRange(slug, q.get('in'), q.get('out'))) free++; else li.dataset.busy = '';
-		}
 		const p = document.createElement('p');
 		p.className = 'note c3-avail';
 		p.setAttribute('role', 'status');
-		p.textContent = (free ? free + (free === 1 ? ' home is' : ' homes are') : 'No homes are') + ' free for ' + lhFormatDate(q.get('in')) + ' to ' + lhFormatDate(q.get('out')) + ' (sample availability).' + (free ? '' : ' Try other dates.');
+		const apply = () => {
+			let free = 0;
+			for (const li of list.children) {
+				const slug = new URL(li.querySelector('a').href).pathname.split('/').filter(Boolean).pop();
+				if (freeRange(slug, q.get('in'), q.get('out'))) { free++; delete li.dataset.busy; } else li.dataset.busy = '';
+			}
+			p.textContent = (free ? free + (free === 1 ? ' home is' : ' homes are') : 'No homes are') + ' free for ' + lhFormatDate(q.get('in')) + ' to ' + lhFormatDate(q.get('out')) + (API ? '.' : ' (sample availability).') + (free ? '' : ' Try other dates.');
+		};
+		for (const li of list.children) loadLive(new URL(li.querySelector('a').href).pathname.split('/').filter(Boolean).pop(), apply);
+		apply();
 		list.before(p);
 	}
 });

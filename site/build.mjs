@@ -154,7 +154,9 @@ const schemaFor = (h) => '<script type="application/ld+json">' + JSON.stringify(
 	'@context': 'https://schema.org', '@type': 'LodgingBusiness', name: `${h.name} by Luton Homes`, description: h.summary,
 	address: { '@type': 'PostalAddress', streetAddress: '34 Beaconsfield', addressLocality: 'Luton', postalCode: 'LU2 0RW', addressCountry: 'GB' },
 }).replace(/</g, '\\u003c') + '</script>';
-const shared = { year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
+// Address of the availability API (backend/api). Empty keeps the sample calendar. Set API_URL when building, for example API_URL=https://api.example.com node build.mjs
+const API_URL = (process.env.API_URL || '').replace(/\/$/, '');
+const shared = { apiUrl: API_URL, year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
@@ -208,7 +210,7 @@ cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
 cpSync(at('src/extras.css'), join(dist, 'assets/extras.css'));
-for (const f of ['quote.js', 'cal.js', 'ui.js', 'review.js', 'admin.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
+for (const f of ['quote.js', 'cal.js', 'ui.js', 'review.js', 'admin.js', 'admin-report.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
 for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
 let built = 0;
 for (const d of DESIGNS) {

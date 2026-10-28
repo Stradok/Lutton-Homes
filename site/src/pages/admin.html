@@ -35,6 +35,23 @@
 </table></div>
 </section>
 
+<section id="reports" aria-labelledby="x-rep">
+<h2 id="x-rep">Reports</h2>
+<p id="rp-mode" class="note" role="status">Showing made-up sample figures. Enter the API address and admin token to see real bookings.</p>
+<form class="x-card x-form x-wide" onsubmit="return false">
+<div class="field"><label for="rp-api">API address</label><input id="rp-api" type="url" placeholder="https://api.example.com"></div>
+<div class="field"><label for="rp-token">Admin token</label><input id="rp-token" type="password" autocomplete="off"></div>
+<div class="field"><label for="rp-from">From (check-in)</label><input id="rp-from" type="date"></div>
+<div class="field"><label for="rp-to">Up to (not including)</label><input id="rp-to" type="date"></div>
+<div class="actions"><button type="button" id="rp-load" class="button button--primary">Load report</button><button type="button" id="rp-csv" class="button button--quiet">Download CSV</button></div>
+</form>
+<div id="rp-out"></div>
+<h3>Calendar sync</h3>
+<p class="note">The website reads Airbnb and Booking.com calendars every few minutes, so a stay booked there blocks the same nights here.</p>
+<div id="rp-sync"></div>
+<div class="actions"><button type="button" id="rp-sync-now" class="button button--quiet">Check calendars now</button></div>
+</section>
+
 <section aria-labelledby="x-list">
 <h2 id="x-list">Bookings (sample)</h2>
 <div class="x-scroll"><table class="x-table">
@@ -77,5 +94,6 @@
 </main>
 {{> footer}}
 <script src="/assets/admin.js" defer></script>
+<script src="/assets/admin-report.js" defer></script>
 </body>
 </html>

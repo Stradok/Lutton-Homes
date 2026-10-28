@@ -8,3 +8,5 @@ node_modules/
 Docs/*.docx
 site/dist/
 Docs/imagineart-*
+backend/api/data/*.json
+backend/api/.env

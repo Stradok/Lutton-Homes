@@ -60,3 +60,9 @@
 .x-cell:hover { text-decoration: underline; }
 .x-grid td:has(.x-cell) { padding: 0; }
 .x-cellinfo { margin: 0 0 0.6rem; font-weight: 700; }
+.x-stat--static { cursor: default; }
+.x-barcell { display: flex; align-items: center; gap: 0.6rem; min-width: 9rem; }
+.x-bar { display: block; flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--lh-amber, #e31c5f) var(--w, 0%), var(--lh-line, #ddd) var(--w, 0%)); }
+.x-bad { color: #b3261e; font-weight: 700; }
+#reports h3 { margin: 1.5rem 0 0.6rem; }
+#reports .x-card { margin-bottom: 1.5rem; }
