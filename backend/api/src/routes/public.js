@@ -76,15 +76,22 @@ export function publicRoutes({ config, store, limit, payments, notify }) {
 		['POST', /^\/api\/payments\/webhook\/([a-z0-9-]+)$/, async (req, res, [name]) => {
 			if (name !== config.paymentProvider) throw new HttpError(404, 'Unknown payment provider');
 			const event = await payments.parseWebhook({ headers: req.headers, raw: await readRaw(req, 200_000) });
-			if (!event) return send(res, 200, { ok: true });
+			if (!event?.paid) return send(res, 200, { ok: true }); // a failed attempt can be retried; the hold expiring frees the nights
 			const block = (await store.list()).find((x) => x.id === event.bookingId);
-			if (!block || block.status !== 'pending') return send(res, 200, { ok: true }); // unknown, or already settled
+			// Money was taken but the booking cannot be confirmed: tell the owner, and answer 200 so the provider stops retrying.
+			const problem = async (note) => {
+				console.error('payment needs attention', event.bookingId, note);
+				if (block?.status === 'pending') await store.update(block.id, { paidConflict: true });
+				await notify('paymentIssue', { ...(block || {}), id: event.bookingId, note });
+				send(res, 200, { ok: true });
+			};
+			if (!block || block.status === 'cancelled') return problem('Paid for a booking that is missing or cancelled. Refund or rebook.');
+			if (block.status === 'confirmed') return send(res, 200, { ok: true }); // a repeated delivery
+			if ((event.ref && block.payment && event.ref !== block.payment) || (event.amount !== undefined && event.amount !== block.total)) return problem('The amount or reference paid does not match the booking.');
 			try {
-				const next = await store.update(block.id, event.paid ? { status: 'confirmed', holdUntil: undefined } : { status: 'cancelled' });
-				await notify(event.paid ? 'confirmed' : 'cancelled', next);
+				await notify('confirmed', await store.update(block.id, { status: 'confirmed', holdUntil: undefined, paidConflict: undefined }));
 			} catch (err) {
-				// Paid after the hold ran out and someone else took the nights: the owner has to refund or rebook.
-				if (err.code === 'OVERLAP') throw new HttpError(409, 'Paid, but the dates were taken. Refund needed.', 'OVERLAP');
+				if (err.code === 'OVERLAP') return problem('Paid after the hold ran out and the dates were taken. Refund or rebook.');
 				throw err;
 			}
 			send(res, 200, { ok: true });

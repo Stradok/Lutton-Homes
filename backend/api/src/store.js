@@ -3,7 +3,7 @@ import { promises as fs } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { dirname } from 'node:path';
 import { CHANNELS, STATUSES, dayNumber, isIsoDate } from './shapes.js';
-import { activeBlocks, overlaps } from './availability.js';
+import { activeBlocks, holds, overlaps } from './availability.js';
 
 // Callers branch on err.code ('OVERLAP' | 'INVALID') instead of parsing messages.
 function fail(code, message) {
@@ -23,7 +23,7 @@ function assertValid(b) {
 
 // Cancelled blocks do not hold nights, so only confirmed and pending ones are checked against the calendar.
 function assertNoOverlap(blocks, candidate) {
-	if (candidate.status === 'cancelled') return;
+	if (!holds(candidate)) return; // cancelled, or a pending request whose hold has run out
 	const clash = activeBlocks(blocks, candidate.home).some((b) => b.id !== candidate.id && overlaps(b, candidate));
 	if (clash) throw fail('OVERLAP', `overlaps an existing booking on ${candidate.home}`);
 }
@@ -73,6 +73,8 @@ export function createStore(filePath) {
 			const data = await read();
 			const next = withDefaults(block);
 			assertValid(next);
+			// Unpaid requests whose hold ran out are dead weight; drop them so the file does not grow with abandoned bookings.
+			data.blocks = data.blocks.filter((b) => b.status !== 'pending' || Date.parse(b.holdUntil) > Date.now() || b.paidConflict);
 			if (data.blocks.some((b) => b.id === next.id)) throw fail('INVALID', `duplicate id: ${next.id}`);
 			assertNoOverlap(data.blocks, next);
 			data.blocks.push(next);

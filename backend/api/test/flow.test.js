@@ -50,7 +50,7 @@ test('an expired hold frees the nights again', async () => {
 	t.close();
 });
 
-test('the payment webhook confirms a booking; a bad signature is ignored; a failure frees the nights', async () => {
+test('the payment webhook confirms a booking; a bad signature is ignored; one failed attempt does not cancel', async () => {
 	const t = await boot();
 	const b = await (await book(t)).json();
 	const hook = (sig, body) => fetch(`${t.base}/api/payments/webhook/fake`, { method: 'POST', headers: { 'x-sig': sig }, body: JSON.stringify(body) });
@@ -61,7 +61,7 @@ test('the payment webhook confirms a booking; a bad signature is ignored; a fail
 	assert.equal((await fetch(`${t.base}/api/payments/webhook/other`, { method: 'POST', body: '{}' })).status, 404);
 	const c = await (await book(t, 20, 22)).json();
 	await hook('ok', { bookingId: c.id, paid: false });
-	assert.equal((await t.store.list()).find((x) => x.id === c.id).status, 'cancelled');
+	assert.equal((await t.store.list()).find((x) => x.id === c.id).status, 'pending', 'one failed attempt does not cancel');
 	t.close();
 });
 
@@ -115,4 +115,19 @@ test('email slot: a registered mailer gets guest and owner messages, and a faili
 	assert.throws(() => createNotifier({ mailer: 'nope' }));
 	assert.throws(() => getProvider('nope'));
 	assert.equal(getProvider().name, 'manual');
+});
+
+test('money that cannot confirm a booking is flagged to the owner, not dropped', async () => {
+	const t = await boot();
+	const hook = (body) => fetch(`${t.base}/api/payments/webhook/fake`, { method: 'POST', headers: { 'x-sig': 'ok' }, body: JSON.stringify(body) });
+	const b = await (await book(t)).json();
+	assert.equal((await hook({ bookingId: b.id, paid: true, amount: 1 })).status, 200);
+	assert.equal((await t.store.list())[0].status, 'pending', 'wrong amount does not confirm');
+	assert.equal((await t.store.list())[0].paidConflict, true);
+	await hook({ bookingId: 'nope', paid: true });
+	await t.store.update(b.id, { holdUntil: new Date(Date.now() - 1000).toISOString() });
+	await book(t); // someone else takes the dates
+	assert.equal((await hook({ bookingId: b.id, paid: true, amount: 225, ref: 'ref_' + b.id })).status, 200);
+	assert.equal(t.sent.filter((s) => s[0] === 'paymentIssue').length, 3);
+	t.close();
 });

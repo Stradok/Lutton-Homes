@@ -108,7 +108,7 @@
 	function loadBookings() {
 		call('/api/admin/bookings').then(function (r) { return r.json(); }).then(function (all) {
 			var box = $('rp-bookings'), now = Date.now();
-			var open = all.filter(function (b) { return b.channel === 'direct' && b.status === 'pending' && Date.parse(b.holdUntil) > now; });
+			var open = all.filter(function (b) { return b.channel === 'direct' && b.status === 'pending' && (b.paidConflict || Date.parse(b.holdUntil) > now); });
 			box.textContent = '';
 			if (!open.length) return box.append(el('p', 'note', 'No requests are waiting.'));
 			box.append(table(['Guest', 'Home', 'Dates', 'Total', ''], open.map(function (b) {

@@ -4,7 +4,7 @@
 //     name: 'stripe',
 //     // Return { url } to send the guest to the provider's checkout page, or null when there is nothing to pay online.
 //     createCheckout: async ({ booking, home, successUrl, cancelUrl }) => ({ url, ref }),
-//     // Check the signature on the provider's webhook and return { bookingId, paid: true|false }, or null to ignore it.
+//     // Check the signature on the provider's webhook and return { bookingId, paid, amount?, ref? } (amount in pounds, ref as returned by createCheckout), or null to ignore it. When given, amount and ref must match the booking.
 //     parseWebhook: async ({ headers, raw }) => ({ bookingId, paid }),
 //   }
 //
