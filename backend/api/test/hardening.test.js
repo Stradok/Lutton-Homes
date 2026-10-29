@@ -58,3 +58,14 @@ test('one address cannot flood the server', async () => {
 	assert.equal(last, 429);
 	t.close();
 });
+
+test('the rate limiter forgets addresses that only came once', async () => {
+	const { rateLimiter } = await import('../src/http.js');
+	const limit = rateLimiter(2, 50);
+	for (let i = 0; i < 1000; i++) limit('ip-' + i);
+	await new Promise((r) => setTimeout(r, 80));
+	assert.equal(limit('fresh'), true);
+	assert.equal(limit('ip-0'), true, 'a returning address gets a new window');
+	assert.equal(limit('ip-0'), true);
+	assert.equal(limit('ip-0'), false, 'but the limit still applies');
+});

@@ -35,7 +35,7 @@ API_URL=https://your-api.example.com node build.mjs
 ```
 cd backend/api
 cp .env.example .env              # then fill it in; .env is git-ignored
-npm test                          # 89 tests
+npm test                          # 90 tests
 npm run hash-password -- 'a long password'   # put the result in OWNERS
 npm start
 ```

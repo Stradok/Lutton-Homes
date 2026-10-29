@@ -67,11 +67,14 @@ export function requireAdmin(req, token) {
 // Fixed-window limiter per address: enough to stop a script hammering the booking endpoint.
 export function rateLimiter(max, windowMs) {
 	const hits = new Map();
+	let nextSweep = 0;
 	return (key) => {
-		const now = Date.now(), h = hits.get(key);
+		const now = Date.now();
+		// Drop finished windows at most once per window, so addresses that never come back cannot pile up.
+		if (now >= nextSweep) { nextSweep = now + windowMs; for (const [k, v] of hits) if (now - v.start > windowMs) hits.delete(k); }
+		const h = hits.get(key);
 		if (!h || now - h.start > windowMs) { hits.set(key, { start: now, n: 1 }); return true; }
 		h.n += 1;
-		if (hits.size > 5000) for (const [k, v] of hits) if (now - v.start > windowMs) hits.delete(k);
 		return h.n <= max;
 	};
 }

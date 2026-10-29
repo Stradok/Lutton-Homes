@@ -81,6 +81,7 @@ export function createStore(filePath) {
 	queue = read().catch(() => {});
 
 	return {
+		// A copy of the array, but the blocks inside are the cache's own: read them, never edit them (use update()).
 		list: () => serial(async () => [...(await peek()).blocks]),
 
 		add: (block) => serial(async () => {
