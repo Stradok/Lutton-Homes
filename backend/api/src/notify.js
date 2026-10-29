@@ -1,9 +1,10 @@
+import { log } from './log.js';
 // Email slot. A mailer is { send: async ({ to, subject, text }) => void }. The default writes to the log, so nothing is
 // emailed until a real provider (SMTP, Postmark, SendGrid, Resend) is registered and MAIL_PROVIDER is set.
 // Logs only the address's domain: a log file should not collect guests' email addresses.
-const log = { name: 'log', send: async ({ to, subject }) => console.log(`[mail not sent: no provider] to=***@${String(to).split('@').pop()} subject="${subject}"`) };
+const logMailer = { name: 'log', send: async ({ to, subject }) => log.info('mail not sent: no provider', { to: `***@${String(to).split('@').pop()}`, subject }) };
 
-const mailers = new Map([[log.name, log]]);
+const mailers = new Map([[logMailer.name, logMailer]]);
 export const registerMailer = (mailer) => mailers.set(mailer.name, mailer);
 
 const money = (n) => (typeof n === 'number' ? ` Total: £${n}.` : '');
@@ -22,7 +23,7 @@ export function createNotifier({ mailer = 'log', ownerEmail = '', homes = [] } =
 	const m = mailers.get(mailer);
 	if (!m) throw new Error(`Unknown MAIL_PROVIDER "${mailer}". Registered: ${[...mailers.keys()].join(', ')}`);
 	// Email trouble must never lose or fail a booking, so errors are logged and swallowed.
-	const safe = (msg) => Promise.resolve().then(() => m.send(msg)).catch((err) => console.error('mail failed', err.message));
+	const safe = (msg) => Promise.resolve().then(() => m.send(msg)).catch((err) => log.error('mail failed', { err }));
 	return async function notify(event, booking) {
 		const h = (typeof homes === 'function' ? await homes() : homes).find((x) => x.slug === booking.home) || { name: booking.home };
 		const t = TEMPLATES[event](booking, h);

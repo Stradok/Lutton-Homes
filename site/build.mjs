@@ -167,7 +167,7 @@ const schemaFor = (h) => '<script type="application/ld+json">' + JSON.stringify(
 	address: { '@type': 'PostalAddress', streetAddress: '34 Beaconsfield', addressLocality: 'Luton', postalCode: 'LU2 0RW', addressCountry: 'GB' },
 }).replace(/</g, '\\u003c') + '</script>';
 // Empty API_URL keeps the sample calendar. Set it when building, for example API_URL=https://api.example.com node build.mjs
-const shared = { apiUrl: API_URL, year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
+const shared = { apiUrl: API_URL, previewLogin: API_URL ? '' : '<script src="/assets/admin-preview.js" defer></script>', year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
@@ -222,6 +222,8 @@ cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
 cpSync(at('src/extras.css'), join(dist, 'assets/extras.css'));
 for (const f of ['quote.js', 'cal.js', 'ui.js', 'review.js', 'admin.js', 'admin-report.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
+// The preview sign-in file exists in the build only when there is no API to check sign-in.
+if (!API_URL) cpSync(at('src/admin-preview.js'), join(dist, 'assets', 'admin-preview.js'));
 for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));
 let built = 0;
 for (const d of DESIGNS) {

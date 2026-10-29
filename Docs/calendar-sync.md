@@ -15,7 +15,7 @@ Code: `backend/api/` (Node 22, no dependencies). Checklist items: CM-06, CM-07, 
 ## What happens, step by step
 
 1. **Setup (once per listing).** The owner copies the export link from Airbnb and from Booking.com into `FEED_AIRBNB_<HOME>` and `FEED_BOOKING_<HOME>`.
-2. **Every 15 minutes** (`SYNC_MINUTES`) the server downloads each feed, turns it into stays, and replaces that home's copy for that site. A failed download keeps the last good copy, so an outage never frees booked nights.
+2. **Every 5 minutes** (`SYNC_MINUTES`) the server downloads each feed, turns it into stays, and replaces that home's copy for that site. It also re-checks that one home when a guest looks at its calendar (in the background) and again just before a booking is taken (waiting up to 5 seconds), at most once every 2 minutes per home so visitors cannot hammer Airbnb or Booking.com. A failed download keeps the last good copy, so an outage never frees booked nights.
 3. **The website calendar** (`GET /api/availability/<home>`) merges direct bookings with those stays and greys out the nights. Check-out day stays free for a same-day check-in.
 4. **A direct booking** (`POST /api/bookings`) is refused if any channel already holds those nights, otherwise it is stored and blocks them.
 5. **The other direction.** The server publishes `GET /api/ical/<home>.ics?token=...&for=airbnb` (and `for=booking`). The owner pastes that address into the listing's "import calendar". Direct bookings and the other site's stays then block those nights there. Guest names are never included.
@@ -23,7 +23,7 @@ Code: `backend/api/` (Node 22, no dependencies). Checklist items: CM-06, CM-07, 
 
 ## Limits to tell the owners
 
-- **Not instant.** Our server checks every 15 minutes. Airbnb and Booking.com refresh imported calendars on their own schedule, often a few hours. A booking made inside that gap can double-book. Only a channel manager removes that gap.
+- **Not instant.** Our server checks every 5 minutes (and just before a booking). Airbnb and Booking.com refresh imported calendars on their own schedule, often a few hours. A booking made inside that gap can double-book. Only a channel manager removes that gap.
 - **No prices or guest details in iCal.** Reports show revenue for this website only.
 - **Direct bookings are not paid yet.** Until payment or owner approval exists, a public booking holds its nights (CM-06 note, and the security notes in the commit history). Payment provider is still an owner decision.
 - **The Vercel site is static.** The API needs a small Node host. Build the website with `API_URL=https://your-api node site/build.mjs`; without it the site keeps showing sample availability.
@@ -36,7 +36,7 @@ Code: `backend/api/` (Node 22, no dependencies). Checklist items: CM-06, CM-07, 
 
 ## When two people book the same nights
 
-Our own website cannot double-book: bookings are checked and stored one at a time (20 simultaneous requests for the same dates give 1 booking and 19 refusals). The risk is a guest booking on Airbnb or Booking.com in the gap before our next check (every 15 minutes, `SYNC_MINUTES`) or before they refresh our calendar.
+Our own website cannot double-book: bookings are checked and stored one at a time (20 simultaneous requests for the same dates give 1 booking and 19 refusals). The risk is a guest booking on Airbnb or Booking.com in the gap before our next check (every 5 minutes, `SYNC_MINUTES`) or before they refresh our calendar.
 
 After every calendar check the API looks for stays from different sources on the same nights (`backend/api/src/conflicts.js`):
 

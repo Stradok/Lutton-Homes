@@ -27,7 +27,7 @@ export function loadConfig(env = process.env) {
 		icalToken: env.ICAL_TOKEN || '',
 		allowedOrigins: (env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean),
 		trustProxy: env.TRUST_PROXY === '1',
-		syncMinutes: Number(env.SYNC_MINUTES) || 15,
+		syncMinutes: Number(env.SYNC_MINUTES) || 5,
 		homes: homes.map((h) => ({
 			slug: h.slug, name: h.name, rate: h.rate, sleeps: h.sleeps,
 			// Each owner pastes the "export calendar" link from Airbnb and Booking.com into these variables.

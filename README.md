@@ -35,7 +35,7 @@ API_URL=https://your-api.example.com node build.mjs
 ```
 cd backend/api
 cp .env.example .env              # then fill it in; .env is git-ignored
-npm test                          # 62 tests
+npm test                          # 89 tests
 npm run hash-password -- 'a long password'   # put the result in OWNERS
 npm start
 ```
@@ -44,7 +44,7 @@ What it does, the booking life cycle, the owner accounts and the slots for outsi
 
 ## How it fits together
 
-- **Calendar.** The API reads each listing's Airbnb and Booking.com calendar export link every 15 minutes (no Airbnb or Booking.com API access needed) and publishes its own calendar for them to import. Plain-language explanation, limits and the double-booking rules: `Docs/calendar-sync.md`.
+- **Calendar.** The API reads each listing's Airbnb and Booking.com calendar export link every 5 minutes, and again just before a booking (no Airbnb or Booking.com API access needed) and publishes its own calendar for them to import. Plain-language explanation, limits and the double-booking rules: `Docs/calendar-sync.md`.
 - **Bookings.** A website booking is held as pending for 30 minutes, then confirmed by the owner or by a payment webhook. Same-time bookings on the website are refused one at a time.
 - **Double bookings.** After each calendar check the API cancels an unpaid website request that lost to a confirmed stay elsewhere, and lists and emails any other clash.
 - **Publishing.** Properties and reviews live in the API. The Publish button on the dashboard calls `DEPLOY_HOOK_URL` so Vercel rebuilds the static site.
@@ -59,6 +59,16 @@ What it does, the booking life cycle, the owner accounts and the slots for outsi
 - The Dockerfile is untested. Browser testing so far is Chromium only.
 
 The full checklist with status per item is the Requirements page on the site (`site/public/requirements/`).
+
+## Operations
+
+- **CI:** `.github/workflows/ci.yml` runs the API tests, the site build and the site checks on every push and pull request.
+- **Startup checks:** with `NODE_ENV=production` the API refuses to start on missing or weak settings and says which (`src/validate.js`).
+- **Logs:** one JSON line per event on stdout (`src/log.js`, level from `LOG_LEVEL`). No error-tracking service is connected yet.
+- **Health:** `GET /api/health` returns 200 only if the data file can be read, otherwise 503.
+- **Backups:** `node backend/api/scripts/backup.js` copies the data file (keeping the newest `BACKUP_KEEP`, default 14) and new photos into `BACKUP_DIR`. Run it from a scheduler and copy the folder off the server. Restore by putting a backup over the data file; the running server notices.
+- **Rollback:** the site is static, so redeploy the previous Vercel deployment or `git revert` and push. For the API, redeploy the previous image or commit and restore the latest backup if data was affected.
+- **Headers:** the site sends a Content-Security-Policy that blocks outside scripts and framing, plus frame, HSTS and permissions headers (`site/vercel.json`). The API adds the same kind of headers to every reply.
 
 ## Keeping this file current
 

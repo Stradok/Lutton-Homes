@@ -5,6 +5,7 @@ import { HttpError, clientIp, readJson, safeEqual, send } from '../http.js';
 import { isIsoDate, dayNumber } from '../shapes.js';
 import { quote } from '../pricing.js';
 import { readRaw } from '../http.js';
+import { log } from '../log.js';
 import { readImage } from '../uploads.js';
 import { cleanReview, publicView, readReviewToken } from '../reviews.js';
 import { randomUUID } from 'node:crypto';
@@ -15,7 +16,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function publicRoutes({ config, store, limit, payments, notify, getHomes }) {
+export function publicRoutes({ config, store, limit, payments, notify, getHomes, refresh }) {
 	const home = async (slug) => {
 		const h = (await getHomes()).find((x) => x.slug === slug);
 		if (!h) throw new HttpError(404, 'Unknown home');
@@ -23,11 +24,15 @@ export function publicRoutes({ config, store, limit, payments, notify, getHomes 
 	};
 
 	return [
-		['GET', /^\/api\/health$/, async (req, res) => send(res, 200, { ok: true })],
+		// Reads the data file, so "ok" means the API can really answer. Says nothing about why when it cannot.
+		['GET', /^\/api\/health$/, async (req, res) => {
+			try { await store.list(); send(res, 200, { ok: true }); } catch { send(res, 503, { ok: false }); }
+		}],
 
 		// Booked and free nights for one home, merged from direct bookings and the Airbnb and Booking.com feeds.
 		['GET', /^\/api\/availability\/([a-z0-9-]+)$/, async (req, res, [slug], url) => {
 			await home(slug);
+			refresh(slug); // refresh in the background; this answer uses the copy we already have
 			const from = isIsoDate(url.searchParams.get('from')) ? url.searchParams.get('from') : today();
 			const days = Math.min(Math.max(parseInt(url.searchParams.get('days'), 10) || 120, 1), 400);
 			const blocks = await store.list();
@@ -82,6 +87,7 @@ export function publicRoutes({ config, store, limit, payments, notify, getHomes 
 			if (!Number.isInteger(guests) || guests < 1 || guests > h.sleeps) throw new HttpError(400, `Guests must be 1 to ${h.sleeps}`);
 			const guest = String(b.name || '').trim().slice(0, 80);
 			if (!guest) throw new HttpError(400, 'Name is required');
+			await refresh(h.slug, { wait: true }); // just before taking the nights, look at Airbnb and Booking.com once more
 			const email = String(b.email || '').trim().slice(0, 120);
 			if (!EMAIL.test(email)) throw new HttpError(400, 'A valid email is required');
 			if (!isRangeFree(await store.list(), h.slug, b.from, b.to)) throw new HttpError(409, 'Those dates are no longer available', 'OVERLAP');
@@ -101,7 +107,7 @@ export function publicRoutes({ config, store, limit, payments, notify, getHomes 
 				if (checkout?.ref) block = await store.update(block.id, { payment: checkout.ref });
 			} catch (err) {
 				await store.update(block.id, { status: 'cancelled' }); // do not hold nights for a payment page that never opened
-				console.error('checkout failed', err.message);
+				log.error('checkout failed', { booking: block.id, err });
 				throw new HttpError(502, 'Payment could not be started, please try again');
 			}
 			await notify('requested', block);
@@ -116,7 +122,7 @@ export function publicRoutes({ config, store, limit, payments, notify, getHomes 
 			const block = (await store.list()).find((x) => x.id === event.bookingId);
 			// Money was taken but the booking cannot be confirmed: tell the owner, and answer 200 so the provider stops retrying.
 			const problem = async (note) => {
-				console.error('payment needs attention', event.bookingId, note);
+				log.error('payment needs attention', { booking: event.bookingId, note });
 				if (block?.status === 'pending') await store.update(block.id, { paidConflict: true });
 				await notify('paymentIssue', { ...(block || {}), id: event.bookingId, note });
 				send(res, 200, { ok: true });

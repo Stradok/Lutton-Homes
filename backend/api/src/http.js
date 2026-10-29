@@ -5,9 +5,15 @@ export class HttpError extends Error {
 	constructor(status, message, code) { super(message); this.status = status; this.code = code; }
 }
 
+// Replies are data, never pages: nothing may load from them, frame them or sniff their type.
+export const SECURITY_HEADERS = {
+	'x-content-type-options': 'nosniff', 'x-frame-options': 'DENY', 'referrer-policy': 'no-referrer',
+	'content-security-policy': "default-src 'none'; frame-ancestors 'none'", 'strict-transport-security': 'max-age=31536000',
+};
+
 export function send(res, status, body, headers = {}) {
 	const isText = typeof body === 'string';
-	res.writeHead(status, { 'content-type': isText ? 'text/plain; charset=utf-8' : 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers });
+	res.writeHead(status, { ...SECURITY_HEADERS, 'content-type': isText ? 'text/plain; charset=utf-8' : 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers });
 	res.end(isText ? body : JSON.stringify(body));
 }
 

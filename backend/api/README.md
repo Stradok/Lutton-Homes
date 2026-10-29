@@ -52,7 +52,7 @@ OWNERS=owner1:scrypt$...,owner2:scrypt$...     # in .env
 SESSION_SECRET=<long random string>            # in .env
 ```
 
-`ADMIN_TOKEN` is still accepted as a service token for scripts. Leave it empty if you do not need one.
+In production (`NODE_ENV=production`) the server will not start if `SESSION_SECRET` is shorter than 32 characters, tokens are short, origins are not https, and similar (`src/validate.js`). `ADMIN_TOKEN` is still accepted as a service token for scripts. Leave it empty if you do not need one.
 
 ## Slots for outside services
 

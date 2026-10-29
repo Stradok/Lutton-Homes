@@ -43,19 +43,30 @@ export function createStore(filePath) {
 		return run;
 	}
 
-	async function read() {
-		let text;
+	// The parsed file is kept in memory and reused while the file on disk is unchanged (size and modified time), so the many
+	// read-only requests (calendar, homes) do not each read and parse the whole file. Our own writes refresh it; a file replaced
+	// from outside (a restored backup) is noticed by its new stamp.
+	let cache = null;
+	const stampOf = (st) => `${st.size}:${st.mtimeMs}`;
+
+	// For readers: the shared copy, which they must not change.
+	async function peek() {
 		try {
-			text = await fs.readFile(filePath, 'utf8');
+			const st = await fs.stat(filePath);
+			if (cache && cache.stamp === stampOf(st)) return cache.data;
+			const data = JSON.parse(await fs.readFile(filePath, 'utf8'));
+			cache = { stamp: stampOf(st), data: { blocks: data.blocks ?? [], meta: data.meta ?? {} } };
+			return cache.data;
 		} catch (err) {
 			if (err.code !== 'ENOENT') throw err;
 			const empty = { blocks: [], meta: {} };
 			await write(empty);
-			return empty;
+			return cache.data;
 		}
-		const data = JSON.parse(text);
-		return { blocks: data.blocks ?? [], meta: data.meta ?? {} };
 	}
+
+	// For writers: a private copy, so a step that fails halfway leaves the cache (and the file) untouched.
+	const read = async () => structuredClone(await peek());
 
 	// Temp file in the same directory, then rename: a reader never sees a half-written file.
 	async function write(data) {
@@ -63,13 +74,14 @@ export function createStore(filePath) {
 		const tmp = `${filePath}.${process.pid}.${randomUUID()}.tmp`;
 		await fs.writeFile(tmp, JSON.stringify(data, null, '\t'));
 		await fs.rename(tmp, filePath);
+		cache = { stamp: stampOf(await fs.stat(filePath)), data: structuredClone(data) };
 	}
 
 	// Creates the file now if missing. A bad file is reported by the first real operation, not here.
 	queue = read().catch(() => {});
 
 	return {
-		list: () => serial(async () => (await read()).blocks),
+		list: () => serial(async () => [...(await peek()).blocks]),
 
 		add: (block) => serial(async () => {
 			const data = await read();
@@ -130,8 +142,8 @@ export function createStore(filePath) {
 
 		// meta(key) reads, meta(key, value) writes and returns the value.
 		meta: (key, value) => serial(async () => {
+			if (value === undefined) return structuredClone((await peek()).meta[key]);
 			const data = await read();
-			if (value === undefined) return data.meta[key];
 			data.meta[key] = value;
 			await write(data);
 			return value;

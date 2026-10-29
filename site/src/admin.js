@@ -2,7 +2,7 @@
 // With an API address (the lh-api meta tag) sign-in is checked by the server, which returns a 12 hour session token.
 // Without one it is a design-preview gate only: this is a static site, so it protects nothing.
 (function () {
-	var USER = 'admin', PASS = 'zamooq121', KEY = 'lh-admin';
+	var P = window.LH_PREVIEW || {}, KEY = 'lh-admin';
 	function $(id) { return document.getElementById(id); }
 
 	var login = $('login-form');
@@ -14,7 +14,7 @@
 	if (login) login.addEventListener('submit', function (e) {
 		e.preventDefault();
 		var user = login.elements.user.value.trim(), pass = login.elements.pass.value, err = $('lg-error');
-		if (!api) return user === USER && pass === PASS ? enter() : (err.textContent = 'That username or password is not right.');
+		if (!api) return P.user && user === P.user && pass === P.pass ? enter() : (err.textContent = 'That username or password is not right.');
 		fetch(api + '/api/admin/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ user: user, password: pass }) })
 			.then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
 			.then(function (r) { if (r.ok) enter(r.j.token); else err.textContent = r.j.error || 'Sign in failed.'; })
