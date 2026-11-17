@@ -252,6 +252,32 @@ eq(h.lhEstimate(95, '2026-11-12', '2026-11-15'), { nights: 3, total: 285 }, 'est
 eq(h.lhEstimate(95, '2026-11-15', '2026-11-12'), null, 'estimate reversed');
 eq(h.lhEstimate(95, 'x', '2026-11-12'), null, 'estimate invalid');
 
+// Demo availability function (api/availability/[slug].js): reads a Lodgify calendar, answers booked or free per night.
+const live = await import(new URL('../api/availability/%5Bslug%5D.js', import.meta.url));
+const ics = (events) => 'BEGIN:VCALENDAR\r\n' + events.map((e) => 'BEGIN:VEVENT\r\n' + e + '\r\nEND:VEVENT\r\n').join('') + 'END:VCALENDAR\r\n';
+const nightsOf = (text) => [...live.bookedNights(text)].sort((a, b) => a - b).map((n) => new Date(n * 864e5).toISOString().slice(0, 10));
+eq(nightsOf(ics(['DTSTART;VALUE=DATE:20261110\r\nDTEND;VALUE=DATE:20261113'])), ['2026-11-10', '2026-11-11', '2026-11-12'], 'ical: check-out day is not a night');
+eq(nightsOf(ics(['DTSTART:20261120T150000Z\r\nDTEND:20261122T100000Z'])), ['2026-11-20', '2026-11-21'], 'ical: date-times');
+eq(nightsOf(ics(['DTSTART;VALUE=DATE:20261201'])), ['2026-12-01'], 'ical: no end is one night');
+eq(nightsOf(ics(['DTSTART;VALUE=DATE:20261205\r\nDTEND;VALUE=DATE:20261207\r\nSTATUS:CANCELLED'])), [], 'ical: cancelled stays hold nothing');
+eq(nightsOf(ics(['DTSTART;VALUE=DATE:20261301\r\nDTEND;VALUE=DATE:20261302', 'DTEND;VALUE=DATE:20261208'])), [], 'ical: bad dates and missing start are ignored');
+eq(nightsOf(ics(['SUMMARY:A very long name that is\r\n  folded\r\nDTSTART;VALUE=DATE:20261215\r\nDTEND;VALUE=DATE:20261216'])), ['2026-12-15'], 'ical: folded lines');
+const call = async (query, env, fetchImpl) => {
+	const out = { headers: {} };
+	const res = { status(c) { out.status = c; return res; }, json(b) { out.body = b; return out; }, setHeader(k, v) { out.headers[k] = v; } };
+	await live.default({ query }, res, { env, fetchImpl, now: () => Date.parse('2026-11-10T09:00:00Z') });
+	return out;
+};
+const LINK = 'https://feed.example/secret-token.ics', ENV = { FEED_LODGIFY_THE_GARDEN_STUDIO: LINK };
+const okFeed = async () => ({ ok: true, text: async () => ics(['DTSTART;VALUE=DATE:20261111\r\nDTEND;VALUE=DATE:20261113']) });
+const hit = await call({ slug: 'the-garden-studio', days: '4' }, ENV, okFeed);
+eq([hit.status, hit.body], [200, { home: 'the-garden-studio', from: '2026-11-10', days: { '2026-11-10': 'free', '2026-11-11': 'booked', '2026-11-12': 'booked', '2026-11-13': 'free' } }], 'availability function answer');
+eq((await call({ slug: 'luton-lodge' }, ENV, okFeed)).status, 404, 'availability function: home without a calendar');
+eq((await call({ slug: '../x' }, ENV, okFeed)).status, 404, 'availability function: odd slug');
+const down = await call({ slug: 'the-garden-studio' }, ENV, async () => { throw new Error('boom ' + LINK); });
+eq([down.status, JSON.stringify(down.body).includes('secret-token')], [502, false], 'availability function: failure never leaks the link');
+eq(read('index.html').includes('<meta name="lh-cal" content="">'), true, 'calendar switch is off by default');
+
 if (failures.length) {
 	console.error(failures.map((f) => '- ' + f).join('\n'));
 	console.error(`\n${failures.length} problem(s).`);
