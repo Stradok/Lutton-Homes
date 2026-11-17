@@ -802,6 +802,162 @@
         "Check out by 10am",
         "No smoking inside",
         "No parties or events"
+      ],
+      "tour": [
+        {
+          "title": "Bedroom",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-studio-01-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-02-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-03-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-04-1600.webp",
+              "w": 1600,
+              "h": 2133
+            }
+          ]
+        },
+        {
+          "title": "Living area",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-studio-05-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-06-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-07-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-08-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-09-1600.webp",
+              "w": 1600,
+              "h": 2133
+            }
+          ]
+        },
+        {
+          "title": "Kitchenette",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-studio-10-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-11-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-12-1600.webp",
+              "w": 1600,
+              "h": 2133
+            }
+          ]
+        },
+        {
+          "title": "Bathroom",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-studio-13-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-14-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-15-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-16-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-17-1600.webp",
+              "w": 1600,
+              "h": 2133
+            }
+          ]
+        },
+        {
+          "title": "Outside",
+          "images": [
+            {
+              "src": "/media/homes/the-garden-studio-18-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-19-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-20-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-21-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-22-1600.webp",
+              "w": 1600,
+              "h": 2133
+            },
+            {
+              "src": "/media/homes/the-garden-studio-23-1600.webp",
+              "w": 1600,
+              "h": 2133
+            }
+          ]
+        }
+      ],
+      "images": [
+        "/media/homes/the-garden-studio-01-1600.webp",
+        "/media/homes/the-garden-studio-05-1600.webp",
+        "/media/homes/the-garden-studio-10-1600.webp",
+        "/media/homes/the-garden-studio-13-1600.webp",
+        "/media/homes/the-garden-studio-18-1600.webp"
+      ],
+      "alts": [
+        "Bedroom with a double bed, grey throw and a mirrored heart on a slatted feature wall",
+        "Living area with a grey armchair, a wide window with blinds and the bed in the foreground",
+        "Kitchenette with a fridge, kettle, microwave and a wall TV beside the front door",
+        "Bathroom with a lit mirror, basin on a grey vanity unit and a toilet",
+        "Front of the studio with a white door, one window and potted plants on a stand"
       ]
     }
   ]
