@@ -55,5 +55,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/availability/:slug/",
+      "destination": "/api/availability/:slug"
+    }
   ]
 }

@@ -30,6 +30,8 @@ Set `API_URL` when building to switch it to the real API: properties are read fr
 API_URL=https://your-api.example.com node build.mjs
 ```
 
+**Live calendar for the Vercel demo (no API server).** `site/api/availability/[slug].js` is a small Vercel function that reads one home's Lodgify calendar link (the setting `FEED_LODGIFY_<HOME>`, for example `FEED_LODGIFY_THE_GARDEN_STUDIO`) and answers booked or free nights in the real API's shape. Build with `CAL_URL=self` to make the calendar use it. Booking, sign-in and the owner dashboard stay sample. A home with no link set keeps the sample pattern. On the Vercel project set `CAL_URL=self` and the `FEED_LODGIFY_*` links (type Secret, Production), then redeploy. The function stores nothing and returns no guest names or links.
+
 ## Run the API
 
 ```

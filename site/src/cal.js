@@ -11,11 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Live availability: when <meta name="lh-api"> holds the API address, booked nights come from the server (direct bookings plus the
 	// Airbnb and Booking.com calendars). Until the answer arrives, or if it never does, the sample pattern above is used.
 	const API = (document.querySelector('meta[name="lh-api"]') || {}).content || '';
+	// Demo: lh-cal = "self" reads the booked nights from this site's own function (live Lodgify calendars). A home it has no calendar for
+	// answers 404 and keeps the sample pattern. Bookings and sign-in are unaffected.
+	const CAL = (document.querySelector('meta[name="lh-cal"]') || {}).content === 'self' ? 'self' : API;
 	const live = Object.create(null);
 	const loadLive = (slug, done) => {
-		if (!API || !slug || slug in live) return;
+		if (!CAL || !slug || slug in live) return;
 		live[slug] = null;
-		fetch(API + '/api/availability/' + slug + '?days=400').then((r) => (r.ok ? r.json() : Promise.reject())).then((j) => {
+		fetch((CAL === 'self' ? '' : CAL) + '/api/availability/' + slug + (CAL === 'self' ? '/' : '') + '?days=400').then((r) => (r.ok ? r.json() : Promise.reject())).then((j) => {
 			live[slug] = new Set(Object.entries(j.days).filter(([, v]) => v === 'booked').map(([d]) => day(d)));
 			done();
 		}).catch(() => { /* keep the sample pattern */ });

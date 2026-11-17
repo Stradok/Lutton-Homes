@@ -9,6 +9,9 @@ const dist = at('dist');
 // Address of the API (backend/api). When set, the properties come from it, so what the owners add shows up on the next build.
 // If it cannot be reached the build falls back to data/homes.json rather than failing.
 const API_URL = (process.env.API_URL || '').replace(/\/$/, '');
+// CAL_URL=self (demo): booked nights come from this site's own api/availability function (live Lodgify calendars) while everything
+// else, booking and sign-in included, stays sample. The real API (API_URL) takes over the calendar when it is set too.
+const CAL_URL = process.env.CAL_URL === 'self' ? 'self' : '';
 // A bad answer (an error page, a record missing a field the pages need) must not break the whole build.
 const checkHomes = (list) => {
 	const ok = Array.isArray(list) && list.length && list.every((h) => h && typeof h.slug === 'string' && typeof h.name === 'string' && typeof h.rate === 'number' && ['tags', 'amenities', 'rules', 'images', 'alts'].every((k) => Array.isArray(h[k])));
@@ -167,7 +170,7 @@ const schemaFor = (h) => '<script type="application/ld+json">' + JSON.stringify(
 	address: { '@type': 'PostalAddress', streetAddress: '34 Beaconsfield', addressLocality: 'Luton', postalCode: 'LU2 0RW', addressCountry: 'GB' },
 }).replace(/</g, '\\u003c') + '</script>';
 // Empty API_URL keeps the sample calendar. Set it when building, for example API_URL=https://api.example.com node build.mjs
-const shared = { apiUrl: API_URL, previewLogin: API_URL ? '' : '<script src="/assets/admin-preview.js" defer></script>', year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
+const shared = { apiUrl: API_URL, calUrl: CAL_URL, previewLogin: API_URL ? '' : '<script src="/assets/admin-preview.js" defer></script>', year: new Date().getFullYear(), wa: WA, maps: MAPS, homesJson, navHomes, whereList, extraHead: PREVIEW_HEAD };
 const pages = [
 	{
 		file: 'index.html', out: 'index.html',
