@@ -10,6 +10,18 @@
 </section>
 <section class="page-section">
 <div class="wrap x-admin">
+<div id="signin" data-mode="owner" class="x-card x-form">
+<div class="si-start">
+<a id="si-google" class="button button--primary" href="#" hidden>Continue with Google<span class="arrow" aria-hidden="true"></span></a>
+<form id="si-otp" novalidate hidden>
+<div class="field"><label for="si-email">Email address</label><input id="si-email" name="email" type="email" autocomplete="email" required></div>
+<div id="si-code-row" class="field" hidden><label for="si-code">6 digit code</label><input id="si-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+<p id="si-note" class="note"></p>
+<button type="submit" class="button button--primary">Email me a code<span class="arrow" aria-hidden="true"></span></button>
+</form>
+</div>
+<p id="si-error" class="error" role="alert"></p>
+</div>
 <form id="login-form" class="x-card x-form" action="/admin/login/" method="get" novalidate>
 <div class="field"><label for="lg-user">Username</label><input id="lg-user" name="user" type="text" autocomplete="username" required></div>
 <div class="field"><label for="lg-pass">Password</label><input id="lg-pass" name="pass" type="password" autocomplete="current-password" required></div>
@@ -23,5 +35,6 @@
 {{> footer}}
 {{{previewLogin}}}
 <script src="/assets/admin.js" defer></script>
+<script src="/assets/signin.js" defer></script>
 </body>
 </html>

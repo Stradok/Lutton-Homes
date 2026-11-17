@@ -201,6 +201,7 @@ const pages = [
 	{ file: 'local-area.html', out: 'local-area/index.html', title: 'Getting here | Luton Homes', description: 'Where Luton Homes is, and how far each home is from Luton Airport.', vars: { distances } },
 	{ file: 'terms.html', out: 'terms/index.html', title: 'Terms and booking conditions | Luton Homes', description: 'Draft terms for booking a Luton Homes stay direct.', vars: {} },
 	{ file: 'manage.html', out: 'manage/index.html', title: 'Manage your booking | Luton Homes', description: 'Preview of how a guest views, changes or cancels a booking. Nothing is changed.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
+	{ file: 'account.html', out: 'account/index.html', title: 'My bookings | Luton Homes', description: 'Sign in with Google or an emailed code to see your Luton Homes bookings.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
 	{ file: 'admin.html', out: 'admin/index.html', title: 'Owner dashboard (preview) | Luton Homes', description: 'Preview of the owner dashboard with made-up sample data.', vars: { adminHead, adminGrid, adminHomes, adminHomeValues, extraHead: PREVIEW_HEAD + XCSS } },
 	{ file: 'login.html', out: 'admin/login/index.html', title: 'Owner sign in | Luton Homes', description: 'Owner sign in for the Luton Homes design preview.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
 	{ file: 'add-property.html', out: 'admin/add/index.html', title: 'Add a property (preview) | Luton Homes', description: 'Preview of how an owner lists a home, restaurant or other property with room photos.', vars: { extraHead: PREVIEW_HEAD + XCSS } },
@@ -221,7 +222,7 @@ cpSync(at('src/app.js'), join(dist, 'assets/app.js'));
 cpSync(at('src/book.js'), join(dist, 'assets/book.js'));
 cpSync(at('src/homes.js'), join(dist, 'assets/homes.js'));
 cpSync(at('src/extras.css'), join(dist, 'assets/extras.css'));
-for (const f of ['quote.js', 'cal.js', 'ui.js', 'review.js', 'admin.js', 'admin-report.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
+for (const f of ['quote.js', 'cal.js', 'ui.js', 'review.js', 'admin.js', 'admin-report.js', 'signin.js']) cpSync(at('src/' + f), join(dist, 'assets', f));
 // The preview sign-in file exists in the build only when there is no API to check sign-in.
 if (!API_URL) cpSync(at('src/admin-preview.js'), join(dist, 'assets', 'admin-preview.js'));
 for (const f of ['switcher.js', 'switcher.css', 'variants.js', 'variants.css', 'theme-original.css']) cpSync(at('src/' + f), join(dist, 'assets', f));

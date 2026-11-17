@@ -1,0 +1,36 @@
+{{> head}}
+{{> preview-strip}}
+{{> header}}
+<main id="content">
+<section class="page-band">
+<div class="wrap">
+<h1>My bookings</h1>
+<p class="lead">Sign in to see the stays you booked with us.</p>
+</div>
+</section>
+<section class="page-section">
+<div class="wrap book-wrap">
+<div id="signin" data-mode="guest" class="summary-box">
+<div class="si-start">
+<a id="si-google" class="button button--primary" href="#" hidden>Continue with Google<span class="arrow" aria-hidden="true"></span></a>
+<form id="si-otp" novalidate hidden>
+<div class="field"><label for="si-email">Email address</label><input id="si-email" name="email" type="email" autocomplete="email" required></div>
+<div id="si-code-row" class="field" hidden><label for="si-code">6 digit code</label><input id="si-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+<p id="si-note" class="note"></p>
+<button type="submit" class="button button--primary">Email me a code<span class="arrow" aria-hidden="true"></span></button>
+</form>
+</div>
+<div id="si-account" hidden>
+<p>Signed in as <strong id="si-who"></strong></p>
+<ul id="si-list"></ul>
+<button id="si-out" type="button" class="button">Sign out</button>
+</div>
+<p id="si-error" class="error" role="alert"></p>
+</div>
+</div>
+</section>
+</main>
+{{> footer}}
+<script src="/assets/signin.js" defer></script>
+</body>
+</html>
