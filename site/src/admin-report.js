@@ -5,8 +5,8 @@
 	var root = document.getElementById('reports');
 	if (!root) return;
 	var $ = function (id) { return document.getElementById(id); };
-	var NAMES = { direct: 'This website', airbnb: 'Airbnb', booking: 'Booking.com', manual: 'Entered by hand' };
-	var ORDER = ['direct', 'airbnb', 'booking', 'manual'];
+	var NAMES = { direct: 'This website', airbnb: 'Airbnb', booking: 'Booking.com', lodgify: 'Lodgify', manual: 'Entered by hand' };
+	var ORDER = ['direct', 'airbnb', 'booking', 'lodgify', 'manual']; // a channel the server does not report yet is skipped
 
 	var SAMPLE = {
 		totals: { bookings: 50, nights: 142 },
@@ -40,20 +40,21 @@
 	function render(r) {
 		var out = $('rp-out'); out.textContent = '';
 		var cards = el('ul', 'x-stats');
-		ORDER.forEach(function (k) {
+		var seen = ORDER.filter(function (k) { return r.channels[k]; });
+		seen.forEach(function (k) {
 			var c = r.channels[k], li = el('li'), box = el('div', 'x-stat x-stat--static');
 			box.append(el('strong', '', c.bookings), el('span', '', NAMES[k]));
 			li.append(box); cards.append(li);
 		});
 		out.append(cards);
-		out.append(el('h3', '', 'Where bookings came from'), table(['Source', 'Bookings', 'Nights', 'Share', 'Revenue'], ORDER.map(function (k) {
+		out.append(el('h3', '', 'Where bookings came from'), table(['Source', 'Bookings', 'Nights', 'Share', 'Revenue'], seen.map(function (k) {
 			var c = r.channels[k]; return [NAMES[k], c.bookings, c.nights, bar(c.share), k === 'direct' ? gbp(c.revenue) : 'Not reported'];
 		})));
 		out.append(el('p', 'note', 'Airbnb and Booking.com do not share what the guest paid in their calendar feeds, so revenue is shown for this website only.'));
-		out.append(el('h3', '', 'By home'), table(['Home', 'Bookings', 'Nights', 'This website', 'Airbnb', 'Booking.com', 'By hand'], r.homes.map(function (h) {
-			return [h.name, h.bookings, h.nights, h.byChannel.direct, h.byChannel.airbnb, h.byChannel.booking, h.byChannel.manual];
+		out.append(el('h3', '', 'By home'), table(['Home', 'Bookings', 'Nights', 'This website', 'Airbnb', 'Booking.com', 'Lodgify', 'By hand'], r.homes.map(function (h) {
+			return [h.name, h.bookings, h.nights, h.byChannel.direct, h.byChannel.airbnb, h.byChannel.booking, h.byChannel.lodgify || 0, h.byChannel.manual];
 		})));
-		out.append(el('h3', '', 'By month (check-in)'), r.months.length ? table(['Month', 'This website', 'Airbnb', 'Booking.com', 'By hand'], r.months.map(function (m) { return [m.month, m.direct, m.airbnb, m.booking, m.manual]; })) : el('p', 'note', 'No bookings in this range.'));
+		out.append(el('h3', '', 'By month (check-in)'), r.months.length ? table(['Month', 'This website', 'Airbnb', 'Booking.com', 'Lodgify', 'By hand'], r.months.map(function (m) { return [m.month, m.direct, m.airbnb, m.booking, m.lodgify || 0, m.manual]; })) : el('p', 'note', 'No bookings in this range.'));
 	}
 
 	var meta = document.querySelector('meta[name="lh-api"]');
@@ -95,7 +96,7 @@
 		call('/api/admin/sync-status').then(function (r) { return r.json(); }).then(function (rows) {
 			var box = $('rp-sync'); box.textContent = '';
 			box.append(table(['Home', 'Site', 'Feed', 'Last check'], rows.map(function (s) {
-				return [s.home, s.channel === 'airbnb' ? 'Airbnb' : 'Booking.com', !s.configured ? 'Not connected' : s.last && s.last.ok ? s.last.count + ' stays' : s.last ? 'Failed: ' + s.last.error : 'Waiting', s.last ? new Date(s.last.at).toLocaleString('en-GB') : '-'];
+				return [s.home, NAMES[s.channel] || s.channel, !s.configured ? 'Not connected' : s.last && s.last.ok ? s.last.count + ' stays' : s.last ? 'Failed: ' + s.last.error : 'Waiting', s.last ? new Date(s.last.at).toLocaleString('en-GB') : '-'];
 			})));
 		}).catch(function () { /* the report message already explains */ });
 	}
